@@ -14,7 +14,7 @@ function RegisterRoute() {
   const search = Route.useSearch()
   return (
     <>
-      <HomePage />
+      <HomePage search={{}} />
       <AuthDialog mode="cadastro" {...search} />
     </>
   )

@@ -90,6 +90,11 @@ export function MobileNav({ activeSection, className }: MobileNavProps) {
                   Meu perfil
                 </Link>
               </Button>
+              <Button asChild variant="outline" className="w-full">
+                <Link to="/favoritos" onClick={() => setOpen(false)}>
+                  Meus favoritos
+                </Link>
+              </Button>
               <Button
                 className="w-full"
                 disabled={logout.isPending}

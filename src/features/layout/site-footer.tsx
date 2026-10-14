@@ -15,12 +15,12 @@ const HIGHLIGHTS = [
   {
     letter: 'C',
     title: 'Criadores em destaque',
-    text: 'Conheça artistas, estúdios e comunidades que moldam a cultura digital da rede.',
+    text: 'Conheça artistas, estúdios e comunidades que moldam a cultura digital na rede.',
   },
   {
     letter: 'D',
     title: 'Alertas de lançamentos',
-    text: 'Receba calendários de cunhagem, novidades da lista de acesso e análises do mercado.',
+    text: 'Receba calendários de cunhagem, novidades de listas de acesso e análises do mercado.',
   },
 ] as const
 
@@ -37,7 +37,7 @@ const LINK_COLUMNS = [
       'Central de ajuda',
       'Como comprar NFTs',
       'Carteira e segurança',
-      'Políticas do mercado',
+      'Política do mercado',
       'Denunciar item',
     ],
   },

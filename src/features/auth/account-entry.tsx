@@ -57,6 +57,9 @@ export function AccountEntry() {
         <DropdownMenuItem asChild>
           <Link to="/perfil">Meu perfil</Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/favoritos">Meus favoritos</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem disabled={logout.isPending} onSelect={() => logout.mutate()}>
           Sair
         </DropdownMenuItem>

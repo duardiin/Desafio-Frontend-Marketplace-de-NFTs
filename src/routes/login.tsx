@@ -14,7 +14,7 @@ function LoginRoute() {
   const search = Route.useSearch()
   return (
     <>
-      <HomePage />
+      <HomePage search={{}} />
       <AuthDialog mode="login" {...search} />
     </>
   )
