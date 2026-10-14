@@ -170,7 +170,37 @@ Nenhuma das 42 combinações (14 telas × 3 larguras) tem overflow horizontal.
 - link "Pular para o conteúdo";
 - teclas de seta nas abas (Radix).
 
-## 8. Testes
+## 8. Login e cadastro no balão do Figma (ajuste final)
+
+**Origem:** print do frame de Login (`9:115`) enviado pelo usuário. Não houve chamada ao MCP, porque o limite do mês já tinha sido usado.
+
+**O que foi feito:**
+- **Um balão** de 500 × 600 px com as abas "Entrar | Criar conta".
+  - Centralizado, a até 192 px do topo, **sem escurecer a página** (o fundo segue visível, como no frame).
+  - Botão de fechar no canto e faixa laranja na base.
+  - Campos de 340 px só com placeholder, botão de 45 px e divisória "Ou continue com" de borda a borda.
+  - Ícones do Google e do Facebook exportados do próprio arquivo.
+- **Abre sobre a tela atual:** antes, "Entrar" navegava para `/login` e trocava a tela pela Início. Agora o header, o menu mobile e o coração (visitante) abrem o balão por cima do que estiver na tela, e fechar ou entrar mantém a página.
+- **Rotas mantidas:** `/login` e `/cadastro` continuam para acesso direto, rotas protegidas e sessão expirada. Nelas, as abas trocam de rota mantendo o `redirect`.
+- **Cadastro:** o frame `9:1022` não foi visto. Os 656 px dele fecham com nome, e-mail, senha e confirmação, sem "Esqueceu a senha?". A dica de senha forte saiu para respeitar a altura; a regra aparece na mensagem de erro.
+- **Fora do escopo:** "Esqueceu a senha?", Google e Facebook mantêm o visual, mas ficam "em breve" (`aria-disabled`, sem foco).
+
+**Acessibilidade:**
+- Os campos têm rótulo para leitores de tela.
+- O título do diálogo acompanha a aba ativa.
+- As abas seguem o padrão WAI-ARIA, com setas do teclado.
+- O foco inicial vai para o primeiro campo (antes ia para o "X").
+- O foco continua preso no balão, e Esc fecha.
+
+**Testes:**
+- **Balão sobre a tela atual:** abre sobre o carrinho e continua no carrinho depois de entrar.
+- **Abas:** troca por clique e por setas do teclado.
+- **"Em breve":** itens fora do escopo não aparentam funcionar.
+- **Abas na rota:** em `/login`, a troca de aba mantém o `redirect`.
+- **Visitante no favorito:** continua no NFT depois de entrar.
+- **Seletores:** os testes de senha passaram a usar `exact`, porque o campo ganhou o botão "Mostrar senha".
+
+## 9. Testes
 
 - **`profile.spec.ts` (desktop e mobile):**
   - edição de todos os campos, com persistência após refresh;
@@ -197,4 +227,4 @@ Nenhuma das 42 combinações (14 telas × 3 larguras) tem overflow horizontal.
 - **Tempo real:**
   - "edição esgotada por outra pessoa avisa";
   - "a própria compra não gera falso alarme".
-- **Resultado:** 151 E2E passando, duas vezes seguidas.
+- **Resultado:** 156 E2E passando, duas vezes seguidas (com o balão de login e a reconciliação na primeira conexão).

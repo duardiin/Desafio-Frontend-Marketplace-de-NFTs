@@ -255,3 +255,13 @@ Frame de 414 px com padding 40 (topo) × 24 e gap 16. Visual de app: **sem heade
   - selo "RARO" opcional (68 × 32, `primary`, 13 Medium `ink`) colado à esquerda, 16 px do topo;
   - nome 15 Regular e preço 16 Bold `text-accent`, com padding-left 8 e gap 8 da caixa.
 - **Tab bar** (126 px, fixa embaixo): fundo curvo `m-tabbar-bg.svg` (`surface-card`) com recorte no centro para o **botão central** de 65 px (`m-tabbar-center.svg`, ícone de leitura `m-scan-*.svg`). Ícones de 20 px: Início (`m-tab-home.svg`, ativo em `text-accent`), Favoritos (`m-tab-heart.svg`), Carrinho (`m-tab-cart.svg`) e Perfil (`m-tab-user.svg`), inativos em `text-secondary`.
+
+## Login · desktop (node `9:115`, a partir de print do frame, 14/10)
+
+Sem chamada ao MCP (limite atingido): medidas tiradas de um print 1:1 do frame.
+- **Balão** de 500 × 600, `surface-card`, sem raio e sem escurecer o fundo. Fica sobre a Início, centralizado na horizontal e ~192 px abaixo do topo. Faixa `primary` de 10 px na base. "X" de 14 px `primary` no canto superior direito.
+- **Abas** centralizadas (centro em y ≈ 59): "Entrar" (20, `text-accent`) | divisória vertical de 1 × 20 `primary` | "Criar conta" (20 Medium, `foreground`).
+- **Frase** "Entre para gerenciar sua carteira, coleção e perfil de criador." (13, `foreground`, centralizada, ~400 px, 2 linhas de 16).
+- **Campos** de 340 × 40 (x = 80), borda `border`, raio 3, só placeholder ("contato@email.com"). A senha tem o olho `icon-hide.svg`, e o campo em foco fica com borda `primary`. Gap de 12.
+- **"Esqueceu a senha?"** (14, `text-accent`) alinhado à direita; botão **Entrar** de 340 × 45, `primary`, 16 Bold `ink`.
+- **Divisória** de borda a borda com "Ou continue com" (13) ao centro. Botões **Continuar com Google** e **Continuar com Facebook** (340 × 40, borda `border`, ícone de 20 px, 13 Medium `text-secondary`, gap 12). Ícones: `login-google.svg` e `login-facebook.svg`.

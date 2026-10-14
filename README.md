@@ -13,7 +13,7 @@ Desafio frontend: marketplace de NFTs em React + TypeScript seguindo o Figma "Gr
 |---|---|
 | **Descoberta** | Início com hero, catálogo com busca, filtros, abas, ordenação e paginação na URL, destaque, promoções e blog. Detalhe do NFT com edições, galeria com zoom, avaliações e "Mais desta coleção". Início mobile com o layout próprio do Figma (busca no topo, grade desencontrada e tab bar). |
 | **Compra** | Carrinho de visitante e de conta (com mescla ao entrar), cupom e cotação da API. Pagamento com conexão de carteira simulada, revisão com revalidação, pedido idempotente, confirmação e recibo. |
-| **Conta** | Login e cadastro (em modal, com rota própria), favoritos, perfil (dados, nome ENS, avatar e troca de senha) e carteiras (principal e secundária). |
+| **Conta** | Login e cadastro no balão do Figma, aberto sobre a tela atual (com rotas próprias para acesso direto), favoritos, perfil (dados, nome ENS, avatar e troca de senha) e carteiras (principal e secundária). |
 | **Tempo real** | Preço, disponibilidade e status do pedido ao vivo pelo `socket.io-client`, ignorando duplicatas e eventos antigos e reconciliando com o REST depois de reconectar. |
 
 **Stack:** React 19, TypeScript, Vite, TanStack Router e Query, Axios, Socket.IO client, Tailwind CSS v4, shadcn/ui (Radix), MSW 2 com `@mswjs/socket.io-binding`, react-hook-form, zod, decimal.js, Playwright e Lighthouse.

@@ -66,7 +66,9 @@ lighthouse/        # configuração e relatórios da auditoria (versionados)
 - **Página do pedido:** também consulta a API a cada 15 s enquanto o pedido está pendente, como rede de segurança.
 
 ### Decisões de UX
-- **Login e cadastro** são modais sobre a tela atual, com rota própria (acesso direto e refresh). Ao entrar, o app volta para a tela pedida.
+- **Login e cadastro** seguem o "balão" do Figma (500 px, abas "Entrar | Criar conta", sem escurecer o fundo):
+  - O "Entrar" do header, do menu mobile e do coração (visitante) abre o balão **sobre a tela atual**. Fechar ou entrar mantém a página.
+  - As rotas `/login` e `/cadastro` continuam existindo para acesso direto, rotas protegidas e sessão expirada. Nelas, ao entrar, o app volta para a tela pedida (`redirect`).
 - **Confirmação de compra** fica na página do pedido (`/pedidos/<id>`), para sobreviver a refresh. Ela só aparece com o status "confirmado" vindo da simulação.
 - **Revisão antes de pagar:** o pagamento passa por uma revisão em diálogo, que revalida a cotação. Mudanças de valor aparecem lado a lado e exigem nova confirmação.
 - **Estados:**
@@ -215,6 +217,11 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 - **Divisória do header:** 1 px a 50% de opacidade em vez de 0,3 px, para renderização estável.
 - **Footer em 390/768:** mesma ordem e cores, com fluxo empilhado. Contato fictício exibido como texto, sem `mailto:`/`tel:`.
 - **Skip link** "Pular para o conteúdo" adicionado (não está no Figma).
+- **Login e cadastro** (`9:115` pelo print do frame; o cadastro `9:1022` não foi visto e segue o mesmo padrão, com nome, e-mail, senha e confirmação, compatível com os 656 px do frame):
+  - Os campos mostram só o placeholder, como no Figma, com rótulo para leitores de tela.
+  - "Esqueceu a senha?", Google e Facebook mantêm o visual, mas ficam "em breve" (fora do escopo).
+  - O foco inicial vai para o primeiro campo.
+  - A dica de senha forte saiu do cadastro para respeitar a altura do frame; a regra aparece na mensagem de erro.
 - **Header autenticado** (não extraído): o "Entrar" vira um botão com inicial e primeiro nome, que abre o menu da conta. Mantém o mesmo lugar e as mesmas medidas.
 - **Busca:** o Figma só tem a lupa. O campo abre num diálogo e a busca vira `?q=`, com um chip removível acima da grade.
 - **Filtros no mobile** num drawer "Filtros". Selecionado também com ✓ e negrito (no Figma, só cor).
