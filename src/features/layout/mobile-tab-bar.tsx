@@ -16,8 +16,14 @@ type TabPath = '/' | '/favoritos' | '/carrinho' | '/perfil'
 
 /**
  * Tab bar do Início mobile (Figma 14:5226), fixa embaixo abaixo de 768 px.
- * O fundo curvo é desenhado em três partes (lados + recorte central de
- * largura fixa) para o recorte não distorcer em larguras diferentes de 414.
+ *
+ * O fundo curvo é uma grade de três colunas que sempre cabe na largura da
+ * tela: lados flexíveis (`minmax(0, 1fr)`, podem encolher) e o recorte central,
+ * que vai de 112 px (telas de 320) a 152 px (414+, medida do Figma). O recorte
+ * fica sempre centralizado sob o botão. Os ícones mantêm as posições do frame:
+ * os de fora a ~24 px das bordas e os de dentro junto ao recorte.
+ *
+ * Embaixo, a área segura (barra de gestos do celular) recebe o mesmo fundo.
  */
 export function MobileTabBar() {
   const pathname = useLocation({ select: (location) => location.pathname })
@@ -27,21 +33,28 @@ export function MobileTabBar() {
   return (
     <nav
       aria-label="Atalhos"
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-[126px] pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 h-[calc(126px+env(safe-area-inset-bottom))] md:hidden"
     >
-      <div className="absolute inset-x-0 bottom-0 flex h-[95px] drop-shadow-[0_-10px_15px_rgba(10,6,4,0.45)]">
-        <div className="pointer-events-auto flex flex-1 items-start justify-start gap-7 rounded-tl-[29px] bg-surface-card pt-[29px] pl-6">
+      <div className="absolute inset-x-0 bottom-0 grid h-[calc(95px+env(safe-area-inset-bottom))] grid-cols-[minmax(0,1fr)_clamp(112px,36vw,152px)_minmax(0,1fr)] drop-shadow-[0_-10px_15px_rgba(10,6,4,0.45)]">
+        <div className="pointer-events-auto flex min-w-0 items-start justify-between rounded-tl-[29px] bg-surface-card pt-[31px] pl-[clamp(8px,6vw,24px)]">
           <TabLink to="/" label="Início" icon={homeIcon} iconSize={[16, 17]} active={pathname === '/'} />
           <TabLink to="/favoritos" label="Favoritos" icon={heartIcon} iconSize={[20, 18]} active={pathname === '/favoritos'} />
         </div>
-        {/* -mx-px: as partes se sobrepõem para não aparecer emenda entre elas. */}
-        <svg aria-hidden="true" width="152" height="95" viewBox="0 0 151.7 94.95" className="relative -mx-px shrink-0">
-          <path
-            d="M151.7 0C137.94 0 125.72 8.2 119.87 20.65C112.11 37.17 95.31 48.62 75.85 48.62C56.39 48.62 39.59 37.18 31.83 20.65C25.98 8.2 13.75 0 0 0V94.95H151.7Z"
-            fill="var(--surface-card)"
-          />
-        </svg>
-        <div className="pointer-events-auto flex flex-1 items-start justify-end gap-[18px] rounded-tr-[29px] bg-surface-card pt-[29px] pr-7">
+        <div aria-hidden="true" className="relative">
+          {/* -1 px de cada lado: as partes se sobrepõem para não aparecer emenda. */}
+          <svg
+            viewBox="0 0 151.7 94.95"
+            preserveAspectRatio="none"
+            className="absolute top-0 -left-px h-[95px] w-[calc(100%+2px)]"
+          >
+            <path
+              d="M151.7 0C137.94 0 125.72 8.2 119.87 20.65C112.11 37.17 95.31 48.62 75.85 48.62C56.39 48.62 39.59 37.18 31.83 20.65C25.98 8.2 13.75 0 0 0V94.95H151.7Z"
+              fill="var(--surface-card)"
+            />
+          </svg>
+          <div className="absolute inset-x-0 top-[94px] bottom-0 bg-surface-card" />
+        </div>
+        <div className="pointer-events-auto flex min-w-0 items-start justify-between rounded-tr-[29px] bg-surface-card pt-[31px] pr-[clamp(8px,6vw,24px)]">
           <TabLink
             to="/carrinho"
             label={count === 0 ? 'Carrinho, vazio' : `Carrinho, ${count} ${count === 1 ? 'item' : 'itens'}`}
@@ -89,7 +102,7 @@ function TabLink({ to, label, icon, iconSize: [width, height], active, badge = 0
       aria-label={label}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'relative grid size-11 place-items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+        'relative grid size-10 shrink-0 place-items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
         active ? 'text-highlight' : 'text-muted-foreground',
       )}
     >
