@@ -14,7 +14,7 @@ export function NotificationRegion() {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-4 bottom-4 z-60 flex flex-col items-end gap-2 sm:left-auto sm:w-[380px]"
+      className="pointer-events-none fixed inset-x-4 bottom-4 max-md:bottom-[134px] z-60 flex flex-col items-end gap-2 sm:left-auto sm:w-[380px]"
     >
       {notifications.map((item) => (
         <div

@@ -7,6 +7,8 @@ declare module '@tanstack/react-router' {
     navSection?: NavSection
     /** Mostra a divisória abaixo do header (Início, Perfil, Carteiras, Login, Cadastro). */
     headerDivider?: boolean
+    /** Header abaixo de 768 px. O Início mobile do Figma não tem header (busca no topo + tab bar). */
+    mobileHeader?: boolean
   }
 }
 

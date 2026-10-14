@@ -4,6 +4,7 @@ import type { NavSection } from '@/features/layout/navigation'
 interface RouteChrome {
   activeSection: NavSection | undefined
   headerDivider: boolean
+  mobileHeader: boolean
 }
 
 /**
@@ -18,5 +19,9 @@ export function useRouteChrome(): RouteChrome {
   const declared = staticData?.navSection
   const activeSection = declared === 'inicio' && hash === 'catalogo' ? 'mercado' : declared
 
-  return { activeSection, headerDivider: staticData?.headerDivider ?? true }
+  return {
+    activeSection,
+    headerDivider: staticData?.headerDivider ?? true,
+    mobileHeader: staticData?.mobileHeader ?? true,
+  }
 }

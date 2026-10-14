@@ -16,9 +16,8 @@ import { FiltersPanel } from '@/features/catalog/filters-panel'
 import { NftCard, NftCardSkeleton } from '@/features/catalog/nft-card'
 import { Pagination } from '@/features/catalog/pagination'
 import {
+  activeFilterCount,
   hasActiveFilters,
-  selectedCollections,
-  selectedNetworks,
   toApiParams,
   withFilter,
   type CatalogSearch,
@@ -32,17 +31,19 @@ interface CatalogSectionProps {
   search: CatalogSearch
   /** Banner "NFT em destaque" abaixo dos filtros (desktop). */
   aside?: ReactNode
+  /** Drawer "Filtros" (abaixo de 1024 px). Controlado pela Início: no mobile, quem abre é o botão do topo (Figma). */
+  filtersOpen: boolean
+  onFiltersOpenChange: (open: boolean) => void
 }
 
 /** Catálogo da Início: sidebar de filtros + abas, ordenação, grade e paginação. Todo o estado vem da URL. */
-export function CatalogSection({ search, aside }: CatalogSectionProps) {
+export function CatalogSection({ search, aside, filtersOpen, onFiltersOpenChange }: CatalogSectionProps) {
   const params = toApiParams(search)
   const catalog = useQuery(catalogQueryOptions(params))
   const data = catalog.data
   // Com placeholderData, a lista anterior fica visível enquanto a nova carrega.
   const isRefreshing = catalog.isPlaceholderData || (catalog.isFetching && !catalog.isPending)
-  const activeFilterCount =
-    selectedCollections(search).length + selectedNetworks(search).length + (search.precoMin || search.precoMax ? 1 : 0)
+  const filterCount = activeFilterCount(search)
 
   return (
     <section id="catalogo" aria-labelledby="catalogo-titulo" className="container-page scroll-mt-6">
@@ -60,14 +61,14 @@ export function CatalogSection({ search, aside }: CatalogSectionProps) {
           <CatalogToolbar search={search} />
 
           <div className="flex flex-wrap items-center gap-3">
-            <Sheet>
+            <Sheet open={filtersOpen} onOpenChange={onFiltersOpenChange}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 border-primary lg:hidden">
+                <Button variant="outline" size="sm" className="hidden gap-2 border-primary md:inline-flex lg:hidden">
                   <SlidersHorizontalIcon className="size-4" aria-hidden="true" />
                   Filtros
-                  {activeFilterCount > 0 && (
+                  {filterCount > 0 && (
                     <span className="rounded-full bg-primary px-1.5 text-caption-12 text-ink">
-                      {activeFilterCount}
+                      {filterCount}
                       <span className="sr-only"> ativos</span>
                     </span>
                   )}
@@ -153,7 +154,8 @@ export function CatalogSection({ search, aside }: CatalogSectionProps) {
             <ul
               aria-busy={isRefreshing}
               className={cn(
-                'grid grid-cols-2 gap-x-4 gap-y-10 transition-opacity sm:grid-cols-3 sm:gap-x-6 lg:gap-y-[72px]',
+                // Mobile (Figma): duas colunas desencontradas, a direita 32 px abaixo.
+                'grid grid-cols-2 gap-x-4 gap-y-6 transition-opacity max-md:pb-8 max-md:[&>li:nth-child(even)]:translate-y-8 sm:grid-cols-3 sm:gap-x-6 md:gap-y-10 lg:gap-y-[72px]',
                 isRefreshing && 'opacity-60',
               )}
             >
@@ -192,7 +194,7 @@ function CatalogSkeleton() {
       <span role="status" className="sr-only">
         Carregando catálogo…
       </span>
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 sm:gap-x-6 lg:gap-y-[72px]">
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-6 max-md:pb-8 max-md:[&>li:nth-child(even)]:translate-y-8 sm:grid-cols-3 sm:gap-x-6 md:gap-y-10 lg:gap-y-[72px]">
         {Array.from({ length: PAGE_SIZE }, (_, index) => (
           <li key={index}>
             <NftCardSkeleton />

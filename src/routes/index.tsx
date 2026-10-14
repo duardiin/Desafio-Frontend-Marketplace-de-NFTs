@@ -3,7 +3,7 @@ import { validateCatalogSearch } from '@/features/catalog/search-params'
 import { HomePage } from '@/features/home/home-page'
 
 export const Route = createFileRoute('/')({
-  staticData: { navSection: 'inicio', headerDivider: true },
+  staticData: { navSection: 'inicio', headerDivider: true, mobileHeader: false },
   validateSearch: validateCatalogSearch,
   component: HomeRoute,
 })

@@ -2,6 +2,7 @@ import { useMutationState } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { HeartIcon } from 'lucide-react'
 import heartIcon from '@/assets/figma/icon-heart.svg'
+import mobileHeartIcon from '@/assets/figma/m-fav-outline.svg'
 import type { NftSummary } from '@/api/contracts/nfts'
 import { Button } from '@/components/ui/button'
 import { useCurrentUser } from '@/features/auth/session-query'
@@ -47,11 +48,21 @@ export function FavoriteButton({ nft, variant, className }: FavoriteButtonProps)
         aria-pressed={isFavorite}
         aria-label={isFavorite ? `Remover ${nft.name} dos favoritos` : `Favoritar ${nft.name}`}
         className={cn(
-          'grid size-9 place-items-center rounded-full border border-border bg-surface-dark/90 text-highlight transition-colors hover:bg-surface-dark',
+          // Mobile (Figma 14:5226): círculo de 28 px `surface-raised` com coração `primary`;
+          // a área de toque continua com 44 px (pseudo-elemento).
+          'relative grid size-9 place-items-center rounded-full border border-border bg-surface-dark/90 text-highlight transition-colors hover:bg-surface-dark max-md:size-7 max-md:bg-surface-raised max-md:text-primary max-md:after:absolute max-md:after:-inset-2 max-md:after:content-[""]',
+          !isFavorite && 'max-md:border-0 max-md:bg-transparent',
           className,
         )}
       >
-        <HeartIcon className={cn('size-[18px]', isFavorite && 'fill-current')} aria-hidden="true" />
+        {isFavorite ? (
+          <HeartIcon className="size-[18px] fill-current max-md:size-[15px]" aria-hidden="true" />
+        ) : (
+          <>
+            <HeartIcon className="size-[18px] max-md:hidden" aria-hidden="true" />
+            <img src={mobileHeartIcon} alt="" width={28} height={28} className="hidden max-md:block" />
+          </>
+        )}
       </button>
     )
   }

@@ -96,3 +96,8 @@ export function toggleInList(current: string | undefined, value: string): string
 export function hasActiveFilters(search: CatalogSearch): boolean {
   return Boolean(search.q || search.colecao || search.rede || search.precoMin || search.precoMax || search.aba)
 }
+
+/** Filtros ativos (coleções, redes e faixa de preço), para o contador dos botões "Filtros". */
+export function activeFilterCount(search: CatalogSearch): number {
+  return selectedCollections(search).length + selectedNetworks(search).length + (search.precoMin || search.precoMax ? 1 : 0)
+}

@@ -10,10 +10,10 @@ import { Wordmark } from '@/features/layout/wordmark'
 import { cn } from '@/lib/utils'
 
 export function SiteHeader() {
-  const { activeSection, headerDivider } = useRouteChrome()
+  const { activeSection, headerDivider, mobileHeader } = useRouteChrome()
 
   return (
-    <header className="container-page pt-6">
+    <header className={cn('container-page pt-6', !mobileHeader && 'max-md:hidden')}>
       <div className="flex h-[45px] items-center justify-between gap-4">
         <Wordmark className="lg:w-40" />
 
