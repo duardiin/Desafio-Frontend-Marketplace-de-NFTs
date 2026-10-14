@@ -56,6 +56,25 @@ Detalhe completo e motivos em [`docs/04-DECISOES-P1.md`](docs/04-DECISOES-P1.md)
 - **Skeleton** com shimmer (não pulse). É `aria-hidden` e não tem dimensões padrão. Com `prefers-reduced-motion`, fica estático. Há também uma regra global de movimento reduzido.
 - **Fora do escopo** (Criadores, Aprenda, links editoriais do footer, redes sociais, newsletter): visual do Figma mantido, mas marcados como "em breve" (`aria-disabled`), sem aparentar sucesso.
 
+### Contratos e mocks (P2)
+Os contratos estão em [`docs/contratos-api.md`](docs/contratos-api.md), os cenários no [README](README.md#cenários-e-reset-dos-mocks) e o detalhe das decisões em [`docs/05-DECISOES-P2.md`](docs/05-DECISOES-P2.md).
+
+- **Contratos como tipos TypeScript** em `src/api/contracts`, compartilhados entre o cliente e os handlers do MSW. Assim, uma mudança no contrato quebra os dois lados na compilação. Não valido as respostas com zod em runtime: a origem é o próprio MSW, tipado pelos mesmos contratos. O zod fica para formulários e env.
+- **"Servidor" simulado em `src/mocks`**, organizado como um backend:
+  - `db/` guarda o estado, persistido no `localStorage` com `schemaVersion`;
+  - `fixtures/` traz os dados iniciais;
+  - `domain/` tem as regras de cotação, carrinho e liquidação;
+  - `handlers/` traz um arquivo por recurso.
+  
+  Nenhum dado fictício existe fora dessa pasta.
+- **Cotação com id derivado do conteúdo** (hash dos preços, quantidades, cupom e taxa). O pedido envia o `quoteId`. Se algo mudou, o servidor responde 409 `QUOTE_OUTDATED`. Isso implementa "a cotação da API é a referência do checkout" sem guardar cotações no servidor.
+- **Idempotência por `Idempotency-Key` + hash do corpo**: mesma chave e mesmo corpo recuperam o pedido; corpo diferente é conflito. O mapa fica persistido, então a regra vale também depois de um refresh.
+- **Liquidação do pagamento por prazo (`settleAt`)**, e não só por timer. O timer resolve no tempo esperado, e qualquer consulta ao pedido também resolve os vencidos. Com isso, um pedido pendente não fica preso se a página recarregar no meio.
+- **Cenários globais só para condições de rede e falhas**. Os casos de negócio (cupons, NFT esgotado, e-mail já cadastrado) vêm dos dados e funcionam em qualquer cenário. O cenário fica no `sessionStorage` (por aba). Assim, cada teste do Playwright parte de um contexto limpo, com dados iniciais e cenário próprio.
+- **Controles da simulação em `window.__kurioMock`**, só com mocks ativos. Servem para os testes dispararem mudanças "do servidor" (preço, disponibilidade, expiração), que se refletem no REST e, no bloco de tempo real, nos eventos. A UI nunca usa esses controles.
+- **Senhas:** o servidor simulado guarda só o salt e o SHA-256 (`crypto.subtle`). As fixtures trazem o hash pré-calculado. Um teste E2E confere que a senha de um cadastro não aparece no estado persistido.
+- **Bootstrap:** o worker do MSW sobe antes do primeiro render, em chunk carregado sob demanda. Sem isso, as primeiras requisições escapariam do mock.
+
 ## Desvios do Figma
 
 - **Header mobile:** frame não extraído. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
@@ -68,5 +87,9 @@ Detalhe completo e motivos em [`docs/04-DECISOES-P1.md`](docs/04-DECISOES-P1.md)
 - `npm run lighthouse` ainda não audita: o runner é implementado no bloco P9 e, por enquanto, sai com código 1 e uma mensagem explícita (não simula sucesso).
 - Playwright usa o servidor de desenvolvimento. Regressão visual, relógio controlado e cenários por teste entram no P9.
 - Busca, carrinho e "Entrar" do header estão "em breve" até P3/P4/P5 criarem as rotas: com o roteamento tipado, um link para rota inexistente não compila.
-- Bundle inicial de ~516 KB (161 KB gzip) num chunk só. A otimização fica para o P9.
+- Bundle inicial de ~600 KB (185 KB gzip). O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
+- **Limitações do ambiente de mocks:**
+  - O estado vive no `localStorage` de cada navegador, então duas abas compartilham os dados, mas dois navegadores não.
+  - A liquidação dos pedidos usa o relógio do navegador.
+  - O hash de senha é SHA-256 simples, sem PBKDF2/bcrypt, por ser uma simulação.
 - O teste E2E do skeleton com movimento reduzido entra no P4, junto com o catálogo. No P1 o CSS foi validado no navegador.
