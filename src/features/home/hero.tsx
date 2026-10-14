@@ -41,7 +41,7 @@ function DesktopHero() {
       <div className="flex flex-col-reverse gap-8 bg-surface-card p-6 md:flex-row md:items-center md:justify-between md:gap-6 md:p-0 md:pl-10">
         <div className="flex max-w-[600px] flex-col gap-4 md:py-10">
           <p className="text-body-14 font-medium tracking-brand text-foreground">Bem-vindo à Kurio</p>
-          <h1 id="hero-titulo" className="text-heading-28 font-bold uppercase md:text-[34px] md:leading-[52px] xl:text-display">
+          <h1 id="hero-titulo" className="text-heading-28 font-bold uppercase md:text-[26px] md:leading-10 lg:text-[34px] lg:leading-[52px] xl:text-display">
             Seja dono do futuro
             <br /> da arte digital
           </h1>

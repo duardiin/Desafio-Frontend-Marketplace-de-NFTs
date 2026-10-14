@@ -11,12 +11,13 @@ export function NftInfoTabs({ nft }: { nft: NftDetail }) {
 
   return (
     <Tabs defaultValue="detalhes" className="gap-6">
-      <div className="border-b border-primary/50">
-        <TabsList variant="line" className="h-auto flex-wrap justify-start gap-x-8 gap-y-3 p-0">
-          <TabsTrigger value="detalhes" className="flex-none px-0 pb-3 text-body-17">
+      {/* Uma linha só: no mobile as abas rolam na horizontal (como as do catálogo) em vez de quebrar. */}
+      <div className="overflow-x-auto border-b border-primary/50">
+        <TabsList variant="line" className="h-auto w-max justify-start gap-x-6 p-0 md:gap-x-8">
+          <TabsTrigger value="detalhes" className="flex-none px-0 pb-3 text-body-15 md:text-body-17">
             Detalhes do NFT
           </TabsTrigger>
-          <TabsTrigger value="avaliacoes" className="flex-none px-0 pb-3 text-body-17">
+          <TabsTrigger value="avaliacoes" className="flex-none px-0 pb-3 text-body-15 md:text-body-17">
             Avaliações de colecionadores ({nft.rating.count})
           </TabsTrigger>
         </TabsList>

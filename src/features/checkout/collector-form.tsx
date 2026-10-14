@@ -44,6 +44,7 @@ export function CollectorForm({ form, wallets }: CollectorFormProps) {
           required
           readOnly
           value={wallet?.address ?? ''}
+          title={wallet?.address}
           placeholder="Endereço 0x da carteira"
           hint="Preenchido pela carteira escolhida."
         />

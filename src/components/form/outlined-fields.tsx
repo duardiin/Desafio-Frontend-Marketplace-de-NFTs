@@ -6,7 +6,8 @@ import { cn } from '@/lib/utils'
 
 /** Campos do Pagamento, Perfil e Carteiras (Figma): altura 40, borda 1 px `border`, raio 3, fundo transparente. */
 export const CONTROL =
-  'h-10 w-full rounded-[3px] border border-border bg-transparent px-3 text-body-16 text-foreground placeholder:text-subtle focus-visible:border-ring aria-invalid:border-destructive disabled:opacity-60 md:text-body-14'
+  // Campos só leitura (ex.: endereço da carteira) cortam com "…" em vez de sumir na borda.
+  'h-10 w-full rounded-[3px] border border-border bg-transparent px-3 read-only:text-ellipsis text-body-16 text-foreground placeholder:text-subtle focus-visible:border-ring aria-invalid:border-destructive disabled:opacity-60 md:text-body-14'
 
 export interface FieldShellProps {
   label: string
