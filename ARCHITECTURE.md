@@ -154,7 +154,8 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 
 ## Desvios do Figma
 
-- **Header mobile:** frame não extraído. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
+- **Início mobile** (`14:5226`, extraído no P8): abaixo de 768 px, o Início não tem header, como no frame. No lugar dele há busca e filtros no topo e tab bar fixa (presente em todas as telas mobile). O botão central da tab bar fica só visual (função não definida) e o selo "RARO" vem do atributo do NFT. Detalhes em docs/11.
+- **Header mobile nas demais telas:** sem frame. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
 - **Divisória do header:** 1 px a 50% de opacidade em vez de 0,3 px, para renderização estável.
 - **Footer em 390/768:** mesma ordem e cores, com fluxo empilhado. Contato fictício exibido como texto, sem `mailto:`/`tel:`.
 - **Skip link** "Pular para o conteúdo" adicionado (não está no Figma).
@@ -176,7 +177,7 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 - `npm run lighthouse` ainda não audita: o runner é implementado no bloco P9 e, por enquanto, sai com código 1 e uma mensagem explícita (não simula sucesso).
 - Playwright usa o servidor de desenvolvimento. Regressão visual, relógio controlado e cenários por teste entram no P9.
 - Carteiras não podem ser excluídas (a API simulada só tem cadastro e edição; o enunciado pede principal e secundária).
-- Bundle inicial de ~362 KB (114 KB gzip) no P8, depois do code-splitting por rota. O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
+- Bundle inicial de ~379 KB (120 KB gzip) no P8, depois do code-splitting por rota. O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
 - **Limitações do tempo real simulado:**
   - não há rooms nem namespaces (filtro por usuário feito à mão);
   - não há long-polling;

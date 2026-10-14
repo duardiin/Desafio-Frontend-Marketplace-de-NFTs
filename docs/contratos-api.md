@@ -53,7 +53,7 @@ Parâmetros de `/nfts` (as listas repetem a chave):
 | `sort` | `recentes` (padrão), `preco-asc`, `preco-desc`, `populares` |
 | `page` | ≥ 1. São 9 itens por página. |
 
-Edições: cada NFT tem `editions: EditionOption[]`, com `{ id: "1-1" | "1-10" | "1-50" | "aberta", label, supply, available }`. Em edição aberta, `supply` e `available` são `null` (sem limite de tiragem; vale só o `maxPerOrder` do NFT). Na listagem, `soldOut` é `true` quando todas as edições estão esgotadas.
+Edições: cada NFT tem `editions: EditionOption[]`, com `{ id: "1-1" | "1-10" | "1-50" | "aberta", label, supply, available }`. Em edição aberta, `supply` e `available` são `null` (sem limite de tiragem; vale só o `maxPerOrder` do NFT). Na listagem, `soldOut` é `true` quando todas as edições estão esgotadas, e `rare` é `true` quando o NFT tem o atributo "Raro" ou "Lendário" (selo do card mobile).
 
 O detalhe traz também `description`, `story` (parágrafos), `creator`, `series`, `tokenId`, `attributes`, `royaltyPercent`, `gallery`, `maxPerOrder`, `rating { average, count }`, `reviews` (as 3 mais recentes), `contractAddress`, `tokenStandard`, `listedAt` e `favoritesCount`.
 

@@ -241,3 +241,17 @@ Header com **"Início" ativo e com divisória** (o mesmo das Carteiras). Corpo c
 - Botão **Salvar** (131 × 40, `primary`, raio 3, 14 Bold `ink`) ao fim do formulário, um só para os dados e a senha.
 
 Diferenças em relação ao contrato do P2: o design tem **Nome ENS** e **Apelido da carteira** (obrigatórios) e **não tem bio**.
+
+## Início · mobile (node `14:5226`, extraído em 14/10, 6ª e última chamada ao MCP do mês)
+
+Frame de 414 px com padding 40 (topo) × 24 e gap 16. Visual de app: **sem header nem footer** no frame, com **tab bar fixa** embaixo. Ícones em `src/assets/figma/m-*.svg`.
+
+- **Barra de busca** (45 px): campo `surface-card` (raio 10, padding 12, lupa `m-search.svg` 22 px + "Explorar coleções" 14 Bold `secondary`) e, 8 px à direita, **botão de filtros** 45 × 45 (raio 14, gradiente 137° `rgba(210,138,76,.45)` → `#D28A4C`, ícone `m-filter.svg` em `ink`).
+- **Hero compacto** (190 px, raio 12, padding 16; fundo `m-hero-mask.svg`, círculos decorativos): à esquerda, "Bem-vindo à Kurio" (12 Medium), "SEJA DONO DA / CULTURA DIGITAL" (18 Bold, lh 29, largura 190), "Descubra NFTs selecionados de criadores do mundo todo." (12/18 `text-secondary`) e "EXPLORAR" (12 Bold `text-accent` + seta `m-arrow-right.svg` 16 px, gap 8). À direita, arte de 138 px (raio 16) com uma segunda arte de 58 px sobreposta no canto inferior esquerdo (ml 14, mt 88). Pontos `m-hero-dots.svg` (33 × 7) centralizados embaixo.
+- **Abas** (gap 4 / 16): "Todos os NFTs" (14 Bold `text-accent`, sublinhado 2 px `primary` via `m-tab-underline.svg`), "Novos lançamentos" e "Em alta" (14 Regular).
+- **Grade em duas colunas desencontradas** (`justify-between`; coluna direita com `pt-32`; gap vertical 24). Card de 175 px:
+  - caixa de 200 px, raio 20, gradiente 139,5° `#241612` → `#2F1D15`, arte de 168 px (raio 16);
+  - favorito em círculo de 28 px no canto superior direito (`m-fav-outline.svg`: fundo `surface-raised`, borda `border`, coração `primary`; os dois corações do frame são iguais, então o favoritado usa o coração preenchido);
+  - selo "RARO" opcional (68 × 32, `primary`, 13 Medium `ink`) colado à esquerda, 16 px do topo;
+  - nome 15 Regular e preço 16 Bold `text-accent`, com padding-left 8 e gap 8 da caixa.
+- **Tab bar** (126 px, fixa embaixo): fundo curvo `m-tabbar-bg.svg` (`surface-card`) com recorte no centro para o **botão central** de 65 px (`m-tabbar-center.svg`, ícone de leitura `m-scan-*.svg`). Ícones de 20 px: Início (`m-tab-home.svg`, ativo em `text-accent`), Favoritos (`m-tab-heart.svg`), Carrinho (`m-tab-cart.svg`) e Perfil (`m-tab-user.svg`), inativos em `text-secondary`.

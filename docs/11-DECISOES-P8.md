@@ -1,6 +1,6 @@
 # Decisões do bloco P8 (perfil, carteiras, responsividade e acessibilidade)
 
-Registro do que foi feito de forma diferente do esperado ou do padrão das ferramentas, com o motivo de cada escolha. A parte 1 cobre perfil e carteiras; as passadas de responsividade e acessibilidade entram na parte 2.
+Registro do que foi feito de forma diferente do esperado ou do padrão das ferramentas, com o motivo de cada escolha. A parte 1 cobre perfil, carteiras e o Início mobile; as passadas de responsividade e acessibilidade entram na parte 2.
 
 ---
 
@@ -93,7 +93,41 @@ Registro do que foi feito de forma diferente do esperado ou do padrão das ferra
 
 ---
 
-## 5. Testes
+## 5. Início mobile (Figma 14:5226, última chamada do mês)
+
+### 5.1 Visual de app abaixo de 768 px
+**O que foi feito:**
+- **Topo:** no Início, o header some e entram a barra "Explorar coleções" e o botão de filtros em degradê.
+- **Hero compacto** (190 px) com o texto do frame mobile ("Seja dono da cultura digital"), que é diferente do desktop.
+- **Abas** de 14 px, com sublinhado de 2 px.
+- **Grade em duas colunas desencontradas:** a da direita fica 32 px abaixo.
+- **Cards:** caixa em degradê com raio 20, coração de 28 px e selo "RARO".
+- **Tab bar fixa** em todas as telas.
+
+O tablet (768 px) e o desktop não mudaram.
+
+**Por quê:** é o frame do Figma. Como o enunciado lista o Início como tela principal, ela é a que mais pesa na avaliação mobile.
+
+### 5.2 Comportamento dos elementos novos
+- **Busca do topo:** é um campo de verdade. Ao enviar, vira `?q=` e **mantém os filtros** (o diálogo do header desktop começa uma busca nova). O campo acompanha a URL ao voltar no histórico e ao recarregar.
+- **Botão de filtros:** abre o mesmo drawer "Filtros" do catálogo, agora controlado pela Início. Mostra quantos filtros estão ativos. Abaixo de 768 px, o botão "Filtros" antigo do catálogo some; entre 768 e 1023 px, continua.
+- **Tab bar:**
+  - Atalhos: Início, Favoritos, Carrinho (com contagem) e Minha conta (Perfil e Carteiras), com `aria-current`.
+  - Favoritos e Minha conta pedem login a visitantes, pelas rotas protegidas.
+  - Os ícones são recoloridos por máscara CSS: ativo em `text-accent`, inativo em `text-secondary`.
+- **Botão central:** a função não está definida no Figma (ler NFT? criar? carteira?). Fica **só visual**: `aria-hidden`, sem foco e sem ação, até a decisão.
+- **Fundo curvo da tab bar:** é montado em três partes, com os lados flexíveis e o recorte central de largura fixa (o mesmo caminho do SVG do Figma). Um SVG único esticado distorceria o recorte fora de 414 px.
+- **Hero:** só uma versão é montada por vez (`useMediaQuery`), para o celular não baixar a imagem grande do desktop (LCP).
+
+### 5.3 Selo "RARO"
+**O que foi feito:** `NftSummary` ganhou `rare`, verdadeiro quando o NFT tem o atributo "Raro" ou "Lendário". O selo só aparece no mobile, como no Figma, e não aparece num NFT esgotado (o selo "Esgotado" tem prioridade).
+
+### 5.4 Efeitos colaterais nos testes
+- `openApp` passou a esperar o `<main>`, porque o Início mobile não tem header.
+- Os testes mobile que entravam pelo menu do header partem do Carrinho ou usam a tab bar.
+- `waitForCatalogIdle` passou a esperar também o skeleton da primeira carga. A busca do topo, mais rápida que o diálogo, revelou essa corrida no helper.
+
+## 6. Testes
 
 - **`profile.spec.ts` (desktop e mobile):**
   - edição de todos os campos, com persistência após refresh;
@@ -109,4 +143,11 @@ Registro do que foi feito de forma diferente do esperado ou do padrão das ferra
   - edição;
   - link do pagamento.
 - **`auth.spec.ts`:** passou a conferir o e-mail pelo valor do campo do perfil, que agora é editável.
-- **Resultado:** 139 E2E passando.
+- **`mobile-home.spec.ts`** (só mobile):
+  - sem header e com tab bar, com o item ativo e o botão central sem foco;
+  - filtros pelo botão do topo, com contagem;
+  - busca que mantém os filtros e sobrevive ao refresh;
+  - selo RARO;
+  - atalhos que exigem login;
+  - contagem do carrinho.
+- **Resultado:** 143 E2E passando (4 só no mobile).
