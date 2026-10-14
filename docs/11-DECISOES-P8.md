@@ -116,7 +116,9 @@ O tablet (768 px) e o desktop não mudaram.
   - Favoritos e Minha conta pedem login a visitantes, pelas rotas protegidas.
   - Os ícones são recoloridos por máscara CSS: ativo em `text-accent`, inativo em `text-secondary`.
 - **Botão central:** a função não está definida no Figma (ler NFT? criar? carteira?). Fica **só visual**: `aria-hidden`, sem foco e sem ação, até a decisão.
-- **Fundo curvo da tab bar:** é montado em três partes, com os lados flexíveis e o recorte central de largura fixa (o mesmo caminho do SVG do Figma). Um SVG único esticado distorceria o recorte fora de 414 px.
+- **Fundo curvo da tab bar:** é uma grade de três colunas que sempre cabe na tela. Os lados podem encolher (`minmax(0, 1fr)`) e o recorte central (o mesmo caminho do SVG do Figma) vai de 112 px, em telas de 320, a 152 px, a partir de 414.
+  - **Correção feita depois de teste em celulares reais:** na primeira versão, o recorte tinha largura fixa e os lados não encolhiam abaixo dos ícones. Em telas de 360 px, a barra passava da borda (o ícone de perfil ficava cortado) e o recorte saía de baixo do botão central. Os testes em 390 e 414 px não mostravam isso.
+  - **Teste novo:** em 320, 360, 375, 390 e 414 px, confere que todos os ícones ficam dentro da tela e que o recorte está centralizado sob o botão. Foi confirmado contra o código antigo, que falha em 320 px.
 - **Hero:** só uma versão é montada por vez (`useMediaQuery`), para o celular não baixar a imagem grande do desktop (LCP).
 
 ### 5.3 Selo "RARO"
