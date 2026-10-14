@@ -81,4 +81,11 @@ npm run test:e2e     # Playwright (desktop 1440 e mobile 390)
 npm run lighthouse   # auditoria (implementada no bloco final)
 ```
 
+## Como reproduzir os fluxos de sessão
+
+- **Rota protegida:** abra `/perfil` sem sessão. O app vai para o login e, depois de entrar, volta para `/perfil`.
+- **Expiração durante o uso:** entre, abra `/perfil` e rode `window.__kurioMock.expireSessions()` no console. Na próxima navegação para uma rota privada (ou no refresh), o app avisa e pede login, voltando à mesma tela.
+- **Expiração com a tela aberta:** use `/?cenario=sessao-expirada`. As sessões novas duram 30 s e o app reage sozinho ao vencer.
+- **Troca de usuário:** entre como Ana, saia e entre como Bruno. Nenhum dado da Ana aparece. Com duas abas abertas, entrar ou sair numa aba atualiza a outra.
+
 O relatório HTML do Playwright fica em `playwright-report/`, e os traces das falhas em `test-results/`.

@@ -75,18 +75,38 @@ Os contratos estão em [`docs/contratos-api.md`](docs/contratos-api.md), os cen�
 - **Senhas:** o servidor simulado guarda só o salt e o SHA-256 (`crypto.subtle`). As fixtures trazem o hash pré-calculado. Um teste E2E confere que a senha de um cadastro não aparece no estado persistido.
 - **Bootstrap:** o worker do MSW sobe antes do primeiro render, em chunk carregado sob demanda. Sem isso, as primeiras requisições escapariam do mock.
 
+### Sessão e rotas protegidas (P3)
+Detalhe completo em [`docs/06-DECISOES-P3.md`](docs/06-DECISOES-P3.md).
+
+- **Política de sessão:**
+  - O token é opaco, tem validade e fica no `localStorage`, porque o MSW não emite cookie `httpOnly`.
+  - O interceptor do Axios envia o token. A senha nunca é persistida.
+  - A sessão é a query `['session']` (`null` = visitante).
+- **Expiração** é detectada em três pontos:
+  - guard das rotas privadas, que revalida na API a cada navegação;
+  - 401 em qualquer chamada autenticada;
+  - timer no `expiresAt`.
+  
+  Nos três casos, o app encerra a sessão local, avisa e, se estiver numa rota privada, vai para `/login?redirect=<href atual>&motivo=expirada`.
+- **Rotas privadas** ficam sob o layout `_auth`. O `redirect` só aceita caminhos internos (sem open redirect) e o login devolve à tela pedida, com os search params.
+- **Isolamento:** dados privados usam `['private', userId, ...]`. Login, logout, expiração e troca de usuário em outra aba (evento `storage`) cancelam as requisições e removem todo o cache privado.
+- **Login e Cadastro** são modais (Radix Dialog) sobre a Início, com rota própria para acesso direto.
+- **Avisos acessíveis:** região `aria-live` própria, chamável fora do React. Evita adicionar o `sonner`, que está fora da lista de dependências.
+
 ## Desvios do Figma
 
 - **Header mobile:** frame não extraído. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
 - **Divisória do header:** 1 px a 50% de opacidade em vez de 0,3 px, para renderização estável.
 - **Footer em 390/768:** mesma ordem e cores, com fluxo empilhado. Contato fictício exibido como texto, sem `mailto:`/`tel:`.
 - **Skip link** "Pular para o conteúdo" adicionado (não está no Figma).
+- **Header autenticado** (não extraído): o "Entrar" vira um botão com inicial e primeiro nome, que abre o menu da conta. Mantém o mesmo lugar e as mesmas medidas.
+- **Avisos (toasts):** estado não desenhado. Seguem `surface-card`, raio 8 e borda por tom, com prefixo "Erro:" nos erros.
 
 ## Limitações conhecidas (até agora)
 
 - `npm run lighthouse` ainda não audita: o runner é implementado no bloco P9 e, por enquanto, sai com código 1 e uma mensagem explícita (não simula sucesso).
 - Playwright usa o servidor de desenvolvimento. Regressão visual, relógio controlado e cenários por teste entram no P9.
-- Busca, carrinho e "Entrar" do header estão "em breve" até P3/P4/P5 criarem as rotas: com o roteamento tipado, um link para rota inexistente não compila.
+- Busca e carrinho do header estão "em breve" até P4/P5 criarem as rotas: com o roteamento tipado, um link para rota inexistente não compila. O "Entrar" funciona desde o P3.
 - Bundle inicial de ~600 KB (185 KB gzip). O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
 - **Limitações do ambiente de mocks:**
   - O estado vive no `localStorage` de cada navegador, então duas abas compartilham os dados, mas dois navegadores não.

@@ -23,9 +23,9 @@ Prazo: `16/10 às 09:14h` (fechamento a partir de 16/10 06:14). Reserve as **úl
 ### Bloco 2 · Contratos, MSW e sessão (~4h) · prompts P2, P3
 - [x] Tipos dos contratos REST e dos erros (validação, sessão inválida, permissão, inexistente, conflito, transitória)
 - [x] MSW: handlers, fixtures (catálogo variado, **2 usuários**), estado persistido, **reset**, cenários por configuração
-- [ ] Cadastro, login, logout, sessão após refresh, expiração, rotas protegidas, retorno ao fluxo anterior
-- [ ] Limpeza de cache privado ao logout/troca de usuário
-- [ ] E2E: cadastro/login/logout/troca de usuário
+- [x] Cadastro, login, logout, sessão após refresh, expiração, rotas protegidas, retorno ao fluxo anterior
+- [x] Limpeza de cache privado ao logout/troca de usuário
+- [x] E2E: cadastro/login/logout/troca de usuário
 - **Pronto quando:** dois usuários logam, sessão sobrevive ao refresh, cache não vaza entre eles.
 
 ### Bloco 3 · Descoberta e carrinho (~5h) · prompts P4, P5
@@ -83,7 +83,7 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 | Bloco | Início | Fim | Status | Observações / o que ficou de fora |
 |---|---|---|---|---|
 | 1 Fundação | 14/10 | 14/10 | Concluído | Setup, P0, tokens e P1 concluídos (tema, layout, nav mobile, 404, skeleton, Router file-based, Query, Axios + ApiError; 17 E2E passando). Decisões em docs/04-DECISOES-P1.md. Deploy conferido (fonte local, 404 em acesso direto, sem overflow em 390). Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
-| 2 Contratos, MSW, sessão | 14/10 | | Em andamento | P2 concluído: contratos tipados, MSW com 47 NFTs, 2 usuários, 15 cenários, reset, idempotência e liquidação de pedidos; 16 E2E de contrato. Docs em docs/contratos-api.md e README. Falta P3 (sessão na UI). |
+| 2 Contratos, MSW, sessão | 14/10 | 14/10 | Concluído | P2: contratos tipados, MSW com 47 NFTs, 2 usuários, 15 cenários, reset, idempotência e liquidação de pedidos (16 E2E). P3: login/cadastro em modal com rota, sessão por token, expiração em 3 pontos, rotas protegidas com retorno, cache privado por usuário, avisos aria-live (9 E2E × desktop/mobile). Decisões em docs/05 e docs/06. Perfil só leitura até o P8. |
 | 3 Descoberta e carrinho | | | | |
 | 4 Compra e tempo real | | | | |
 | 5 Conta, qualidade, entrega | | | | |
@@ -92,7 +92,9 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 - Ver ARCHITECTURE.md (seção "Decisões"). Resumo: MSW fixado em 2.x; oxlint no lugar de ESLint; shadcn com base Radix; defaults de env no código; .gitattributes com LF.
 
 ### Pendências / dívidas técnicas
-- Busca, carrinho e "Entrar" do header estão "em breve" até P3/P4/P5 criarem as rotas.
+- Busca e carrinho do header estão "em breve" até P4/P5 criarem as rotas.
+- Rascunho do checkout no sessionStorage para retomar após expiração (P6).
+- Mesclar o carrinho do visitante no login (P5): o endpoint existe, a chamada entra com o carrinho.
 - E2E do skeleton com reduced motion entra no P4.
 - Bundle inicial de ~600 KB + chunk do MSW de ~420 KB antes do render (otimizar e medir no P9).
 
