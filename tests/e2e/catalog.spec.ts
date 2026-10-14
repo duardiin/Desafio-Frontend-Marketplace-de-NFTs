@@ -54,10 +54,15 @@ test.describe('catálogo da Início', () => {
     await expect.poll(() => catalogCardNames(page)).toEqual(sortedNames)
   })
 
-  test('busca pelo header vira ?q= e mostra estado vazio com "Limpar filtros"', async ({ page }) => {
+  test('busca (header no desktop, topo no mobile) vira ?q= e mostra estado vazio com "Limpar filtros"', async ({ page, isMobile }) => {
     await openApp(page)
-    await page.getByRole('button', { name: 'Buscar NFTs' }).click()
-    await page.getByRole('dialog', { name: 'Buscar NFTs' }).getByLabel('Termo de busca').fill('golden')
+    if (isMobile) {
+      // Início mobile (Figma): campo "Explorar coleções" no topo.
+      await page.getByRole('searchbox', { name: 'Buscar NFTs' }).fill('golden')
+    } else {
+      await page.getByRole('button', { name: 'Buscar NFTs' }).click()
+      await page.getByRole('dialog', { name: 'Buscar NFTs' }).getByLabel('Termo de busca').fill('golden')
+    }
     await page.keyboard.press('Enter')
     await expect(page).toHaveURL(/q=golden/)
     await waitForCatalogIdle(page)

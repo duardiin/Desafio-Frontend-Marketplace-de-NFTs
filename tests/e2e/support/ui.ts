@@ -39,7 +39,8 @@ export async function catalogCardNames(page: Page): Promise<string[]> {
 /** Espera o catálogo terminar de atualizar (sem a lista anterior em placeholder). */
 export async function waitForCatalogIdle(page: Page) {
   await expect(page.locator('#catalogo').getByText('Atualizando…')).toHaveCount(0)
-  await expect(page.locator('#catalogo ul[aria-busy="true"]')).toHaveCount(0)
+  // Primeira carga (skeleton) e recargas (lista anterior em placeholder).
+  await expect(page.locator('#catalogo [aria-busy="true"]')).toHaveCount(0)
 }
 
 export function resultCount(page: Page) {

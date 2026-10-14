@@ -37,10 +37,17 @@ async function logout(page: Page, isMobile: boolean) {
   await expect(page.getByRole('status').filter({ hasText: 'Você saiu da sua conta.' })).toBeVisible()
 }
 
-/** Indicador de sessão visível no header (desktop) ou no menu (mobile). */
+/**
+ * Indicador de sessão visível no header (desktop) ou no menu (mobile). O Início
+ * mobile do Figma não tem header: ali, a tab bar leva à área da conta primeiro.
+ */
 async function expectSignedInAs(page: Page, firstName: string, isMobile: boolean) {
   if (isMobile) {
-    await page.getByRole('button', { name: 'Abrir menu' }).click()
+    const menu = page.getByRole('button', { name: 'Abrir menu' })
+    if (!(await menu.isVisible())) {
+      await page.getByRole('navigation', { name: 'Atalhos' }).getByRole('link', { name: 'Minha conta' }).click()
+    }
+    await menu.click()
     await expect(page.getByRole('dialog')).toContainText(`Conectado como ${firstName}`)
     await page.keyboard.press('Escape')
   } else {
@@ -50,7 +57,8 @@ async function expectSignedInAs(page: Page, firstName: string, isMobile: boolean
 
 test.describe('login', () => {
   test('valida campos, mostra erro da API e mantém a sessão após o refresh', async ({ page, isMobile }) => {
-    await openApp(page)
+    // O carrinho tem header também no mobile (o Início mobile do Figma não tem).
+    await openApp(page, '/carrinho')
     await openLoginFromHeader(page, isMobile)
     const dialog = page.getByRole('dialog', { name: 'Entrar' })
 
@@ -76,11 +84,11 @@ test.describe('login', () => {
   })
 
   test('Esc fecha o modal e devolve a tela anterior', async ({ page, isMobile }) => {
-    await openApp(page)
+    await openApp(page, '/carrinho')
     await openLoginFromHeader(page, isMobile)
     await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeHidden()
-    await expect(page).toHaveURL(/\/$/)
+    await expect(page).toHaveURL(/\/carrinho$/)
   })
 })
 

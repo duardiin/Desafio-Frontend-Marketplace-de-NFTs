@@ -14,11 +14,12 @@ export async function useScenario(page: Page, scenario: string) {
 
 /**
  * Abre o app e espera os mocks subirem (o render só acontece depois do worker).
- * Usa seletor CSS: com um modal aberto (ex.: /login) o header fica aria-hidden.
+ * Usa seletor CSS: com um modal aberto (ex.: /login) a página fica aria-hidden.
+ * Espera o <main> (o Início mobile do Figma não tem header).
  */
 export async function openApp(page: Page, path = '/') {
   await page.goto(path)
-  await page.locator('header').first().waitFor()
+  await page.locator('#conteudo').waitFor()
 }
 
 /**
