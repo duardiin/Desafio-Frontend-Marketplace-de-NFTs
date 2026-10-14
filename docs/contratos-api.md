@@ -8,6 +8,7 @@ Base: `VITE_API_URL` (padrão `/api`). Todas as respostas são JSON.
 - **ETH** trafega como string decimal (`"1.19"`, `"0.0021"`) e é calculado com decimal.js. **Quantidades** são inteiras.
 - **Autenticação:** `Authorization: Bearer <token>`. O token é opaco e tem validade (`expiresAt`).
 - **Carrinho de visitante:** header `X-Guest-Id` com um UUID gerado no navegador.
+- **Imagens** (`ImageAsset`): `{ src, alt, width, height, variants: [{ width, src }] }`. As variantes são WebP de 256, 512 e 900 px, e `src` aponta para a de 512.
 - **Versão:** NFTs, carrinho e pedidos têm `version`, que aumenta a cada mudança. Os eventos em tempo real usam esse campo para descartar dados antigos.
 - **Erros** seguem o formato `{ code, message, fieldErrors? }`:
 
@@ -52,6 +53,10 @@ Parâmetros de `/nfts` (as listas repetem a chave):
 | `sort` | `recentes` (padrão), `preco-asc`, `preco-desc`, `populares` |
 | `page` | ≥ 1. São 9 itens por página. |
 
+Edições: cada NFT tem `editions: EditionOption[]`, com `{ id: "1-1" | "1-10" | "1-50" | "aberta", label, supply, available }`. Em edição aberta, `supply` e `available` são `null` (sem limite de tiragem; vale só o `maxPerOrder` do NFT). Na listagem, `soldOut` é `true` quando todas as edições estão esgotadas.
+
+O detalhe traz também `description`, `story` (parágrafos), `creator`, `series`, `tokenId`, `attributes`, `royaltyPercent`, `gallery`, `maxPerOrder`, `rating { average, count }`, `reviews` (as 3 mais recentes), `contractAddress`, `tokenStandard`, `listedAt` e `favoritesCount`.
+
 A resposta traz `{ items, page, pageSize, totalItems, totalPages, facets }`:
 - `facets.collections` e `facets.networks` dão a contagem por opção, considerando os demais filtros.
 - `facets.priceRange` dá os limites do catálogo inteiro.
@@ -68,15 +73,15 @@ A resposta traz `{ items, page, pageSize, totalItems, totalPages, facets }`:
 | Método | Caminho | Corpo | Resposta |
 |---|---|---|---|
 | GET | `/cart` | | 200 `Cart` |
-| POST | `/cart/items` | `{ nftId, quantity }` (soma à quantidade atual) | 200 `Cart` · 409 `EDITION_SOLD_OUT` / `QUANTITY_LIMIT` |
-| PATCH | `/cart/items/:nftId` | `{ quantity }` | 200 `Cart` · 409 · 404 |
-| DELETE | `/cart/items/:nftId` | | 200 `Cart` |
+| POST | `/cart/items` | `{ nftId, editionId, quantity }` (soma à quantidade atual) | 200 `Cart` · 409 `EDITION_SOLD_OUT` / `QUANTITY_LIMIT` · 422 (edição inválida) |
+| PATCH | `/cart/items/:lineId` | `{ quantity }` | 200 `Cart` · 409 · 404 |
+| DELETE | `/cart/items/:lineId` | | 200 `Cart` |
 | PUT | `/cart/coupon` | `{ code }` | 200 `Cart` · 422 `COUPON_INVALID` / `COUPON_EXPIRED` |
 | DELETE | `/cart/coupon` | | 200 `Cart` |
 | POST | `/cart/merge` | `{ guestId }` (exige sessão) | 200 `Cart`. Soma ao carrinho do usuário, respeitando os limites. |
 | GET | `/cart/quote` | | 200 `Quote` |
 
-`CartItem` traz `maxQuantity` (o menor valor entre edições disponíveis e limite por pedido) e `priceWhenAddedEth`. Se este for diferente de `nft.priceEth`, o preço mudou desde que o item foi adicionado.
+Cada linha do carrinho é NFT + edição (`lineId = <nftId>__<editionId>`). `CartItem` traz `edition` e `maxQuantity` (o menor valor entre edições disponíveis e limite por pedido) e `priceWhenAddedEth`. Se este for diferente de `nft.priceEth`, o preço mudou desde que o item foi adicionado.
 
 **Cotação:** `{ id, lines, subtotalEth, discountEth, networkFeeEth, totalEth, coupon, blockers }`.
 - É sempre calculada com os preços atuais.

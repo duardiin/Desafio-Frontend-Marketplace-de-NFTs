@@ -183,3 +183,23 @@ Observações de estrutura:
 - Login, Cadastro e Confirmação são **modais com scrim** sobre outra tela (o footer fica abaixo do scrim). Mesmo assim, devem ter rota própria (acesso direto).
 - Detalhe e Carrinho têm uma seção **"Related Products"** acima do footer.
 - Ainda não detalhados (sem chamada gasta): todas as telas exceto Início desktop. Se necessário, priorizar `get_design_context` de Detalhe desktop (`10:244`) e Pagamento desktop (`11:2862`).
+
+## Detalhes do NFT · desktop (node `10:244`, extraído em 14/10, 3ª chamada ao MCP)
+
+Estrutura (container 1200, gap de 96 entre blocos, header com "Mercado" ativo e **sem** divisória):
+- **Breadcrumb** "Início / Mercado" (15 Bold, lh 16), 12 px acima do produto.
+- **Produto** (gap 32): coluna de imagens (573 × 448) + detalhes (flex 1, conteúdo distribuído com `justify-between` na altura das imagens).
+  - Miniaturas: coluna de 4 × 100 px (gap 16, raio 8); a selecionada tem borda 1 px `primary`.
+  - Imagem principal: caixa 444 × 444 `surface-card`, raio 6, padding 16; imagem 404 × 404, raio 24. Botão de zoom 30 px (círculo `#2F1D15` com borda `border`, lupa) no canto superior direito (asset `detail-zoom.svg`).
+  - Nome: Heading 28 Bold. Preço: 22 Bold `text-accent`. À direita do preço: 5 estrelas de 15 px (4 cheias, 1 vazia; `icon-star-*.svg`) + "19 avaliações de colecionadores" (15 Regular).
+  - Divisória de 0,3 px `primary` (573 px).
+  - "Sobre este NFT:" (15 Bold) + texto 14/24 `text-secondary`.
+  - "Edição:" (15 Bold) + chips em pílula (altura 28, borda fina): `1/1`, `1/10`, `1/50` (selecionado: borda e texto `text-accent`, Medium), `ABERTA`. Demais em `text-secondary` Regular 14.
+  - Linha de ação: quantidade (botões circulares `primary` com borda `ink` e sombra `0 6.6 9.9 rgba(20,13,10,.15)`, ícones `icon-minus.svg`/`icon-plus.svg` de 26,4 px; número 20 Regular lh 28, gap 12) à esquerda; à direita **COMPRAR** (130 × 40, `primary`, 14 Bold `ink`) e **Favoritar** (130 × 40, borda `primary`, coração 20 px `icon-heart.svg` + 14 Medium `text-accent`), gap 8.
+  - Metadados 15 Regular `secondary` (#B39463), gap 12: "ID do token: #0042", "Coleção: Kurio Apes", "Atributos: Óculos, Esmeralda, Raro".
+  - "Compartilhar este NFT:" (15 Bold) + LinkedIn, e-mail, Twitter (~15 px; `share-*.svg`), gap 8.
+- **Descrição** com abas: "Detalhes do NFT" (17 Bold `text-accent`, sublinhado 3 px `primary`, largura 161) | "Avaliações de colecionadores (19)" (17 Regular), gap 32, divisória 0,3 px abaixo. Conteúdo 14/24 `text-secondary` em parágrafos, e seções com título 14 Bold lh 24: **Rede**, **Contrato**, **Direitos autorais**. (No Figma os textos de "Contrato" e "Direitos autorais" estão trocados; o código pareia título e conteúdo corretamente.)
+- **"Mais desta coleção"** (17 Bold `text-accent` + divisória 0,3 px): 5 cards de ~219 px (área 255 de altura `surface-card`, imagem ~212 com raio 13; nome 15 Regular; preço 16 Bold `text-accent`), `justify-between`, e indicador de 3 pontos (`carousel-dots.svg`, 52 × 12) centralizado, 32 px abaixo.
+- Tokens novos vistos nesta tela: `color/surface-raised` `#2F1D15` (fundo do botão de zoom); estilo `Title/20 Regular` (20/28, número da quantidade).
+
+Diferenças de conteúdo do footer nesta extração (o mesmo componente): "Conheça artistas, estúdios e comunidades que moldam a cultura digital **na** rede", "novidades **de listas** de acesso", "**Política** do mercado" e newsletter com o botão **Enviar** colado ao input (raio só à direita, 18 Bold).

@@ -93,6 +93,18 @@ Detalhe completo em [`docs/06-DECISOES-P3.md`](docs/06-DECISOES-P3.md).
 - **Login e Cadastro** são modais (Radix Dialog) sobre a Início, com rota própria para acesso direto.
 - **Avisos acessíveis:** região `aria-live` própria, chamável fora do React. Evita adicionar o `sonner`, que está fora da lista de dependências.
 
+### Catálogo, detalhe e favoritos (P4)
+Detalhe completo em [`docs/07-DECISOES-P4.md`](docs/07-DECISOES-P4.md).
+
+- **Edições por NFT** (1/1, 1/10, 1/50, aberta), cada uma com disponibilidade própria, como no Figma do detalhe. O carrinho passou a ter uma linha por NFT + edição. O contrato do P2 foi ajustado e o banco simulado foi para a versão 2.
+- **Search params** em texto simples, legíveis (`?colecao=musica,arte-3d&pagina=2`), por meio de `parseSearch`/`stringifySearch` próprios no router. São validados e normalizados, os padrões ficam fora da URL e filtro novo remove `pagina`.
+- **Estratégia de cache do catálogo:**
+  - A chave `['nfts', 'list', params]` inclui todos os parâmetros, e o `signal` é repassado ao Axios. Respostas obsoletas ou fora de ordem caem na própria entrada de cache e não sobrescrevem a tela.
+  - `keepPreviousData` mostra a lista anterior atenuada, com "Atualizando…".
+  - O detalhe usa `['nfts', 'detail', id]`, carregado no `loader` da rota. O 404 vira `notFound()`.
+- **Favoritos otimistas:** `onMutate` altera `['private', userId, 'favorites']`; o rollback em `onError` vem com aviso; `onSettled` invalida a lista.
+- **Imagens:** WebP responsivo (256/512/900) gerado por script com o Chromium do Playwright, com `srcset`/`sizes`, proporção reservada, `lazy` e `fetchpriority="high"` só na imagem principal.
+
 ## Desvios do Figma
 
 - **Header mobile:** frame não extraído. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
@@ -100,14 +112,19 @@ Detalhe completo em [`docs/06-DECISOES-P3.md`](docs/06-DECISOES-P3.md).
 - **Footer em 390/768:** mesma ordem e cores, com fluxo empilhado. Contato fictício exibido como texto, sem `mailto:`/`tel:`.
 - **Skip link** "Pular para o conteúdo" adicionado (não está no Figma).
 - **Header autenticado** (não extraído): o "Entrar" vira um botão com inicial e primeiro nome, que abre o menu da conta. Mantém o mesmo lugar e as mesmas medidas.
+- **Busca:** o Figma só tem a lupa. O campo abre num diálogo e a busca vira `?q=`, com um chip removível acima da grade.
+- **Filtros no mobile** num drawer "Filtros". Selecionado também com ✓ e negrito (no Figma, só cor).
+- **Banner em destaque** com nome e preço sobre a imagem, porque o banner é clicável e precisa dizer o destino.
+- **Detalhe:** os textos de "Contrato" e "Direitos autorais" estão trocados no Figma; o código os pareia corretamente. A galeria repete a arte principal, como no próprio frame (só há 4 artes). "Mais desta coleção" não pagina, porque mostra os 5 itens de uma vez.
+- **Valores ETH com ponto** em todo lugar ("1.19 ETH"), como nos cards do Figma. O filtro de preço do Figma usa vírgula.
 - **Avisos (toasts):** estado não desenhado. Seguem `surface-card`, raio 8 e borda por tom, com prefixo "Erro:" nos erros.
 
 ## Limitações conhecidas (até agora)
 
 - `npm run lighthouse` ainda não audita: o runner é implementado no bloco P9 e, por enquanto, sai com código 1 e uma mensagem explícita (não simula sucesso).
 - Playwright usa o servidor de desenvolvimento. Regressão visual, relógio controlado e cenários por teste entram no P9.
-- Busca e carrinho do header estão "em breve" até P4/P5 criarem as rotas: com o roteamento tipado, um link para rota inexistente não compila. O "Entrar" funciona desde o P3.
-- Bundle inicial de ~600 KB (185 KB gzip). O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
+- O carrinho do header e o "COMPRAR" do detalhe estão "em breve" até o P5.
+- Bundle inicial de ~337 KB (106 KB gzip), depois do code-splitting por rota. O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
 - **Limitações do ambiente de mocks:**
   - O estado vive no `localStorage` de cada navegador, então duas abas compartilham os dados, mas dois navegadores não.
   - A liquidação dos pedidos usa o relógio do navegador.

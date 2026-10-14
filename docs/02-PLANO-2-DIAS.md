@@ -29,10 +29,10 @@ Prazo: `16/10 às 09:14h` (fechamento a partir de 16/10 06:14). Reserve as **úl
 - **Pronto quando:** dois usuários logam, sessão sobrevive ao refresh, cache não vaza entre eles.
 
 ### Bloco 3 · Descoberta e carrinho (~5h) · prompts P4, P5
-- [ ] Catálogo: busca, filtros, ordenação, paginação na URL; mudar filtro reinicia página
-- [ ] Respostas obsoletas descartadas; loading, vazio, erro, atualização em segundo plano
-- [ ] Detalhe: acesso direto, inexistente, edição indisponível, limite de quantidade
-- [ ] Favoritos com atualização otimista e rollback
+- [x] Catálogo: busca, filtros, ordenação, paginação na URL; mudar filtro reinicia página
+- [x] Respostas obsoletas descartadas; loading, vazio, erro, atualização em segundo plano
+- [x] Detalhe: acesso direto, inexistente, edição indisponível, limite de quantidade
+- [x] Favoritos com atualização otimista e rollback
 - [ ] Carrinho: adicionar/alterar/remover, persistir após refresh, preservar itens do visitante ao logar
 - [ ] Cupom (válido, inválido, expirado) e cotação (subtotal, desconto, taxa, total) com `decimal.js`
 - [ ] E2E: filtros combinados, histórico, detalhe inexistente, favoritos com falha, carrinho e cupom
@@ -84,7 +84,7 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 |---|---|---|---|---|
 | 1 Fundação | 14/10 | 14/10 | Concluído | Setup, P0, tokens e P1 concluídos (tema, layout, nav mobile, 404, skeleton, Router file-based, Query, Axios + ApiError; 17 E2E passando). Decisões em docs/04-DECISOES-P1.md. Deploy conferido (fonte local, 404 em acesso direto, sem overflow em 390). Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
 | 2 Contratos, MSW, sessão | 14/10 | 14/10 | Concluído | P2: contratos tipados, MSW com 47 NFTs, 2 usuários, 15 cenários, reset, idempotência e liquidação de pedidos (16 E2E). P3: login/cadastro em modal com rota, sessão por token, expiração em 3 pontos, rotas protegidas com retorno, cache privado por usuário, avisos aria-live (9 E2E × desktop/mobile). Decisões em docs/05 e docs/06. Perfil só leitura até o P8. |
-| 3 Descoberta e carrinho | | | | |
+| 3 Descoberta e carrinho | 14/10 | | Em andamento | P4 concluído: Início completa (hero, catálogo com estado na URL, destaque, promos, blog), detalhe do Figma 10:244 (3ª chamada ao MCP) com edições por NFT, favoritos otimistas, imagens WebP; 84 E2E passando. Decisões em docs/07. Falta P5 (carrinho e cotação). |
 | 4 Compra e tempo real | | | | |
 | 5 Conta, qualidade, entrega | | | | |
 
@@ -92,11 +92,11 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 - Ver ARCHITECTURE.md (seção "Decisões"). Resumo: MSW fixado em 2.x; oxlint no lugar de ESLint; shadcn com base Radix; defaults de env no código; .gitattributes com LF.
 
 ### Pendências / dívidas técnicas
-- Busca e carrinho do header estão "em breve" até P4/P5 criarem as rotas.
+- Carrinho do header e "COMPRAR" do detalhe "em breve" até o P5.
 - Rascunho do checkout no sessionStorage para retomar após expiração (P6).
 - Mesclar o carrinho do visitante no login (P5): o endpoint existe, a chamada entra com o carrinho.
 - E2E do skeleton com reduced motion entra no P4.
-- Bundle inicial de ~600 KB + chunk do MSW de ~420 KB antes do render (otimizar e medir no P9).
+- Bundle inicial de ~337 KB + chunk do MSW de ~420 KB antes do render (medir no P9).
 
 ### Se eu me perder
 1. Leia a seção "Regras do jogo" acima.

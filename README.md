@@ -66,8 +66,20 @@ O estado da API simulada fica no `localStorage` do navegador e sobrevive ao refr
 Os casos de negócio vêm dos dados e funcionam em qualquer cenário:
 
 - **Cupons:** `KURIO10` dá 10% de desconto; `EXPIRADO` está vencido; qualquer outro código é inválido.
-- **NFT esgotado:** `nft-044` (Onyx Relic #001). **Última edição:** `nft-045` (Amber Pilot #777), com limite de 1 unidade.
+- **Edições:** `nft-001` (Emerald Ape #042) tem as quatro edições do Figma, com a 1/1 esgotada. `nft-044` (Onyx Relic #001) tem todas as edições esgotadas. `nft-045` (Amber Pilot #777) tem uma única unidade.
 - **Cadastro com e-mail já usado** (`ana@kurio.dev`) responde 409 `EMAIL_TAKEN`.
+
+## Estado do catálogo na URL
+
+Busca, filtros, aba, ordenação e paginação ficam na URL e sobrevivem a refresh e ao histórico. Exemplo:
+
+`/?q=golden&colecao=musica,arte-3d&rede=polygon&precoMin=0.5&precoMax=3&aba=em-alta&ordem=preco-asc&pagina=2`
+
+No detalhe, a edição escolhida também fica na URL: `/nft/nft-001?edicao=1-50`.
+
+## Imagens
+
+As artes do Figma (`design/nfts-original/*.png`, ~2 MB cada) são convertidas em WebP de 256, 512 e 900 px por `node scripts/optimize-images.mjs`, usando o Chromium do Playwright. As versões ficam em `public/nfts/` e são versionadas.
 
 ## Comandos
 
