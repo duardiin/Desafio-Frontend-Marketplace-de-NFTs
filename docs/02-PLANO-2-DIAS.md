@@ -82,7 +82,7 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 
 | Bloco | Início | Fim | Status | Observações / o que ficou de fora |
 |---|---|---|---|---|
-| 1 Fundação | 14/10 | | Em andamento | Setup, P0, tokens e P1 concluídos (tema, layout, nav mobile, 404, skeleton, Router file-based, Query, Axios + ApiError; 17 E2E passando). Decisões em docs/04-DECISOES-P1.md. Falta conferir o deploy na Vercel. Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
+| 1 Fundação | 14/10 | 14/10 | Concluído | Setup, P0, tokens e P1 concluídos (tema, layout, nav mobile, 404, skeleton, Router file-based, Query, Axios + ApiError; 17 E2E passando). Decisões em docs/04-DECISOES-P1.md. Deploy conferido (fonte local, 404 em acesso direto, sem overflow em 390). Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
 | 2 Contratos, MSW, sessão | | | | |
 | 3 Descoberta e carrinho | | | | |
 | 4 Compra e tempo real | | | | |
