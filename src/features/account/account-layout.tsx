@@ -49,9 +49,10 @@ export function AccountLayout({ active, children }: { active: AccountSection; ch
 function AccountSidebar({ active }: { active: AccountSection }) {
   const logout = useLogout()
 
+  // Nome "Minha conta": o rodapé já tem uma navegação "Meu perfil" (landmarks distintos para leitores de tela).
   return (
-    <nav aria-labelledby="meu-perfil-titulo" className="min-w-0 bg-surface-card py-2 lg:w-[310px] lg:shrink-0">
-      <h2 id="meu-perfil-titulo" className="p-2.5 text-body-18 leading-4 font-bold">
+    <nav aria-label="Minha conta" className="min-w-0 bg-surface-card py-2 lg:w-[310px] lg:shrink-0">
+      <h2 className="p-2.5 text-body-18 leading-4 font-bold">
         Meu perfil
       </h2>
       {/* `relative`: os textos sr-only (absolutos) ficam contidos na faixa rolável e não alargam a página. */}

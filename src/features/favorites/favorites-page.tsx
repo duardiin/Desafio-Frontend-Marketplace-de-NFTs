@@ -57,6 +57,8 @@ function FavoritesContent({ userId }: { userId: string }) {
         </div>
       )}
 
+      {/* Os cards usam h3: o h2 (oculto) mantém a hierarquia de títulos. */}
+      <h2 className="sr-only">NFTs favoritados</h2>
       {favorites.isSuccess && favorites.data.items.length > 0 && (
         <ul className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3">
           {favorites.data.items.map((nft) => (
