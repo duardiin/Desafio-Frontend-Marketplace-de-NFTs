@@ -1,7 +1,6 @@
 # Arquitetura
 
-Documento vivo. Registra decisões, limitações e desvios do Figma conforme o projeto avança.
-Contratos REST/eventos, sessão, carrinho, cache e reconciliação REST × Socket.IO serão detalhados nos blocos correspondentes.
+Decisões, limitações e desvios do Figma. A seção **Visão geral** resume cada tema. As seções por etapa (P1 a P9) trazem o detalhe e apontam para `docs/04` a `docs/11`, que explicam cada escolha.
 
 ## Stack e versões principais
 
@@ -30,16 +29,59 @@ src/
   components/ui/   # componentes shadcn/ui adaptados ao tema
   lib/             # utilitários genéricos
   mocks/           # handlers MSW, fixtures, cenários (ÚNICO lugar com dados fictícios)
-tests/e2e/         # testes Playwright
+tests/e2e/         # testes Playwright funcionais (inclui overflow e axe)
+tests/visual/      # regressão visual e baselines versionadas
 lighthouse/        # configuração e relatórios da auditoria (versionados)
 ```
+
+## Visão geral
+
+### Contratos REST e eventos
+- **Fonte única:** tipos em `src/api/contracts`, usados pelo cliente e pelos handlers do MSW. Uma mudança de contrato quebra os dois lados na compilação.
+- **Referência:** a tabela de rotas, os códigos de erro e o envelope dos eventos estão em [`docs/contratos-api.md`](docs/contratos-api.md).
+- **Erros:** chegam ao app normalizados em `ApiError`, com `kind`, `code` e `fieldErrors`. Os formulários mapeiam `fieldErrors` para os campos (`applyApiErrors`).
+- **Eventos:** `nft.updated` e `order.updated`, com `id` estável (`<recurso>:<id>:v<versão>`), `resource` e `version`. Nascem da mesma mudança no banco simulado que o REST devolve.
+
+### Sessão
+- **Token:** opaco, no `localStorage` (o MSW não emite cookie `httpOnly`), enviado pelo interceptor do Axios. A sessão é a query `['session']`.
+- **Expiração:** detectada no guard das rotas privadas, no 401 de chamadas autenticadas e por um timer. O app avisa e leva ao login, voltando depois à mesma tela; o rascunho do pagamento é preservado.
+- **Isolamento:** dados privados ficam sob `['private', userId, …]`. Login, logout, expiração e troca de usuário (inclusive em outra aba) cancelam as requisições, apagam o cache privado e recriam o socket.
+
+### Carrinho
+- **Visitante e conta:** o carrinho é recurso da API. O visitante é identificado por `X-Guest-Id`, e o login mescla o carrinho dele no da conta.
+- **Valores:** todos vêm da cotação da API. O cliente só formata com decimal.js (strings decimais; quantidades inteiras).
+- **Pedido:** envia o `quoteId`. Se a cotação mudou, a API responde 409 e a revisão pede nova confirmação. O pedido tem `Idempotency-Key` por tentativa, e o clique repetido ou o "Tentar de novo" reenviam a mesma tentativa.
+
+### Cache e retries
+- **Padrão das queries** (`src/lib/query-client.ts`): `staleTime` de 30 s, refetch ao focar a janela e **retry só para erros transitórios** (rede, timeout, 408, 429, 5xx), até 2 vezes.
+- **Mutations nunca repetem sozinhas:** o pedido depende da chave de idempotência, e a pessoa decide quando tentar de novo.
+- **Catálogo:** a chave tem todos os parâmetros da URL, o `signal` cancela as requisições obsoletas e a lista anterior fica visível (atenuada) enquanto a nova carrega. Respostas fora de ordem não sobrescrevem a tela.
+- **Favoritos:** otimistas, com rollback e aviso. Carrinho e perfil gravam a resposta da API no cache, sem nova requisição.
+- **Gravação do carrinho:** cancela as leituras do carrinho em andamento antes de gravar, para uma leitura antiga não sobrescrever a resposta nova.
+
+### Reconciliação REST × Socket.IO
+- **Versão:** o evento só é aplicado se a versão for **maior que a do dado em cache**, item a item (detalhe, listas, favoritos e carrinho). Duplicatas são descartadas pelo `id`.
+- **Carrinho:** um evento que afeta o carrinho recarrega carrinho e cotação da API. O aviso de preço é imediato. O de disponibilidade só aparece depois do refetch, se o item ainda estiver lá.
+- **Reconexão:** ao reconectar, as consultas ativas de NFTs, carrinho e dados privados são invalidadas e recarregadas do REST. Eventos perdidos durante a queda são cobertos assim.
+- **Página do pedido:** também consulta a API a cada 15 s enquanto o pedido está pendente, como rede de segurança.
+
+### Decisões de UX
+- **Login e cadastro** são modais sobre a tela atual, com rota própria (acesso direto e refresh). Ao entrar, o app volta para a tela pedida.
+- **Confirmação de compra** fica na página do pedido (`/pedidos/<id>`), para sobreviver a refresh. Ela só aparece com o status "confirmado" vindo da simulação.
+- **Revisão antes de pagar:** o pagamento passa por uma revisão em diálogo, que revalida a cotação. Mudanças de valor aparecem lado a lado e exigem nova confirmação.
+- **Estados:**
+  - **Carregamento:** skeletons com shimmer e dimensões reservadas (sem deslocar o layout), estáticos com `prefers-reduced-motion`.
+  - **Vazio:** mensagem e ação ("Explorar o catálogo", "Limpar filtros").
+  - **Erro:** `role="alert"` com "Tentar novamente".
+- **Avisos:** mutations e eventos em tempo real são anunciados numa região `aria-live`, com prefixo "Erro:" nos erros (não só cor).
+- **Fora do escopo** (Criadores, Aprenda, Atividade, Ofertas, Suporte, newsletter, botão central da tab bar): visual mantido, mas marcado como "em breve" (`aria-disabled`, sem foco), sem aparentar que funciona.
 
 ## Decisões
 
 - **MSW fixado em 2.x** (`^2.15.0`). O MSW 3 já existe, mas `@mswjs/socket.io-binding@0.2.0` declara peer `msw@^2.10.2`. Priorizamos o transporte Socket.IO compatível exigido pelo enunciado.
 - **oxlint em vez de ESLint.** Veio no template atual do Vite, é muito mais rápido e cobre as regras de React Hooks e TypeScript. `npm run lint` falha com warnings (`--deny-warnings`). `no-explicit-any` é erro. A regra `only-export-components` fica desligada só em `src/components/ui/**` (código gerado pelo shadcn, que exporta variantes).
 - **shadcn/ui com base Radix.** Os primitivos Radix já tratam foco em diálogos e drawers, navegação por teclado e ARIA, que são requisitos de acessibilidade. O utilitário `cn` vem do pacote oficial `cn` (mantido pelo shadcn), substituindo `clsx` + `tailwind-merge`.
-- **Defaults de ambiente no código** (`src/config/env.ts`, validado com zod). Os defaults espelham o `.env.example` (`VITE_ENABLE_MOCKS=true`, `VITE_API_URL=/api`, `VITE_MOCK_SCENARIO=default`), para que um checkout limpo sem `.env` rode com mocks, como exige o enunciado. Na Vercel as mesmas variáveis estão definidas explicitamente.
+- **Defaults de ambiente no código** (`src/config/env.ts`, com validação à mão desde o P9, para tirar o zod do carregamento inicial). Os defaults espelham o `.env.example` (`VITE_ENABLE_MOCKS=true`, `VITE_API_URL=/api`, `VITE_MOCK_SCENARIO=default`), para que um checkout limpo sem `.env` rode com mocks, como exige o enunciado. Na Vercel as mesmas variáveis estão definidas explicitamente.
 - **TypeScript em projetos separados:** `tsconfig.app.json` (app, DOM), `tsconfig.node.json` (`vite.config.ts`) e `tsconfig.e2e.json` (Playwright, DOM + Node, porque `page.evaluate` roda no navegador). `npm run typecheck` = `tsc -b` em todos.
 - **Quebras de linha LF** via `.gitattributes`, já que o desenvolvimento é em Windows e o build é em Linux (Vercel), além de baselines estáveis.
 - **SPA na Vercel:** `vercel.json` reescreve todas as rotas para `index.html` (acesso direto e refresh). `public/mockServiceWorker.js` é publicado junto com o build.
@@ -59,7 +101,7 @@ Detalhe completo e motivos em [`docs/04-DECISOES-P1.md`](docs/04-DECISOES-P1.md)
 ### Contratos e mocks (P2)
 Os contratos estão em [`docs/contratos-api.md`](docs/contratos-api.md), os cenários no [README](README.md#cenários-e-reset-dos-mocks) e o detalhe das decisões em [`docs/05-DECISOES-P2.md`](docs/05-DECISOES-P2.md).
 
-- **Contratos como tipos TypeScript** em `src/api/contracts`, compartilhados entre o cliente e os handlers do MSW. Assim, uma mudança no contrato quebra os dois lados na compilação. Não valido as respostas com zod em runtime: a origem é o próprio MSW, tipado pelos mesmos contratos. O zod fica para formulários e env.
+- **Contratos como tipos TypeScript** em `src/api/contracts`, compartilhados entre o cliente e os handlers do MSW. Assim, uma mudança no contrato quebra os dois lados na compilação. Não valido as respostas com zod em runtime: a origem é o próprio MSW, tipado pelos mesmos contratos. O zod fica para os formulários.
 - **"Servidor" simulado em `src/mocks`**, organizado como um backend:
   - `db/` guarda o estado, persistido no `localStorage` com `schemaVersion`;
   - `fixtures/` traz os dados iniciais;
@@ -125,7 +167,7 @@ Detalhe completo em [`docs/09-DECISOES-P6.md`](docs/09-DECISOES-P6.md).
   - `Idempotency-Key` por tentativa (corpo do pedido), salva com o corpo no `sessionStorage`.
   - Clique repetido e "Tentar de novo" depois de timeout reenviam a **mesma** tentativa, sem revalidar, porque a confirmação pode já ter alterado o carrinho.
   - Uma trava síncrona (`ref`) cobre o intervalo antes do `isPending`.
-- **Estados do pedido:** `/pedidos/$id` consulta a cada 1,5 s enquanto o pedido está pendente; no P7 isso vira evento `order.updated` + reconciliação. A confirmação (modal) só aparece com `confirmed`. O recibo é o snapshot do pedido. A saída de pendente invalida carrinho, pedidos e catálogo e avisa por `aria-live`.
+- **Estados do pedido:** o caminho principal é o evento `order.updated` (P7). Enquanto o pedido está pendente, `/pedidos/$id` também consulta a API a cada 15 s, como rede de segurança. A confirmação (modal) só aparece com `confirmed`. O recibo é o snapshot do pedido. A saída de pendente invalida carrinho, pedidos e catálogo e avisa por `aria-live`.
 - **Rascunho do pagamento** no `sessionStorage` por usuário: sobrevive a refresh e à expiração da sessão.
 
 ### Tempo real (P7)
@@ -182,16 +224,17 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 - **Pagamento** (`11:2862`): Código de indicação e Nome ENS são opcionais (no Figma, obrigatórios). O endereço vem da carteira escolhida (só leitura). "Usar outra carteira?" leva a `/carteiras`, e o rascunho do pagamento é restaurado na volta. O chip de provedores é um cabeçalho, e não uma opção. O resumo mostra a edição no lugar do ID do token. "Confirmar compra" abre a revisão, e o envio é em "Confirmar pagamento".
 - **Confirmação** (`11:4385`, não extraída): modal sobre a página do pedido (`/pedidos/<id>`), e não sobre o Pagamento, para sobreviver a refresh.
 - **Perfil** (`9:1238`): a barra lateral vira uma faixa rolável abaixo de 1024 px, porque não há frame mobile. O olho aberto do "mostrar senha" é um ícone Lucide, porque o Figma só tem o estado oculto. A dica de senha forte e as mensagens de erro foram acrescentadas. A bio, que existe na API, não aparece, porque não está no design.
-- **Carteiras** (`9:1670`, não extraído; a chamada ficou reservada para um frame mobile): seguem os campos e cartões do Pagamento e do Perfil, com a mesma barra lateral.
+- **Carteiras** (`9:1670`, não extraído; a última chamada do mês foi para o Início mobile): seguem os campos e cartões do Pagamento e do Perfil, com a mesma barra lateral.
 - **Valores ETH com ponto** em todo lugar ("1.19 ETH"), como nos cards do Figma. O filtro de preço do Figma usa vírgula.
 - **Avisos (toasts):** estado não desenhado. Seguem `surface-card`, raio 8 e borda por tom, com prefixo "Erro:" nos erros.
 
-## Limitações conhecidas (até agora)
+## Limitações conhecidas
 
 - **Lighthouse mobile abaixo de 90 em Performance** (~79 no Início e ~76 no Detalhe; desktop ~98; as demais categorias em 100). A causa principal é a camada de mocks (~180 KB gzip, incluindo a Public Suffix List do MSW), que precisa subir antes da primeira requisição no 4G lento simulado. Análise e experimentos em `lighthouse/ANALISE.md`.
 - **Baselines visuais geradas no Windows.** A regressão visual (`npm run test:visual`) fica fora do `test:e2e`, porque fonte e antialiasing variam por sistema. Em outro sistema, gere as baselines com `npm run test:visual:update` antes de comparar.
 - Carteiras não podem ser excluídas (a API simulada só tem cadastro e edição; o enunciado pede principal e secundária).
 - Bundle inicial de ~379 KB (120 KB gzip), depois do code-splitting por rota. O zod saiu do carregamento inicial no P9. A camada de mocks soma ~180 KB gzip antes do primeiro render (ver `lighthouse/ANALISE.md`).
+- **Janela da primeira conexão:** a reconciliação com o REST acontece em cada *reconexão*. Uma mudança feita entre a primeira resposta REST da página e a primeira conexão do socket (fração de segundo no carregamento) só aparece no próximo refetch (30 s de `staleTime`, foco na janela ou navegação). Os testes esperam o socket conectar antes de disparar eventos.
 - **Limitações do tempo real simulado:**
   - não há rooms nem namespaces (filtro por usuário feito à mão);
   - não há long-polling;
@@ -200,4 +243,3 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
   - O estado vive no `localStorage` de cada navegador, então duas abas compartilham os dados, mas dois navegadores não.
   - A liquidação dos pedidos usa o relógio do navegador.
   - O hash de senha é SHA-256 simples, sem PBKDF2/bcrypt, por ser uma simulação.
-- O teste E2E do skeleton com movimento reduzido entra no P4, junto com o catálogo. No P1 o CSS foi validado no navegador.
