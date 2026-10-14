@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { callApi, openApp } from './support/mock-api'
+import { callApi, openApp, placeOrderAsAna } from './support/mock-api'
 import { loginViaUi } from './support/ui'
 
 /**
@@ -96,6 +96,33 @@ test.describe('tempo real', () => {
     })
     await expect(page.getByRole('dialog', { name: 'Pedido confirmado' })).toBeVisible()
     expect(await ordersOf(page)).toHaveLength(1)
+  })
+
+  test('edição do carrinho esgotada por outra pessoa avisa', async ({ page }) => {
+    await loginViaUi(page, 'ana@kurio.dev', '/carrinho')
+    await waitForSocket(page, 'usr-ana')
+    const soldOut = page.getByRole('status').filter({ hasText: 'A edição 1/1 de "Sage Nomad #089" esgotou.' })
+    // O aviso compara com o carrinho em cache: espera ele carregar.
+    await expect(page.getByRole('main')).toContainText('Sage Nomad #089')
+
+    // Outra pessoa compra a edição 1/1 que está no carrinho da Ana.
+    await page.evaluate(() => window.__kurioMock?.updateNft('nft-002', { available: 0, editionId: '1-1' }))
+    await expect(soldOut).toBeVisible()
+  })
+
+  test('a própria compra não gera falso alarme de "esgotou" na confirmação', async ({ page }) => {
+    await loginViaUi(page, 'ana@kurio.dev', '/pagamento')
+    // Espera o Pagamento assentar (cotação, carrinho e socket), como numa compra real.
+    await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeVisible()
+    await page.waitForTimeout(1500)
+    // Pedido criado (pendente) com o Pagamento aberto, e a página do pedido aberta antes da
+    // confirmação (~2,5 s): o carrinho em cache ainda tem o item quando o evento de baixa chega.
+    const orderId = await placeOrderAsAna(page, 'falso-alarme-1')
+    await page.goto(`/pedidos/${orderId}`)
+    await expect(page.getByRole('dialog', { name: 'Pedido confirmado' })).toBeVisible({ timeout: 15_000 })
+    await page.waitForTimeout(1500)
+    // Checagem instantânea: `toHaveCount(0)` esperaria o aviso sumir sozinho (6 s) e passaria sempre.
+    expect(await page.getByRole('status').filter({ hasText: 'esgotou' }).count()).toBe(0)
   })
 
   test('logout e troca de usuário encerram o socket anterior (sem eventos da sessão passada)', async ({ page }) => {

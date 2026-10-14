@@ -55,3 +55,31 @@ export async function login(page: Page, email: string, password = 'Kurio@123'): 
   if (result.status !== 200) throw new Error(`login falhou: ${result.status}`)
   return result.body.token
 }
+
+/**
+ * Cria um pedido da Ana pela API (carteira principal conectada, cotação atual),
+ * como se fosse feito em outra aba. Devolve o id do pedido.
+ */
+export async function placeOrderAsAna(page: Page, idempotencyKey: string): Promise<string> {
+  const token = (await page.evaluate(() => localStorage.getItem('kurio:session-token'))) ?? ''
+  const quote = await callApi<{ id: string }>(page, '/cart/quote', { token })
+  const connection = await callApi<{ id: string }>(page, '/checkout/wallet-connection', {
+    method: 'POST',
+    token,
+    body: { walletId: 'wal-ana-1', network: 'ethereum' },
+  })
+  const order = await callApi<{ id: string }>(page, '/orders', {
+    method: 'POST',
+    token,
+    headers: { 'Idempotency-Key': idempotencyKey },
+    body: {
+      walletId: 'wal-ana-1',
+      network: 'ethereum',
+      quoteId: quote.body.id,
+      connectionId: connection.body.id,
+      buyer: { fullName: 'Ana Ribeiro', email: 'ana@kurio.dev', username: 'anaribeiro', profileName: 'Ana Ribeiro' },
+    },
+  })
+  if (order.status !== 201) throw new Error(`pedido falhou: ${order.status}`)
+  return order.body.id
+}

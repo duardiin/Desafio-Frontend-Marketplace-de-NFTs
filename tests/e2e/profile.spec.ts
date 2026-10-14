@@ -107,7 +107,7 @@ test.describe('perfil', () => {
 
   test('a barra "Meu perfil" navega entre as áreas da conta e marca a atual', async ({ page }) => {
     await loginViaUi(page, 'ana@kurio.dev', '/perfil')
-    const nav = page.getByRole('navigation', { name: 'Meu perfil' })
+    const nav = page.getByRole('navigation', { name: 'Minha conta' })
     await expect(nav.getByRole('link', { name: 'Dados do perfil' })).toHaveAttribute('aria-current', 'page')
     await nav.getByRole('link', { name: 'Carteiras' }).click()
     await expect(page).toHaveURL(/\/carteiras$/)
