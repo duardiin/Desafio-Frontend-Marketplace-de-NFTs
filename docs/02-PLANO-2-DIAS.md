@@ -15,9 +15,9 @@ Prazo: `16/10 às 09:14h` (fechamento a partir de 16/10 06:14). Reserve as **úl
 ### Bloco 1 · Fundação (~3h) · prompts P0, P1
 - [x] Setup completo (`01-SETUP-VSCODE.md`) e deploy vazio na Vercel funcionando
 - [x] Scripts do `package.json`
-- [~] Tokens do Figma em `docs/design-tokens.md` (feito) e no tema do Tailwind/shadcn (P1)
-- [ ] Layout base (header, footer, nav mobile), skeleton com shimmer, rota 404
-- [ ] Router + Query + Axios configurados (cliente único)
+- [x] Tokens do Figma em `docs/design-tokens.md` e no tema do Tailwind/shadcn (P1)
+- [x] Layout base (header, footer, nav mobile), skeleton com shimmer, rota 404
+- [x] Router + Query + Axios configurados (cliente único)
 - **Pronto quando:** app sobe local e na Vercel, tema bate com o Figma, typecheck e lint passam.
 
 ### Bloco 2 · Contratos, MSW e sessão (~4h) · prompts P2, P3
@@ -82,7 +82,7 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 
 | Bloco | Início | Fim | Status | Observações / o que ficou de fora |
 |---|---|---|---|---|
-| 1 Fundação | 14/10 | | Em andamento | Setup + P0 + tokens do Figma concluídos. Falta P1 (tema, layout, skeleton, Router/Query/Axios). Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
+| 1 Fundação | 14/10 | | Em andamento | Setup, P0, tokens e P1 concluídos (tema, layout, nav mobile, 404, skeleton, Router file-based, Query, Axios + ApiError; 17 E2E passando). Decisões em docs/04-DECISOES-P1.md. Falta conferir o deploy na Vercel. Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
 | 2 Contratos, MSW, sessão | | | | |
 | 3 Descoberta e carrinho | | | | |
 | 4 Compra e tempo real | | | | |
@@ -92,7 +92,9 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 - Ver ARCHITECTURE.md (seção "Decisões"). Resumo: MSW fixado em 2.x; oxlint no lugar de ESLint; shadcn com base Radix; defaults de env no código; .gitattributes com LF.
 
 ### Pendências / dívidas técnicas
--
+- Busca, carrinho e "Entrar" do header estão "em breve" até P3/P4/P5 criarem as rotas.
+- E2E do skeleton com reduced motion entra no P4.
+- Bundle inicial de ~516 KB (otimizar no P9).
 
 ### Se eu me perder
 1. Leia a seção "Regras do jogo" acima.
