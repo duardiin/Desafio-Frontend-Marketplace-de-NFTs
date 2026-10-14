@@ -80,3 +80,10 @@ export function cartOwner(request: Request): CartOwner | null {
 export function nowIso(): string {
   return new Date().toISOString()
 }
+
+/** Usuário de um token de sessão válido (conexões em tempo real não têm Request HTTP). */
+export function userIdForToken(token: string | null | undefined): string | null {
+  if (!token) return null
+  const session = getDb().sessions.find((item) => item.token === token)
+  return session && Date.parse(session.expiresAt) > Date.now() ? session.userId : null
+}

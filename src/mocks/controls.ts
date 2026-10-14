@@ -30,6 +30,15 @@ export interface KurioMockControls {
   updateNft(id: string, patch: { priceEth?: EthAmount; available?: number; editionId?: string }): void
   /** Expira todas as sessões ativas. */
   expireSessions(): void
+  /** Servidor Socket.IO simulado: duplicatas, eventos antigos, queda de conexão. */
+  realtime: RealtimeControls
+}
+
+export interface RealtimeControls {
+  replayLast(): void
+  emitStale(nftId: string, priceEth: string): void
+  goOffline(ms: number): void
+  connections(): { id: string; userId: string | null }[]
 }
 
 declare global {
@@ -38,8 +47,9 @@ declare global {
   }
 }
 
-export function exposeMockControls() {
+export function exposeMockControls(realtime: RealtimeControls) {
   window.__kurioMock = {
+    realtime,
     scenarios: SCENARIOS,
     getScenario: getActiveScenario,
     setScenario(name) {

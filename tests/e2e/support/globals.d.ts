@@ -8,6 +8,12 @@ interface KurioMockControlsForTests {
   reset(): void
   updateNft(id: string, patch: { priceEth?: string; available?: number; editionId?: string }): void
   expireSessions(): void
+  realtime: {
+    replayLast(): void
+    emitStale(nftId: string, priceEth: string): void
+    goOffline(ms: number): void
+    connections(): { id: string; userId: string | null }[]
+  }
 }
 
 interface Window {

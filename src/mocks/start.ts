@@ -37,8 +37,10 @@ export async function startMocks() {
     serviceWorker: { url: '/mockServiceWorker.js' },
   })
 
+  const { startRealtimeEvents, realtimeControls } = await import('@/mocks/realtime')
+  startRealtimeEvents()
   resumePendingOrders()
-  exposeMockControls()
+  exposeMockControls(realtimeControls)
 
   if (!import.meta.env.PROD) console.info(`[mocks] Cenário ativo: ${getActiveScenario()}`)
 }
