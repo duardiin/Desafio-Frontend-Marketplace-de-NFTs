@@ -35,6 +35,7 @@ test.describe('layout base', () => {
 
   test('link "Pular para o conteúdo" é o primeiro foco e leva ao main', async ({ page }) => {
     await page.goto('/')
+    await page.getByRole('banner').waitFor()
     await page.keyboard.press('Tab')
     const skipLink = page.getByRole('link', { name: 'Pular para o conteúdo' })
     await expect(skipLink).toBeFocused()

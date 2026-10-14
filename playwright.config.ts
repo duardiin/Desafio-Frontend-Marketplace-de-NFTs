@@ -38,5 +38,7 @@ export default defineConfig({
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Timeout curto do cliente HTTP para os cenários de timeout não demorarem 10 s.
+    env: { VITE_HTTP_TIMEOUT_MS: '3000' },
   },
 })
