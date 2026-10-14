@@ -15,8 +15,11 @@ import { notify } from '@/features/feedback/notifications'
 import { shortAddress } from '@/features/wallets/api'
 import { formatEth } from '@/lib/eth'
 
-/** Enquanto pendente, consulta o pedido periodicamente (o tempo real entra no P7). */
-const PENDING_POLL_MS = 1500
+/**
+ * O estado chega pelo evento `order.updated` (Socket.IO) e é reconciliado ao
+ * reconectar. Esta consulta lenta é só uma rede de segurança.
+ */
+const PENDING_SAFETY_POLL_MS = 15_000
 const DATE = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
 
 export function OrderPage({ orderId }: { orderId: string }) {
@@ -29,7 +32,7 @@ function OrderContent({ userId, orderId }: { userId: string; orderId: string }) 
   const queryClient = useQueryClient()
   const order = useQuery({
     ...orderQueryOptions(userId, orderId),
-    refetchInterval: (query) => (query.state.data?.status === 'pending' ? PENDING_POLL_MS : false),
+    refetchInterval: (query) => (query.state.data?.status === 'pending' ? PENDING_SAFETY_POLL_MS : false),
   })
   const status = order.data?.status
   const previousStatus = useRef(status)

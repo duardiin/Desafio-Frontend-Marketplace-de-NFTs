@@ -32,6 +32,11 @@ function CheckoutLoader({ user }: { user: SessionUser }) {
   const cart = useCart()
   const profile = useQuery(profileQueryOptions(user.id))
   const wallets = useQuery(walletsQueryOptions(user.id))
+  // Com uma tentativa de compra sem resposta, o pagamento continua montado mesmo
+  // se o carrinho esvaziar (o pedido pode ter sido confirmado e retirado os
+  // itens): a revisão e o "Tentar de novo" não podem sumir.
+  const hasAttempt = purchaseAttempt.load(user.id) !== null
+  const hasItems = (cart.data?.items.length ?? 0) > 0
 
   return (
     <div className="container-page mt-6 flex flex-col gap-8">
@@ -68,9 +73,9 @@ function CheckoutLoader({ user }: { user: SessionUser }) {
         </div>
       )}
 
-      {cart.isSuccess && cart.data.items.length === 0 && <EmptyCheckout userId={user.id} />}
+      {cart.isSuccess && !hasItems && !hasAttempt && <EmptyCheckout userId={user.id} />}
 
-      {cart.isSuccess && cart.data.items.length > 0 && profile.isSuccess && wallets.isSuccess && (
+      {cart.isSuccess && (hasItems || hasAttempt) && profile.isSuccess && wallets.isSuccess && (
         <CheckoutContent user={user} profile={profile.data} wallets={wallets.data.items} />
       )}
     </div>
