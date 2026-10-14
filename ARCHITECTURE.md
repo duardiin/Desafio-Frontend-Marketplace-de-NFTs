@@ -157,6 +157,15 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 - `a11y.spec.ts` roda o axe (WCAG 2.0/2.1/2.2 A e AA, mais boas práticas) em 10 telas e num diálogo, em desktop e mobile, sem tolerar violações.
 - O aviso de edição esgotada no carrinho só aparece depois de recarregar o carrinho da API, para não dar alarme falso na própria compra.
 
+### Regressão visual e Lighthouse (P9)
+- **Regressão visual** (`npm run test:visual`, configuração em `playwright.visual.config.ts`):
+  - Telas: Início, Detalhe, Carrinho e Pagamento em desktop e mobile, mais a primeira tela do Início mobile com a tab bar. São 10 baselines versionadas em `tests/visual/__screenshots__/`.
+  - Dados estáveis: banco simulado novo por teste, relógio fixo (`page.clock.setFixedTime`, sem congelar os timers), nenhum evento de tempo real, animações desligadas, imagens e fontes carregadas, e avisos e tab bar ocultos na captura de página inteira.
+- **Lighthouse** (`npm run lighthouse`, configuração versionada em `lighthouse/config.mjs`):
+  - Faz o build, sobe o `vite preview` com os mocks ativos e roda o Chromium do Playwright.
+  - Mede 3 vezes cada página e perfil, num Chrome novo a cada vez, e calcula a mediana por categoria, com LCP, CLS e TBT.
+  - Salva HTML e JSON em `lighthouse/reports/` e o resumo, as versões e o ambiente em `lighthouse/RESULTADOS.md`. A análise está em `lighthouse/ANALISE.md`.
+
 ## Desvios do Figma
 
 - **Início mobile** (`14:5226`, extraído no P8): abaixo de 768 px, o Início não tem header, como no frame. No lugar dele há busca e filtros no topo e tab bar fixa (presente em todas as telas mobile). O botão central da tab bar fica só visual (função não definida) e o selo "RARO" vem do atributo do NFT. Detalhes em docs/11.
@@ -179,10 +188,10 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 
 ## Limitações conhecidas (até agora)
 
-- `npm run lighthouse` ainda não audita: o runner é implementado no bloco P9 e, por enquanto, sai com código 1 e uma mensagem explícita (não simula sucesso).
-- Playwright usa o servidor de desenvolvimento. Regressão visual, relógio controlado e cenários por teste entram no P9.
+- **Lighthouse mobile abaixo de 90 em Performance** (~79 no Início e ~76 no Detalhe; desktop ~98; as demais categorias em 100). A causa principal é a camada de mocks (~180 KB gzip, incluindo a Public Suffix List do MSW), que precisa subir antes da primeira requisição no 4G lento simulado. Análise e experimentos em `lighthouse/ANALISE.md`.
+- **Baselines visuais geradas no Windows.** A regressão visual (`npm run test:visual`) fica fora do `test:e2e`, porque fonte e antialiasing variam por sistema. Em outro sistema, gere as baselines com `npm run test:visual:update` antes de comparar.
 - Carteiras não podem ser excluídas (a API simulada só tem cadastro e edição; o enunciado pede principal e secundária).
-- Bundle inicial de ~379 KB (120 KB gzip) no P8, depois do code-splitting por rota. O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
+- Bundle inicial de ~379 KB (120 KB gzip), depois do code-splitting por rota. O zod saiu do carregamento inicial no P9. A camada de mocks soma ~180 KB gzip antes do primeiro render (ver `lighthouse/ANALISE.md`).
 - **Limitações do tempo real simulado:**
   - não há rooms nem namespaces (filtro por usuário feito à mão);
   - não há long-polling;
