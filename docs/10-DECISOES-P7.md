@@ -95,6 +95,15 @@ Um host próprio resolve os dois problemas. O endereço não é acessado: o MSW 
 
 ---
 
+### 4.1 Reconciliação também na primeira conexão (ajuste final, 14/10)
+**Problema:** num teste manual em produção, uma mudança de preço feita entre a resposta REST da página e a **primeira** conexão do socket (fração de segundo no carregamento) não aparecia até o próximo refetch. A reconciliação só rodava nas reconexões.
+
+**Correção:**
+- A reconciliação passou a rodar em **toda** conexão, com `cancelRefetch: false`, para não cancelar requisições em andamento. Um loader de rota cancelado viraria tela de erro, como se viu num experimento do P9.
+- O aviso "restabelecida" continua só nas reconexões.
+
+**Teste:** "mudança entre o carregamento da página e a primeira conexão do socket é reconciliada". O servidor simulado recusa conexões por 4 s logo depois de subir; a página carrega pelo REST, o preço muda sem nenhuma conexão e, na primeira conexão, a tela mostra o preço atual. O teste foi confirmado contra o código antigo (falha) e o novo (passa 3 vezes seguidas).
+
 ## 5. Correção de UX encontrada pelos testes
 
 **Problema:** no cenário de timeout do pedido, o pedido era criado e confirmado no servidor, os eventos chegavam e o carrinho esvaziava. A página de pagamento trocava para "Não há itens para pagar" e desmontava a revisão junto com o botão "Tentar de novo". A pessoa ficaria sem saber o resultado da compra.

@@ -62,7 +62,7 @@ lighthouse/        # configuração e relatórios da auditoria (versionados)
 ### Reconciliação REST × Socket.IO
 - **Versão:** o evento só é aplicado se a versão for **maior que a do dado em cache**, item a item (detalhe, listas, favoritos e carrinho). Duplicatas são descartadas pelo `id`.
 - **Carrinho:** um evento que afeta o carrinho recarrega carrinho e cotação da API. O aviso de preço é imediato. O de disponibilidade só aparece depois do refetch, se o item ainda estiver lá.
-- **Reconexão:** ao reconectar, as consultas ativas de NFTs, carrinho e dados privados são invalidadas e recarregadas do REST. Eventos perdidos durante a queda são cobertos assim.
+- **Conexão e reconexão:** a **cada** conexão do socket, inclusive a primeira, as consultas ativas de NFTs, carrinho e dados privados são invalidadas e recarregadas do REST, sem cancelar as requisições em andamento. Isso cobre os eventos perdidos durante uma queda e também os emitidos entre a resposta REST da página e a primeira conexão.
 - **Página do pedido:** também consulta a API a cada 15 s enquanto o pedido está pendente, como rede de segurança.
 
 ### Decisões de UX
@@ -183,7 +183,7 @@ Detalhe completo em [`docs/10-DECISOES-P7.md`](docs/10-DECISOES-P7.md).
   - **Duplicatas:** ignoradas pelo `id`.
   - **Eventos antigos:** só aplicados se a versão for maior que a do dado em cache, item a item.
   - **Carrinho afetado:** recarrega da API e avisa por `aria-live`.
-  - **Após reconectar:** as consultas ativas são invalidadas e recarregadas do REST.
+  - **A cada conexão** (inclusive a primeira): as consultas ativas são invalidadas e recarregadas do REST.
 - **Isolamento:** um socket por sessão, recriado no login, logout e troca de usuário, com os listeners liberados. O servidor filtra `order.updated` pelo dono e o cliente confere o `userId` de novo.
 
 ### Perfil e carteiras (P8)
@@ -234,7 +234,6 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 - **Baselines visuais geradas no Windows.** A regressão visual (`npm run test:visual`) fica fora do `test:e2e`, porque fonte e antialiasing variam por sistema. Em outro sistema, gere as baselines com `npm run test:visual:update` antes de comparar.
 - Carteiras não podem ser excluídas (a API simulada só tem cadastro e edição; o enunciado pede principal e secundária).
 - Bundle inicial de ~379 KB (120 KB gzip), depois do code-splitting por rota. O zod saiu do carregamento inicial no P9. A camada de mocks soma ~180 KB gzip antes do primeiro render (ver `lighthouse/ANALISE.md`).
-- **Janela da primeira conexão:** a reconciliação com o REST acontece em cada *reconexão*. Uma mudança feita entre a primeira resposta REST da página e a primeira conexão do socket (fração de segundo no carregamento) só aparece no próximo refetch (30 s de `staleTime`, foco na janela ou navegação). Os testes esperam o socket conectar antes de disparar eventos.
 - **Limitações do tempo real simulado:**
   - não há rooms nem namespaces (filtro por usuário feito à mão);
   - não há long-polling;

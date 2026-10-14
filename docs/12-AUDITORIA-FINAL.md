@@ -11,7 +11,7 @@ Feita em 14/10, com o código do commit `6cfe397` e as mudanças de documentaç�
 | Compra confirmada só com resposta da simulação | ✅ | A confirmação só aparece com `status: confirmed` vindo da API ou do evento (`checkout.spec`, `realtime.spec`). |
 | Sem exposição de dados entre usuários | ✅ | Cache privado por `userId`, purga no logout e na troca de conta, socket por sessão e filtro duplo de `order.updated` (`auth.spec`, `realtime.spec`). |
 | Eventos não simulados direto na UI | ✅ | Os testes mudam só o "servidor" (`__kurioMock`); o evento chega pelo `socket.io-client`. |
-| Testes E2E executáveis | ✅ | `npm run test:e2e`: 151 testes (desktop e mobile), executados duas vezes seguidas sem falha. |
+| Testes E2E executáveis | ✅ | `npm run test:e2e`: 152 testes (desktop e mobile), executados duas vezes seguidas sem falha. |
 
 ## 1–3. Escopo, stack, telas e fluxos
 
@@ -72,7 +72,7 @@ Feita em 14/10, com o código do commit `6cfe397` e as mudanças de documentaç�
 | Mocks ativados por configuração e presentes no build publicado | ✅ |
 | Mudanças refletidas no REST e nos eventos | ✅ |
 | `nft.updated` e `order.updated` com id, recurso e versão; duplicatas e eventos antigos tolerados | ✅ |
-| Reconciliação após reconexão; isolamento entre sessões; listeners liberados | ✅ |
+| Reconciliação a cada conexão (inclusive a primeira) e após reconexão; isolamento entre sessões; listeners liberados | ✅ |
 | Cenário do carrinho com preço alterado durante o checkout | ✅ |
 | Queda com pedido pendente e retomada sem nova compra | ✅ |
 
