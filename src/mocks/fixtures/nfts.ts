@@ -213,6 +213,7 @@ export function createNftFixtures(): NftDetail[] {
     const creator = CREATORS[index % CREATORS.length]
     const series = SERIES[index % SERIES.length]
     const royaltyPercent = 5
+    const attributes = seed.attributes ?? [COLLECTION_LABELS[seed.collection], 'Edição limitada']
     const tokenNumber = seed.name.match(/#(\d+)/)?.[1] ?? String(index + 1)
 
     return {
@@ -226,6 +227,7 @@ export function createNftFixtures(): NftDetail[] {
       priceEth: seed.priceEth,
       previousPriceEth: seed.previousPriceEth ?? null,
       soldOut: isSoldOut(editions),
+      rare: attributes.includes('Raro') || attributes.includes('Lendário'),
       editions,
       maxPerOrder: seed.maxPerOrder ?? 1,
       description: SUMMARIES[seed.collection],
@@ -233,7 +235,7 @@ export function createNftFixtures(): NftDetail[] {
       creator,
       series,
       tokenId: `#${tokenNumber.padStart(4, '0')}`,
-      attributes: seed.attributes ?? [COLLECTION_LABELS[seed.collection], 'Edição limitada'],
+      attributes,
       royaltyPercent,
       contractAddress: contractAddress(seed.network, index),
       tokenStandard: tokenStandard(seed.network, editions),

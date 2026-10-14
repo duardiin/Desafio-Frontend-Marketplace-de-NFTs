@@ -79,6 +79,8 @@ export interface NftSummary {
   previousPriceEth: EthAmount | null
   /** Todas as edições esgotadas. */
   soldOut: boolean
+  /** Atributo "Raro" ou "Lendário" (selo RARO do card mobile no Figma). */
+  rare: boolean
   /** Versão do recurso; aumenta a cada mudança de preço ou disponibilidade. */
   version: number
 }
