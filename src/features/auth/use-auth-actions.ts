@@ -3,6 +3,7 @@ import { useRouter } from '@tanstack/react-router'
 import type { LoginRequest, RegisterRequest, Session } from '@/api/contracts/auth'
 import { authToken } from '@/api/auth-token'
 import * as authApi from '@/features/auth/api'
+import { mergeGuestCartIntoAccount } from '@/features/cart/use-cart'
 import { purgePrivateCache, SESSION_QUERY_KEY } from '@/features/auth/session-query'
 import { endLocalSession, isOnProtectedRoute } from '@/features/auth/session-lifecycle'
 import { notify } from '@/features/feedback/notifications'
@@ -12,6 +13,8 @@ async function startSession(queryClient: ReturnType<typeof useQueryClient>, sess
   await purgePrivateCache(queryClient)
   authToken.set(session.token)
   queryClient.setQueryData<Session | null>(SESSION_QUERY_KEY, session)
+  // Preserva os itens escolhidos como visitante.
+  await mergeGuestCartIntoAccount(queryClient, session.user.id)
 }
 
 export function useLogin() {

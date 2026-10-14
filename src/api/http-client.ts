@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { toApiError } from '@/api/api-error'
 import { authToken, notifySessionRejected } from '@/api/auth-token'
+import { guestId } from '@/api/guest-id'
 import { env } from '@/config/env'
 
 /**
@@ -16,6 +17,9 @@ export const httpClient = axios.create({
 httpClient.interceptors.request.use((config) => {
   const token = authToken.get()
   if (token) config.headers.set('Authorization', `Bearer ${token}`)
+  // Carrinho de visitante. Com sessão, a API usa o carrinho da conta.
+  const guest = guestId.get()
+  if (guest && !token) config.headers.set('X-Guest-Id', guest)
   return config
 })
 

@@ -46,33 +46,37 @@ interface QuantityStepperProps {
   value: number
   max: number
   onChange: (value: number) => void
+  /** Nome do item, para rótulos únicos quando há vários steppers (carrinho). */
+  itemName?: string
+  disabled?: boolean
 }
 
 const STEP_BUTTON =
   'grid size-[33px] place-items-center rounded-full border border-ink bg-primary shadow-[0_6.6px_9.9px_rgba(20,13,10,0.15)] disabled:cursor-not-allowed disabled:opacity-40'
 
 /** Quantidade inteira entre 1 e o máximo da edição (Figma: botões circulares e número 20/28). */
-export function QuantityStepper({ value, max, onChange }: QuantityStepperProps) {
+export function QuantityStepper({ value, max, onChange, itemName, disabled = false }: QuantityStepperProps) {
+  const suffix = itemName ? ` de ${itemName}` : ''
   return (
-    <div className="flex items-center gap-3" role="group" aria-label="Quantidade">
+    <div className="flex items-center gap-3" role="group" aria-label={`Quantidade${suffix}`}>
       <button
         type="button"
         className={STEP_BUTTON}
         onClick={() => onChange(value - 1)}
-        disabled={value <= 1}
-        aria-label="Diminuir quantidade"
+        disabled={disabled || value <= 1}
+        aria-label={`Diminuir quantidade${suffix}`}
       >
         <img src={minusIcon} alt="" width={26} height={26} />
       </button>
-      <output aria-live="polite" aria-label={`Quantidade: ${value}`} className="min-w-6 text-center text-[20px] leading-7">
+      <output aria-live="polite" aria-label={`Quantidade${suffix}: ${value}`} className="min-w-6 text-center text-[20px] leading-7">
         {value}
       </output>
       <button
         type="button"
         className={STEP_BUTTON}
         onClick={() => onChange(value + 1)}
-        disabled={value >= max}
-        aria-label="Aumentar quantidade"
+        disabled={disabled || value >= max}
+        aria-label={`Aumentar quantidade${suffix}`}
       >
         <img src={plusIcon} alt="" width={26} height={26} />
       </button>

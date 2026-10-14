@@ -7,7 +7,7 @@ import { NETWORK_LABELS } from '@/api/contracts/common'
 import { Skeleton } from '@/components/ui/skeleton'
 import { nftDetailQueryOptions } from '@/features/catalog/api'
 import { FavoriteButton } from '@/features/favorites/favorite-button'
-import { ComingSoon } from '@/features/layout/coming-soon'
+import { BuyButton } from '@/features/cart/buy-button'
 import { availabilityText, initialEdition, maxForEdition } from '@/features/nft/editions'
 import { Gallery } from '@/features/nft/gallery'
 import { NftInfoTabs } from '@/features/nft/nft-info-tabs'
@@ -110,10 +110,14 @@ function ProductSection({ nft, editionId }: { nft: NftDetail; editionId: string 
           <div className="flex flex-wrap items-center justify-between gap-4">
             <QuantityStepper value={safeQuantity} max={max} onChange={setQuantity} />
             <div className="flex gap-2">
-              {/* Ligado ao carrinho no bloco P5. */}
-              <ComingSoon className="inline-flex h-10 w-[130px] items-center justify-center rounded-md bg-primary/60 text-body-14 font-bold text-ink">
-                COMPRAR
-              </ComingSoon>
+              <BuyButton
+                nftId={nft.id}
+                nftName={nft.name}
+                editionId={edition?.id}
+                editionLabel={edition?.label}
+                quantity={safeQuantity}
+                disabled={max === 0}
+              />
               <FavoriteButton nft={nft} variant="full" />
             </div>
           </div>

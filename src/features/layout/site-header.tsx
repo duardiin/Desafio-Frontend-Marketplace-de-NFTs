@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import cartIcon from '@/assets/figma/icon-cart.svg'
 import { AccountEntry } from '@/features/auth/account-entry'
 import { SearchDialog } from '@/features/catalog/search-dialog'
+import { CartLink } from '@/features/cart/cart-link'
 import { ComingSoon } from '@/features/layout/coming-soon'
 import { MobileNav } from '@/features/layout/mobile-nav'
 import { NAV_ITEMS, type NavItem, type NavSection } from '@/features/layout/navigation'
@@ -29,10 +29,7 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-5 lg:gap-7">
           <SearchDialog />
-          {/* O carrinho ganha comportamento no bloco P5. */}
-          <ComingSoon className="inline-flex size-6 items-center justify-center">
-            <img src={cartIcon} alt="Carrinho" width={24} height={24} />
-          </ComingSoon>
+          <CartLink />
           <div className="hidden lg:block">
             <AccountEntry />
           </div>
