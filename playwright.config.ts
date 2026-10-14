@@ -13,6 +13,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: [['html', { open: 'never' }], ['list']],
+  // Com vários workers contra o servidor de desenvolvimento, 5 s (padrão) ficou justo em máquinas mais lentas.
+  expect: { timeout: 10_000 },
   use: {
     baseURL: BASE_URL,
     trace: 'retain-on-failure',
