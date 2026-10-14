@@ -18,7 +18,7 @@ export async function useScenario(page: Page, scenario: string) {
  */
 export async function openApp(page: Page, path = '/') {
   await page.goto(path)
-  await page.locator('header').waitFor()
+  await page.locator('header').first().waitFor()
 }
 
 /**
