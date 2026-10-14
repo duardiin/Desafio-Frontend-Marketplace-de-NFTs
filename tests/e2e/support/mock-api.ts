@@ -12,10 +12,13 @@ export async function useScenario(page: Page, scenario: string) {
   }, scenario)
 }
 
-/** Abre o app e espera os mocks subirem (o render só acontece depois do worker). */
+/**
+ * Abre o app e espera os mocks subirem (o render só acontece depois do worker).
+ * Usa seletor CSS: com um modal aberto (ex.: /login) o header fica aria-hidden.
+ */
 export async function openApp(page: Page, path = '/') {
   await page.goto(path)
-  await page.getByRole('banner').waitFor()
+  await page.locator('header').waitFor()
 }
 
 /**
