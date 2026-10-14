@@ -15,11 +15,20 @@ export async function useScenario(page: Page, scenario: string) {
 /**
  * Abre o app e espera os mocks subirem (o render só acontece depois do worker).
  * Usa seletor CSS: com um modal aberto (ex.: /login) a página fica aria-hidden.
- * Espera o <main> (o Início mobile do Figma não tem header).
+ * Espera o <main> (o Início mobile do Figma não tem header) e o MSW ativo.
  */
 export async function openApp(page: Page, path = '/') {
   await page.goto(path)
   await page.locator('#conteudo').waitFor()
+  await waitForMocks(page)
+}
+
+/**
+ * O app desenha antes de o MSW subir; os controles só aparecem com ele ativo.
+ * Use depois de `page.reload()`/`page.goto()` antes de chamar a API direto.
+ */
+export async function waitForMocks(page: Page) {
+  await page.waitForFunction(() => window.__kurioMock !== undefined)
 }
 
 /**

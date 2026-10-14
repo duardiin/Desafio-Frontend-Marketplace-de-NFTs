@@ -4,8 +4,9 @@ const PORT = 5173
 const BASE_URL = `http://localhost:${PORT}`
 
 /**
- * Configuração base. Regressão visual, relógio controlado e cenários
- * de mock por teste são adicionados no bloco P9.
+ * E2E funcionais (`npm run test:e2e`): desktop e mobile, relatório HTML,
+ * trace e captura nas falhas. A regressão visual tem configuração própria
+ * (playwright.visual.config.ts), que herda esta.
  */
 export default defineConfig({
   testDir: './tests/e2e',

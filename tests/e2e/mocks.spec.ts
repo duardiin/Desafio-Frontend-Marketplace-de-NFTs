@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { callApi, login, openApp, useScenario } from './support/mock-api'
+import { callApi, login, openApp, useScenario, waitForMocks } from './support/mock-api'
 
 interface ListBody {
   items: { id: string; name: string; collection: string; network: string; priceEth: string }[]
@@ -182,7 +182,7 @@ test.describe('persistência e reset', () => {
     await callApi(page, '/me/favorites/nft-020', { method: 'PUT', token })
 
     await page.reload()
-    await page.getByRole('banner').waitFor()
+    await waitForMocks(page)
     const afterReload = await callApi<{ items: { id: string }[] }>(page, '/me/favorites', { token })
     expect(afterReload.body.items.map((item) => item.id)).toContain('nft-020')
 
