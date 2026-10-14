@@ -124,8 +124,9 @@ Regras da criação:
 | Método | Caminho | Corpo | Resposta |
 |---|---|---|---|
 | GET | `/me/profile` | | 200 `Profile` |
-| PATCH | `/me/profile` | `{ displayName?, username?, email?, bio? }` | 200 `Profile` · 409 `EMAIL_TAKEN` · 422 |
+| PATCH | `/me/profile` | `{ displayName?, username?, email?, ensName?, walletNickname?, bio? }` | 200 `Profile` · 409 `EMAIL_TAKEN` · 422 (inclui nome de usuário em uso) |
 | PUT | `/me/avatar` | `{ dataUrl }` (PNG/JPEG/WebP, até 300 KB) | 200 `Profile` · 422 |
+| DELETE | `/me/avatar` | | 200 `Profile` (sem avatar) |
 | POST | `/me/password` | `{ currentPassword, newPassword }` | 204 · 422 `WRONG_PASSWORD` |
 | GET | `/me/wallets` | | 200 `{ items: Wallet[] }` |
 | POST | `/me/wallets` | `{ label, provider, address, networks, role }` | 201 `Wallet` · 409 `WALLET_LIMIT` · 422 |

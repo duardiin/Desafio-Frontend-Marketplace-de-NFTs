@@ -1,0 +1,112 @@
+# Decisões do bloco P8 (perfil, carteiras, responsividade e acessibilidade)
+
+Registro do que foi feito de forma diferente do esperado ou do padrão das ferramentas, com o motivo de cada escolha. A parte 1 cobre perfil e carteiras; as passadas de responsividade e acessibilidade entram na parte 2.
+
+---
+
+## 1. Figma
+
+### 1.1 Perfil extraído, Carteiras não
+**O que foi feito:** a 5ª chamada ao MCP foi o Perfil desktop (`9:1238`). As Carteiras (`9:1670`) não foram extraídas.
+
+**Por quê:** a conta tem ~6 chamadas por mês. A última ficou reservada para um frame **mobile**, porque a fidelidade no mobile também conta e nenhum frame mobile foi extraído até aqui. O Perfil traz a barra lateral e os campos que as Carteiras reaproveitam.
+
+### 1.2 O design trouxe campos que o contrato não tinha
+**O que foi feito:**
+- `Profile` ganhou `ensName` (completo, ex.: `anaribeiro.eth`) e `walletNickname`, obrigatórios como no design.
+- O seletor de domínio ao lado do ENS aceita `.eth` e `.box`.
+- A `bio` continua na API, mas não aparece na tela, porque não está no design.
+
+**Por quê:** o contrato do P2 foi escrito antes da extração. Seguir o Figma tem prioridade, e manter a `bio` na API evita uma mudança sem ganho.
+
+---
+
+## 2. Área da conta
+
+### 2.1 Uma barra lateral para Perfil, Carteiras e Favoritos
+**O que foi feito:** o componente `AccountLayout` reproduz a barra "Meu perfil" (310 px, item ativo com borda de 6 px) e envolve as três telas. "Lista de interesse" leva a `/favoritos`. Atividade, Ofertas, Arquivos baixados e Suporte ficam "em breve": visuais, não focáveis e anunciados como "(em breve)".
+
+**Por quê:** a barra é o mesmo componente nas telas de conta do Figma, e dar a ela as rotas que já existem evita links mortos.
+
+### 2.2 Mobile sem frame
+**O que foi feito:** abaixo de 1024 px, a barra vira uma faixa horizontal rolável acima do conteúdo, com o item ativo sublinhado (como as abas do Detalhe). "Sair" fica logo abaixo.
+
+**Por quê:** empilhar os 8 itens (~400 px) empurraria o formulário para fora da primeira tela.
+
+**Bug encontrado e corrigido:** os textos "(em breve)" só para leitores de tela usam `position: absolute`. Dentro de uma faixa rolável sem `position`, eles escapavam do recorte e alargavam o documento para ~1080 px no mobile. A página parecia normal na captura, mas o navegador encolhia o zoom. Com `relative` na faixa, o problema some. A varredura automática de overflow da passada de responsividade vai procurar casos assim nas outras telas.
+
+---
+
+## 3. Perfil
+
+### 3.1 Um "Salvar" para dados e senha
+**O que foi feito:**
+- O Figma tem um único botão no fim do formulário.
+- Ao salvar, os dados vão por `PATCH /me/profile` **só se mudaram**, e a senha por `POST /me/password` **só se foi preenchida**.
+- Se a senha falhar depois de os dados terem sido salvos, o aviso diz isso: "Dados do perfil salvos. A senha não foi alterada."
+- Sem mudanças, o aviso é "Nada para salvar".
+
+**Por quê:** é o comportamento do design sem enviar requisições à toa. Os três campos de senha são tudo ou nada: preencher qualquer um exige os três.
+
+### 3.2 Erros da API no campo
+**O que foi feito:**
+- Os erros por campo da API aparecem sob o campo certo e recebem o foco:
+  - e-mail em uso (409);
+  - nome de usuário em uso;
+  - "senha atual incorreta" (422).
+- `applyApiErrors` ganhou aliases, porque a API valida `ensName` e o formulário edita nome e domínio separados (`ensLabel` e `ensSuffix`).
+
+### 3.3 Cache e header
+**O que foi feito:** a resposta do `PATCH` (e do avatar) é gravada no cache do perfil e no usuário da sessão. O header mostra o nome e o avatar novos na hora, sem outra requisição.
+
+### 3.4 Avatar
+**O que foi feito:**
+- O navegador recorta ao centro e reduz para 256 px em WebP (qualidade 0,85) antes de enviar. Uma foto de vários MB vira poucos KB.
+- O tipo é validado no cliente (PNG, JPEG ou WebP). A API valida de novo, incluindo o limite de 300 KB.
+- O avatar é salvo **na hora**, em endpoint próprio, e "Remover" usa o novo `DELETE /me/avatar`.
+
+**Por quê:**
+- O avatar é exibido em no máximo 50 px, e o `localStorage` do banco simulado tem limite de tamanho.
+- Salvar na hora segue o padrão de "Alterar/Remover" ao lado da imagem e evita perder o upload se a pessoa sair sem clicar em "Salvar".
+
+### 3.5 Mostrar senha
+**O que foi feito:** o ícone do Figma (olho riscado) indica o campo oculto. Ao mostrar, entra um olho aberto do Lucide. O botão tem `aria-pressed` e nome "Mostrar senha atual" (e assim por diante).
+
+**Por quê:** o Figma só desenha o estado oculto.
+
+---
+
+## 4. Carteiras
+
+- **Lista:**
+  - cartões com papel (Principal ou Secundária), rótulo, provedor, redes e endereço completo;
+  - "Tornar principal" na secundária;
+  - "Editar" em ambas.
+- **Cadastro e edição:**
+  - Feitos num diálogo (foco preso e devolvido, Esc fecha), com os campos do Pagamento.
+  - Redes em caixas de seleção e papel com o rádio do Figma.
+  - As regras são as mesmas da API: Solana não se mistura com redes EVM, e o endereço é EVM (`0x` + 40 hex) ou Solana (base58).
+- **Limite:** com principal e secundária cadastradas, "Adicionar carteira" fica desabilitado, com a explicação ao lado. Se a API recusar mesmo assim (409 `WALLET_LIMIT`, ex.: escolher "Principal" quando ela já existe), a mensagem aparece no formulário.
+- **Troca de papel:** o `PATCH` devolve a lista inteira, porque promover uma carteira rebaixa a outra. O cache recebe a lista pronta.
+- **Pagamento:** usa a mesma chave de cache, então uma carteira nova aparece lá sem recarregar. "Usar outra carteira?" deixou de ser "em breve" e leva a `/carteiras`. O rascunho do pagamento é restaurado na volta.
+- **Sem exclusão:** a API simulada não tem `DELETE /me/wallets/:id`, e o enunciado pede principal e secundária, não uma lista livre.
+
+---
+
+## 5. Testes
+
+- **`profile.spec.ts` (desktop e mobile):**
+  - edição de todos os campos, com persistência após refresh;
+  - validação no cliente com `aria-invalid` e descrição do erro;
+  - e-mail em uso vindo da API, com foco no campo;
+  - avatar: arquivo inválido, envio, header, refresh e remoção;
+  - senha: confirmação divergente, senha atual errada, mostrar senha, troca efetiva (a antiga passa a dar 422 no login e a nova, 200);
+  - navegação pela barra lateral.
+- **`wallets.spec.ts`:**
+  - troca de papel persistida;
+  - cadastro com validação de redes e endereço e persistência;
+  - erro `WALLET_LIMIT` da API;
+  - edição;
+  - link do pagamento.
+- **`auth.spec.ts`:** passou a conferir o e-mail pelo valor do campo do perfil, que agora é editável.
+- **Resultado:** 139 E2E passando.

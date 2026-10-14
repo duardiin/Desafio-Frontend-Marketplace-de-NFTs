@@ -220,3 +220,24 @@ Header com "Mercado" ativo e sem divisória. Trilha "Início / Mercado / Pagamen
 **"Carteira e rede"** (17 Bold, centralizado): opções em caixas de 45 px (borda `border`, raio 3; selecionada com borda `primary`), círculo de rádio de 16 px: chip "METAMASK • WALLETCONNECT • COINBASE", "MetaMask", "Coinbase Wallet" (selecionada: rádio preenchido `radio-selected.svg`; vazio: `radio-empty.svg`). Botão **Confirmar compra**: 45 px, `primary`, **raio 8**, 15 Bold `ink`.
 
 Observação: o componente "Checkout Page" é compartilhado com a Confirmação (`11:4385`), que é um modal sobre esta tela.
+
+## Perfil do colecionador · desktop (node `9:1238`, extraído em 14/10, 5ª chamada ao MCP)
+
+Header com **"Início" ativo e com divisória** (o mesmo das Carteiras). Corpo com duas colunas e gap de 28: barra lateral de 310 px + formulário (flex 1). Gap de 32 entre header e corpo.
+
+**Barra lateral "Meu perfil"** (`surface-card`, padding vertical 8):
+- Título "Meu perfil" (18 Bold, lh 16, padding 10).
+- Itens de 45 px (15 Regular, lh 45, `text-accent`), padding horizontal 16, ícone de 16 a 20 px + gap 12. O ativo tem **borda esquerda de 6 px `primary`** (gap 16).
+- Itens: Dados do perfil (`icon-user.svg`), Carteiras (`icon-location.svg`), Atividade (`icon-shopping.svg`), Lista de interesse (`icon-heart-outline.svg`), Ofertas (`icon-activity.svg`), Arquivos baixados (`icon-download.svg`), Suporte (`icon-danger-triangle.svg`).
+- Divisória de 0,3 px e **Sair** (15 Bold, `icon-logout-accent.svg` de 20 px, altura 40, gap 8).
+
+**Formulário "Perfil do colecionador"** (16 Bold, lh 16), gap de 32 entre blocos e 24 entre linhas de campos. Duas colunas de 417 px com `justify-between`:
+- Linha 1: Nome de exibição\*, Nome de usuário\*.
+- Linha 2: E-mail\*, Nome ENS\* (select de 78 px ".eth" com `ens-arrow-down.svg` de 20 px + campo de 329 px, gap 10).
+- Linha 3: Apelido da carteira\*, Avatar.
+- Campos com o mesmo padrão do Pagamento: rótulo 15 Regular + asterisco 22 `text-coral`, altura 40, borda 1 px `border`, raio 3. Gap de 10 entre rótulo e campo.
+- **Avatar:** círculo de 50 px (`surface-raised`, borda `border`, ícone `icon-image.svg` de 24 px), gap 24, botão **Alterar** (98 × 40, `primary`, raio 3, 14 Bold `ink`) e **Remover** (14 Regular, `foreground`, gap 20).
+- **"Alterar senha"** (16 Medium, lh 16): Senha atual, Nova senha, Confirmar nova senha. Uma coluna de 417 px, gap de 12 entre rótulo e campo. O campo tem o ícone de visibilidade `icon-hide.svg` (20 px, `secondary`) à direita, com padding 16.
+- Botão **Salvar** (131 × 40, `primary`, raio 3, 14 Bold `ink`) ao fim do formulário, um só para os dados e a senha.
+
+Diferenças em relação ao contrato do P2: o design tem **Nome ENS** e **Apelido da carteira** (obrigatórios) e **não tem bio**.

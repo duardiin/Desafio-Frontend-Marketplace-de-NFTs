@@ -55,7 +55,7 @@ Prazo: `16/10 às 09:14h` (fechamento a partir de 16/10 06:14). Reserve as **úl
 - **Pronto quando:** compra completa funciona e os dois cenários de tempo real passam em E2E.
 
 ### Bloco 5 · Conta, qualidade e entrega (~5h) · prompts P8, P9
-- [ ] Perfil (dados, avatar simples, senha) e carteiras (principal/secundária) com validação e erros da API
+- [x] Perfil (dados, avatar simples, senha) e carteiras (principal/secundária) com validação e erros da API
 - [ ] Passada de responsividade em 390, 768 e 1440 px (perfil, carteiras e confirmação também no mobile)
 - [ ] Acessibilidade: teclado, foco em diálogos/drawers, labels e erros associados, `aria-live`
 - [ ] Regressão visual (início, detalhe, carrinho, pagamento) em desktop e mobile, baselines versionadas
@@ -86,13 +86,12 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 | 2 Contratos, MSW, sessão | 14/10 | 14/10 | Concluído | P2: contratos tipados, MSW com 47 NFTs, 2 usuários, 15 cenários, reset, idempotência e liquidação de pedidos (16 E2E). P3: login/cadastro em modal com rota, sessão por token, expiração em 3 pontos, rotas protegidas com retorno, cache privado por usuário, avisos aria-live (9 E2E × desktop/mobile). Decisões em docs/05 e docs/06. Perfil só leitura até o P8. |
 | 3 Descoberta e carrinho | 14/10 | 14/10 | Concluído | P5: carrinho na API (visitante por X-Guest-Id, mescla no login), cotação como única fonte de valores, cupom, avisos de preço/esgotado, badge no header, COMPRAR no detalhe; 96 E2E passando. Decisões em docs/08. P4: Início completa (hero, catálogo com estado na URL, destaque, promos, blog), detalhe do Figma 10:244 (3ª chamada ao MCP) com edições por NFT, favoritos otimistas, imagens WebP; 84 E2E passando. Decisões em docs/07. Falta P5 (carrinho e cotação). |
 | 4 Compra e tempo real | 14/10 | 14/10 | Concluído | P7: Socket.IO real no cliente + servidor simulado no MSW (binding), nft.updated/order.updated com id/recurso/versão, dedupe e versão por item, reconciliação após reconexão, socket por sessão; os 2 cenários do enunciado em E2E; 121 E2E passando. Decisões em docs/10. P6: pagamento do Figma 11:2862 (4ª chamada ao MCP), conexão de carteira simulada (recusa/desconexão), revisão com revalidação, pedido idempotente (clique repetido, timeout), estados e recibo, rascunho após expiração; 116 E2E passando. Decisões em docs/09. Falta P7 (Socket.IO). |
-| 5 Conta, qualidade, entrega | | | | |
+| 5 Conta, qualidade, entrega | 14/10 | | Em andamento | P8 (parte 1): Perfil do Figma 9:1238 (5ª chamada ao MCP; a última fica para um frame mobile) com barra "Meu perfil", dados + ENS + apelido da carteira, avatar (reduzido no navegador, salvo na hora) e troca de senha; Carteiras (/carteiras) com cadastro, edição, validação EVM/Solana, limite e troca de papel; "Usar outra carteira?" ligado; 139 E2E passando. Decisões em docs/11. Falta: passadas de responsividade e acessibilidade (P8) e o P9. |
 
 ### Decisões tomadas (copie para ARCHITECTURE.md)
 - Ver ARCHITECTURE.md (seção "Decisões"). Resumo: MSW fixado em 2.x; oxlint no lugar de ESLint; shadcn com base Radix; defaults de env no código; .gitattributes com LF.
 
 ### Pendências / dívidas técnicas
-- "Usar outra carteira?" do pagamento "em breve" até o P8.
 - E2E do skeleton com reduced motion entra no P4.
 - Bundle inicial de ~337 KB + chunk do MSW de ~420 KB antes do render (medir no P9).
 

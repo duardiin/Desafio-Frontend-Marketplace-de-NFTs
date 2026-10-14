@@ -144,6 +144,14 @@ Detalhe completo em [`docs/10-DECISOES-P7.md`](docs/10-DECISOES-P7.md).
   - **Após reconectar:** as consultas ativas são invalidadas e recarregadas do REST.
 - **Isolamento:** um socket por sessão, recriado no login, logout e troca de usuário, com os listeners liberados. O servidor filtra `order.updated` pelo dono e o cliente confere o `userId` de novo.
 
+### Perfil e carteiras (P8)
+Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
+
+- **Área da conta:** a barra "Meu perfil" do Figma (`AccountLayout`) envolve Perfil, Carteiras e Favoritos ("Lista de interesse"). Os itens sem tela (Atividade, Ofertas, Arquivos baixados, Suporte) ficam "em breve".
+- **Perfil:** um formulário e um "Salvar", como no Figma. Os dados vão por `PATCH /me/profile` só se mudaram, e a senha por `POST /me/password` só se foi preenchida. Os erros da API vão para o campo certo (`applyApiErrors` com aliases, ex.: `ensName` → `ensLabel`). A resposta atualiza o cache do perfil e o usuário da sessão (header), sem nova requisição.
+- **Avatar:** o navegador recorta e reduz para 256 px em WebP antes do envio (limite de 300 KB da API). É salvo na hora, por endpoint próprio, com remoção por `DELETE /me/avatar`.
+- **Carteiras:** cadastro e edição num diálogo, com as mesmas regras da API (redes EVM ou Solana, formato do endereço). O `PATCH` devolve a lista inteira, porque trocar o papel muda as duas carteiras. A lista usa a mesma chave de cache do Pagamento.
+
 ## Desvios do Figma
 
 - **Header mobile:** frame não extraído. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
@@ -156,8 +164,10 @@ Detalhe completo em [`docs/10-DECISOES-P7.md`](docs/10-DECISOES-P7.md).
 - **Banner em destaque** com nome e preço sobre a imagem, porque o banner é clicável e precisa dizer o destino.
 - **Detalhe:** os textos de "Contrato" e "Direitos autorais" estão trocados no Figma; o código os pareia corretamente. A galeria repete a arte principal, como no próprio frame (só há 4 artes). "Mais desta coleção" não pagina, porque mostra os 5 itens de uma vez.
 - **Carrinho** (frame `11:1278` não extraído, por decisão de guardar a chamada para o Pagamento): segue o padrão do Detalhe, com a lista de itens e o resumo em cartão de 380 px. COMPRAR adiciona e abre o carrinho.
-- **Pagamento** (`11:2862`): Código de indicação e Nome ENS são opcionais (no Figma, obrigatórios). O endereço vem da carteira escolhida (só leitura). "Usar outra carteira?" está "em breve" até o P8. O chip de provedores é um cabeçalho, e não uma opção. O resumo mostra a edição no lugar do ID do token. "Confirmar compra" abre a revisão, e o envio é em "Confirmar pagamento".
+- **Pagamento** (`11:2862`): Código de indicação e Nome ENS são opcionais (no Figma, obrigatórios). O endereço vem da carteira escolhida (só leitura). "Usar outra carteira?" leva a `/carteiras`, e o rascunho do pagamento é restaurado na volta. O chip de provedores é um cabeçalho, e não uma opção. O resumo mostra a edição no lugar do ID do token. "Confirmar compra" abre a revisão, e o envio é em "Confirmar pagamento".
 - **Confirmação** (`11:4385`, não extraída): modal sobre a página do pedido (`/pedidos/<id>`), e não sobre o Pagamento, para sobreviver a refresh.
+- **Perfil** (`9:1238`): a barra lateral vira uma faixa rolável abaixo de 1024 px, porque não há frame mobile. O olho aberto do "mostrar senha" é um ícone Lucide, porque o Figma só tem o estado oculto. A dica de senha forte e as mensagens de erro foram acrescentadas. A bio, que existe na API, não aparece, porque não está no design.
+- **Carteiras** (`9:1670`, não extraído; a chamada ficou reservada para um frame mobile): seguem os campos e cartões do Pagamento e do Perfil, com a mesma barra lateral.
 - **Valores ETH com ponto** em todo lugar ("1.19 ETH"), como nos cards do Figma. O filtro de preço do Figma usa vírgula.
 - **Avisos (toasts):** estado não desenhado. Seguem `surface-card`, raio 8 e borda por tom, com prefixo "Erro:" nos erros.
 
@@ -165,8 +175,8 @@ Detalhe completo em [`docs/10-DECISOES-P7.md`](docs/10-DECISOES-P7.md).
 
 - `npm run lighthouse` ainda não audita: o runner é implementado no bloco P9 e, por enquanto, sai com código 1 e uma mensagem explícita (não simula sucesso).
 - Playwright usa o servidor de desenvolvimento. Regressão visual, relógio controlado e cenários por teste entram no P9.
-- "Usar outra carteira?" do pagamento está "em breve" até o P8 (cadastro de carteiras).
-- Bundle inicial de ~337 KB (106 KB gzip), depois do code-splitting por rota. O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
+- Carteiras não podem ser excluídas (a API simulada só tem cadastro e edição; o enunciado pede principal e secundária).
+- Bundle inicial de ~362 KB (114 KB gzip) no P8, depois do code-splitting por rota. O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
 - **Limitações do tempo real simulado:**
   - não há rooms nem namespaces (filtro por usuário feito à mão);
   - não há long-polling;
