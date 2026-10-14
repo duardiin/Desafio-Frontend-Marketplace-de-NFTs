@@ -3,16 +3,19 @@ import { openApp, useScenario } from './support/mock-api'
 import { loginViaUi } from './support/ui'
 
 test.describe('favoritos', () => {
-  test('visitante é levado ao login e volta para o NFT', async ({ page }) => {
+  test('visitante: o login abre sobre o NFT e, depois de entrar, continua na mesma página', async ({ page }) => {
     await openApp(page, '/nft/nft-003')
     await page.getByRole('button', { name: 'Favoritar', exact: true }).click()
-    await expect(page).toHaveURL(/\/login\?redirect=%2Fnft%2Fnft-003/)
 
     const dialog = page.getByRole('dialog', { name: 'Entrar' })
-    await dialog.getByLabel('E-mail').fill('ana@kurio.dev')
-    await dialog.getByLabel('Senha').fill('Kurio@123')
-    await dialog.getByRole('button', { name: 'Entrar' }).click()
+    await expect(dialog).toBeVisible()
     await expect(page).toHaveURL(/\/nft\/nft-003$/)
+    await dialog.getByLabel('E-mail').fill('ana@kurio.dev')
+    await dialog.getByLabel('Senha', { exact: true }).fill('Kurio@123')
+    await dialog.getByRole('button', { name: 'Entrar' }).click()
+    await expect(dialog).toBeHidden()
+    await expect(page).toHaveURL(/\/nft\/nft-003$/)
+    await expect(page.getByRole('button', { name: 'Favoritar', exact: true })).toBeVisible()
   })
 
   test('favoritar é otimista, persiste após refresh e aparece em "Meus favoritos"', async ({ page }) => {

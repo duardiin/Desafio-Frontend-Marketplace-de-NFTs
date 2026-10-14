@@ -8,13 +8,13 @@ function profileEmail(page: Page) {
 
 const PASSWORD = 'Kurio@123'
 
-/** Abre o login pelo header (desktop) ou pelo menu (mobile). */
+/** Abre o balão de login pelo header (desktop) ou pelo menu (mobile), sem trocar de página. */
 async function openLoginFromHeader(page: Page, isMobile: boolean) {
   if (isMobile) {
     await page.getByRole('button', { name: 'Abrir menu' }).click()
-    await page.getByRole('dialog').getByRole('link', { name: 'Entrar' }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Entrar' }).click()
   } else {
-    await page.getByRole('banner').getByRole('link', { name: 'Entrar' }).click()
+    await page.getByRole('banner').getByRole('button', { name: 'Entrar' }).click()
   }
   await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeVisible()
 }
@@ -22,7 +22,7 @@ async function openLoginFromHeader(page: Page, isMobile: boolean) {
 async function fillLogin(page: Page, email: string, password = PASSWORD) {
   const dialog = page.getByRole('dialog', { name: 'Entrar' })
   await dialog.getByLabel('E-mail').fill(email)
-  await dialog.getByLabel('Senha').fill(password)
+  await dialog.getByLabel('Senha', { exact: true }).fill(password)
   await dialog.getByRole('button', { name: 'Entrar' }).click()
 }
 
@@ -92,6 +92,43 @@ test.describe('login', () => {
   })
 })
 
+test.describe('balão de login (Figma)', () => {
+  test('abre sobre a tela atual; entrar mantém a página; abas trocam entre login e cadastro', async ({ page, isMobile }) => {
+    await openApp(page, '/carrinho')
+    await openLoginFromHeader(page, isMobile)
+    await expect(page).toHaveURL(/\/carrinho$/)
+
+    // Abas "Entrar | Criar conta", também pelas setas do teclado.
+    const loginTab = page.getByRole('tab', { name: 'Entrar' })
+    await expect(loginTab).toHaveAttribute('aria-selected', 'true')
+    await page.getByRole('tab', { name: 'Criar conta' }).click()
+    await expect(page.getByRole('dialog', { name: 'Criar conta' }).getByLabel('Nome', { exact: true })).toBeVisible()
+    await page.getByRole('tab', { name: 'Criar conta' }).press('ArrowLeft')
+    await expect(loginTab).toBeFocused()
+    await expect(loginTab).toHaveAttribute('aria-selected', 'true')
+
+    // Fora do escopo: visual do Figma, sem aparentar funcionar.
+    const dialog = page.getByRole('dialog', { name: 'Entrar' })
+    await expect(dialog.getByText('Esqueceu a senha?')).toHaveAttribute('aria-disabled', 'true')
+    await expect(dialog.getByText('Continuar com Google')).toHaveAttribute('aria-disabled', 'true')
+    await expect(dialog.getByRole('button', { name: /Google|Facebook/ })).toHaveCount(0)
+
+    // O foco começa no e-mail; entrar fecha o balão e continua no carrinho.
+    await fillLogin(page, 'ana@kurio.dev')
+    await expect(dialog).toBeHidden()
+    await expect(page).toHaveURL(/\/carrinho$/)
+    await expect(page.getByRole('main')).toContainText('Sage Nomad #089')
+  })
+
+  test('na rota /login, as abas trocam de rota mantendo o redirect', async ({ page }) => {
+    await openApp(page, '/login?redirect=%2Fperfil')
+    await page.getByRole('tab', { name: 'Criar conta' }).click()
+    await expect(page).toHaveURL(/\/cadastro\?redirect=%2Fperfil$/)
+    await page.getByRole('tab', { name: 'Entrar' }).click()
+    await expect(page).toHaveURL(/\/login\?redirect=%2Fperfil$/)
+  })
+})
+
 test.describe('cadastro', () => {
   test('conflito de e-mail vindo da API fica no campo; cadastro novo entra na conta', async ({ page, isMobile }) => {
     await openApp(page, '/cadastro')
@@ -99,11 +136,11 @@ test.describe('cadastro', () => {
     await dialog.getByLabel('Nome').fill('Carla Souza')
     await dialog.getByLabel('E-mail').fill('ana@kurio.dev')
     await dialog.getByLabel('Senha', { exact: true }).fill('Segredo123')
-    await dialog.getByLabel('Confirmar senha').fill('Segredo321')
+    await dialog.getByLabel('Confirmar senha', { exact: true }).fill('Segredo321')
     await dialog.getByRole('button', { name: 'Criar conta' }).click()
-    await expect(dialog.getByLabel('Confirmar senha')).toHaveAccessibleDescription('As senhas não conferem.')
+    await expect(dialog.getByLabel('Confirmar senha', { exact: true })).toHaveAccessibleDescription('As senhas não conferem.')
 
-    await dialog.getByLabel('Confirmar senha').fill('Segredo123')
+    await dialog.getByLabel('Confirmar senha', { exact: true }).fill('Segredo123')
     await dialog.getByRole('button', { name: 'Criar conta' }).click()
     const emailField = dialog.getByLabel('E-mail')
     await expect(emailField).toHaveAccessibleDescription(/já está cadastrado/)

@@ -6,7 +6,7 @@ export async function loginViaUi(page: Page, email: string, redirect = '/') {
   await openApp(page, `/login?redirect=${encodeURIComponent(redirect)}`)
   const dialog = page.getByRole('dialog', { name: 'Entrar' })
   await dialog.getByLabel('E-mail').fill(email)
-  await dialog.getByLabel('Senha').fill('Kurio@123')
+  await dialog.getByLabel('Senha', { exact: true }).fill('Kurio@123')
   await dialog.getByRole('button', { name: 'Entrar' }).click()
   await expect(dialog).toBeHidden()
 }

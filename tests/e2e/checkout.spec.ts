@@ -43,7 +43,7 @@ test.describe('pagamento e pedido', () => {
     await expect(page).toHaveURL(/\/login\?redirect=%2Fpagamento/)
     const login = page.getByRole('dialog', { name: 'Entrar' })
     await login.getByLabel('E-mail').fill('ana@kurio.dev')
-    await login.getByLabel('Senha').fill('Kurio@123')
+    await login.getByLabel('Senha', { exact: true }).fill('Kurio@123')
     await login.getByRole('button', { name: 'Entrar' }).click()
     await expect(page).toHaveURL(/\/pagamento$/)
 
@@ -181,7 +181,7 @@ test.describe('pagamento e pedido', () => {
     await expect(page).toHaveURL(/\/login\?redirect=%2Fpagamento&motivo=expirada/)
     const login = page.getByRole('dialog', { name: 'Entrar' })
     await login.getByLabel('E-mail').fill('ana@kurio.dev')
-    await login.getByLabel('Senha').fill('Kurio@123')
+    await login.getByLabel('Senha', { exact: true }).fill('Kurio@123')
     await login.getByRole('button', { name: 'Entrar' }).click()
 
     await expect(page).toHaveURL(/\/pagamento$/)
