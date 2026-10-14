@@ -12,6 +12,7 @@ const envSchema = z.object({
     .transform((value) => value === 'true'),
   VITE_API_URL: z.string().min(1).default('/api'),
   VITE_MOCK_SCENARIO: z.string().min(1).default('default'),
+  VITE_HTTP_TIMEOUT_MS: z.coerce.number().int().positive().default(10_000),
 })
 
 const parsed = envSchema.parse(import.meta.env)
@@ -20,4 +21,5 @@ export const env = {
   enableMocks: parsed.VITE_ENABLE_MOCKS,
   apiUrl: parsed.VITE_API_URL,
   mockScenario: parsed.VITE_MOCK_SCENARIO,
+  httpTimeoutMs: parsed.VITE_HTTP_TIMEOUT_MS,
 } as const
