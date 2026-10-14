@@ -105,6 +105,18 @@ Detalhe completo em [`docs/07-DECISOES-P4.md`](docs/07-DECISOES-P4.md).
 - **Favoritos otimistas:** `onMutate` altera `['private', userId, 'favorites']`; o rollback em `onError` vem com aviso; `onSettled` invalida a lista.
 - **Imagens:** WebP responsivo (256/512/900) gerado por script com o Chromium do Playwright, com `srcset`/`sizes`, proporção reservada, `lazy` e `fetchpriority="high"` só na imagem principal.
 
+### Carrinho e cotação (P5)
+Detalhe completo em [`docs/08-DECISOES-P5.md`](docs/08-DECISOES-P5.md).
+
+- **Estado do carrinho:**
+  - O carrinho é recurso da API.
+  - O visitante tem um UUID (`kurio:guest-id`), enviado pelo Axios em `X-Guest-Id`, criado só na primeira inclusão.
+  - Login e cadastro chamam `POST /cart/merge` e descartam o id do visitante.
+  - O cache fica em `['private', userId, 'cart' | 'quote']` para a conta e em `['cart', 'guest', guestId]` para o visitante.
+- **Cotação como única fonte de valores:** subtotal, desconto, taxa, total e total por linha vêm da API. O cliente só formata com decimal.js.
+- **Mutations do carrinho** (quantidade, remoção, cupom) não são otimistas: gravam o carrinho devolvido pela API e invalidam a cotação.
+- **Avisos** de preço alterado (`priceWhenAddedEth`) e de itens bloqueados (`quote.blockers`) aparecem na linha e no resumo.
+
 ## Desvios do Figma
 
 - **Header mobile:** frame não extraído. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
@@ -116,6 +128,7 @@ Detalhe completo em [`docs/07-DECISOES-P4.md`](docs/07-DECISOES-P4.md).
 - **Filtros no mobile** num drawer "Filtros". Selecionado também com ✓ e negrito (no Figma, só cor).
 - **Banner em destaque** com nome e preço sobre a imagem, porque o banner é clicável e precisa dizer o destino.
 - **Detalhe:** os textos de "Contrato" e "Direitos autorais" estão trocados no Figma; o código os pareia corretamente. A galeria repete a arte principal, como no próprio frame (só há 4 artes). "Mais desta coleção" não pagina, porque mostra os 5 itens de uma vez.
+- **Carrinho** (frame `11:1278` não extraído, por decisão de guardar a chamada para o Pagamento): segue o padrão do Detalhe, com a lista de itens e o resumo em cartão de 380 px. COMPRAR adiciona e abre o carrinho.
 - **Valores ETH com ponto** em todo lugar ("1.19 ETH"), como nos cards do Figma. O filtro de preço do Figma usa vírgula.
 - **Avisos (toasts):** estado não desenhado. Seguem `surface-card`, raio 8 e borda por tom, com prefixo "Erro:" nos erros.
 
@@ -123,7 +136,7 @@ Detalhe completo em [`docs/07-DECISOES-P4.md`](docs/07-DECISOES-P4.md).
 
 - `npm run lighthouse` ainda não audita: o runner é implementado no bloco P9 e, por enquanto, sai com código 1 e uma mensagem explícita (não simula sucesso).
 - Playwright usa o servidor de desenvolvimento. Regressão visual, relógio controlado e cenários por teste entram no P9.
-- O carrinho do header e o "COMPRAR" do detalhe estão "em breve" até o P5.
+- "Finalizar compra" do carrinho está "em breve" até o P6.
 - Bundle inicial de ~337 KB (106 KB gzip), depois do code-splitting por rota. O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
 - **Limitações do ambiente de mocks:**
   - O estado vive no `localStorage` de cada navegador, então duas abas compartilham os dados, mas dois navegadores não.

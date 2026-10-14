@@ -69,6 +69,13 @@ Os casos de negócio vêm dos dados e funcionam em qualquer cenário:
 - **Edições:** `nft-001` (Emerald Ape #042) tem as quatro edições do Figma, com a 1/1 esgotada. `nft-044` (Onyx Relic #001) tem todas as edições esgotadas. `nft-045` (Amber Pilot #777) tem uma única unidade.
 - **Cadastro com e-mail já usado** (`ana@kurio.dev`) responde 409 `EMAIL_TAKEN`.
 
+## Como reproduzir os fluxos do carrinho
+
+- **Visitante:** escolha uma edição no detalhe e clique em COMPRAR. O carrinho sobrevive ao refresh.
+- **Itens do visitante preservados:** com itens no carrinho, entre como Ana. Os itens se juntam ao carrinho dela.
+- **Cupom:** `KURIO10` (10%), `EXPIRADO` e qualquer outro código para inválido.
+- **Preço alterado e esgotado:** com a Ana logada, rode `window.__kurioMock.updateNft('nft-002', { priceEth: '1.79' })` ou `{ available: 0 }` e recarregue o carrinho.
+
 ## Estado do catálogo na URL
 
 Busca, filtros, aba, ordenação e paginação ficam na URL e sobrevivem a refresh e ao histórico. Exemplo:
