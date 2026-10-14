@@ -24,6 +24,32 @@ test.describe('Início mobile', () => {
     await expect(tabBar.getByRole('link', { name: /^Carrinho/ })).toHaveAttribute('aria-current', 'page')
   })
 
+  test('tab bar cabe e fica alinhada nas larguras comuns de celular (320 a 414 px)', async ({ page }) => {
+    await openApp(page)
+    const tabBar = page.getByRole('navigation', { name: 'Atalhos' })
+    for (const width of [320, 360, 375, 390, 414]) {
+      await page.setViewportSize({ width, height: 800 })
+      const layout = await tabBar.evaluate((nav) => {
+        const links = [...nav.querySelectorAll('a')].map((link) => link.getBoundingClientRect())
+        const center = nav.querySelector<HTMLElement>(':scope > span')!.getBoundingClientRect()
+        const notch = nav.querySelector('svg')!.getBoundingClientRect()
+        return {
+          viewport: document.documentElement.clientWidth,
+          linksLeft: Math.min(...links.map((rect) => rect.left)),
+          linksRight: Math.max(...links.map((rect) => rect.right)),
+          buttonCenter: center.left + center.width / 2,
+          notchCenter: notch.left + notch.width / 2,
+        }
+      })
+      const label = `${width}px: ${JSON.stringify(layout)}`
+      expect(layout.linksLeft, label).toBeGreaterThanOrEqual(0)
+      expect(layout.linksRight, label).toBeLessThanOrEqual(layout.viewport)
+      // Recorte centralizado na tela e sob o botão central (tolerância de 1 px).
+      expect(Math.abs(layout.notchCenter - layout.viewport / 2), label).toBeLessThanOrEqual(1)
+      expect(Math.abs(layout.buttonCenter - layout.notchCenter), label).toBeLessThanOrEqual(1)
+    }
+  })
+
   test('o botão de filtros do topo abre o drawer e mostra quantos filtros estão ativos', async ({ page }) => {
     await openApp(page)
     await page.getByRole('button', { name: 'Filtros', exact: true }).click()
