@@ -37,12 +37,16 @@ export function AccountEntry() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size="sm" variant="outline" className="max-w-[180px] gap-2 border-primary">
-          <span
-            aria-hidden="true"
-            className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-caption-12 font-bold text-ink"
-          >
-            {firstName.charAt(0).toUpperCase()}
-          </span>
+          {user.avatarUrl ? (
+            <img src={user.avatarUrl} alt="" width={24} height={24} className="size-6 shrink-0 rounded-full object-cover" />
+          ) : (
+            <span
+              aria-hidden="true"
+              className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-caption-12 font-bold text-ink"
+            >
+              {firstName.charAt(0).toUpperCase()}
+            </span>
+          )}
           <span className="truncate">{firstName}</span>
           <ChevronDownIcon className="size-4" aria-hidden="true" />
           <span className="sr-only">: menu da conta</span>
@@ -56,6 +60,9 @@ export function AccountEntry() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link to="/perfil">Meu perfil</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/carteiras">Minhas carteiras</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link to="/favoritos">Meus favoritos</Link>

@@ -91,6 +91,11 @@ export function MobileNav({ activeSection, className }: MobileNavProps) {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full">
+                <Link to="/carteiras" onClick={() => setOpen(false)}>
+                  Minhas carteiras
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="w-full">
                 <Link to="/favoritos" onClick={() => setOpen(false)}>
                   Meus favoritos
                 </Link>

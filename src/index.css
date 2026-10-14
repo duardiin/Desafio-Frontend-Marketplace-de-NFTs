@@ -38,6 +38,7 @@
     --color-ink: var(--ink);
     --color-surface-card: var(--surface-card);
     --color-surface-dark: var(--surface-dark);
+    --color-surface-raised: var(--surface-raised);
     --color-highlight: var(--highlight);
     --color-subtle: var(--subtle);
     --color-border-soft: var(--border-soft);
@@ -109,6 +110,8 @@
     --ink: #140d0a;
     --surface-card: #241612;
     --surface-dark: #38220f;
+    /* Fundo do avatar e do botão de zoom (Figma, Perfil e Detalhe). */
+    --surface-raised: #2f1d15;
     --highlight: #e89b55;
     --subtle: #b39463;
     --border-soft: #55321f;

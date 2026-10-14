@@ -1,12 +1,14 @@
-import { useId, type ComponentProps, type ReactNode } from 'react'
+import { EyeIcon } from 'lucide-react'
+import { useId, useState, type ComponentProps, type ReactNode } from 'react'
+import hideIcon from '@/assets/figma/icon-hide.svg'
 import selectArrow from '@/assets/figma/select-arrow-down.svg'
 import { cn } from '@/lib/utils'
 
-/** Campo do Pagamento (Figma): altura 40, borda 1 px `border`, raio 3, fundo transparente. */
-const CONTROL =
+/** Campos do Pagamento, Perfil e Carteiras (Figma): altura 40, borda 1 px `border`, raio 3, fundo transparente. */
+export const CONTROL =
   'h-10 w-full rounded-[3px] border border-border bg-transparent px-3 text-body-16 text-foreground placeholder:text-subtle focus-visible:border-ring aria-invalid:border-destructive disabled:opacity-60 md:text-body-14'
 
-interface FieldShellProps {
+export interface FieldShellProps {
   label: string
   required?: boolean
   error?: string
@@ -17,7 +19,7 @@ interface FieldShellProps {
   children: (ids: { id: string; describedBy: string | undefined }) => ReactNode
 }
 
-function FieldShell({ label, required, error, hint, srOnlyLabel, className, children }: FieldShellProps) {
+export function FieldShell({ label, required, error, hint, srOnlyLabel, className, children }: FieldShellProps) {
   const id = useId()
   const errorId = error ? `${id}-erro` : undefined
   const hintId = hint && !error ? `${id}-dica` : undefined
@@ -129,6 +131,43 @@ export function TextAreaField({ label, required, error, hint, className, ...text
           className={cn(CONTROL, 'h-[152px] resize-none py-2')}
           {...textarea}
         />
+      )}
+    </FieldShell>
+  )
+}
+
+type PasswordFieldProps = Omit<ComponentProps<'input'>, 'id' | 'type'> & Omit<FieldShellProps, 'children'>
+
+/** "Password Input" (Figma, Perfil): campo com o botão de mostrar/ocultar a senha à direita. */
+export function PasswordField({ label, required, error, hint, className, ...input }: PasswordFieldProps) {
+  const [visible, setVisible] = useState(false)
+  return (
+    <FieldShell label={label} required={required} error={error} hint={hint} className={className}>
+      {({ id, describedBy }) => (
+        <div className="relative">
+          <input
+            id={id}
+            type={visible ? 'text' : 'password'}
+            aria-required={required}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={describedBy}
+            className={cn(CONTROL, 'pr-12')}
+            {...input}
+          />
+          <button
+            type="button"
+            aria-pressed={visible}
+            aria-label={`Mostrar ${label.toLowerCase()}`}
+            onClick={() => setVisible((current) => !current)}
+            className="absolute top-1/2 right-2 grid size-8 -translate-y-1/2 place-items-center rounded-sm text-subtle outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {visible ? (
+              <EyeIcon aria-hidden="true" className="size-5" strokeWidth={1.5} />
+            ) : (
+              <img src={hideIcon} alt="" width={20} height={20} className="size-5 p-[1.7px]" />
+            )}
+          </button>
+        </div>
       )}
     </FieldShell>
   )

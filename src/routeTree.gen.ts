@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthCarteirasRouteImport } from './routes/_auth/carteiras'
 import { Route as AuthFavoritosRouteImport } from './routes/_auth/favoritos'
 import { Route as AuthPagamentoRouteImport } from './routes/_auth/pagamento'
 import { Route as AuthPerfilRouteImport } from './routes/_auth/perfil'
@@ -44,6 +45,11 @@ const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCarteirasRoute = AuthCarteirasRouteImport.update({
+  id: '/carteiras',
+  path: '/carteiras',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthFavoritosRoute = AuthFavoritosRouteImport.update({
   id: '/favoritos',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
+  '/carteiras': typeof AuthCarteirasRoute
   '/favoritos': typeof AuthFavoritosRoute
   '/pagamento': typeof AuthPagamentoRoute
   '/perfil': typeof AuthPerfilRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
+  '/carteiras': typeof AuthCarteirasRoute
   '/favoritos': typeof AuthFavoritosRoute
   '/pagamento': typeof AuthPagamentoRoute
   '/perfil': typeof AuthPerfilRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
+  '/_auth/carteiras': typeof AuthCarteirasRoute
   '/_auth/favoritos': typeof AuthFavoritosRoute
   '/_auth/pagamento': typeof AuthPagamentoRoute
   '/_auth/perfil': typeof AuthPerfilRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/carrinho'
     | '/login'
+    | '/carteiras'
     | '/favoritos'
     | '/pagamento'
     | '/perfil'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/carrinho'
     | '/login'
+    | '/carteiras'
     | '/favoritos'
     | '/pagamento'
     | '/perfil'
@@ -146,6 +157,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/carrinho'
     | '/login'
+    | '/_auth/carteiras'
     | '/_auth/favoritos'
     | '/_auth/pagamento'
     | '/_auth/perfil'
@@ -201,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/carteiras': {
+      id: '/_auth/carteiras'
+      path: '/carteiras'
+      fullPath: '/carteiras'
+      preLoaderRoute: typeof AuthCarteirasRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/favoritos': {
       id: '/_auth/favoritos'
       path: '/favoritos'
@@ -247,6 +266,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteChildren {
+  AuthCarteirasRoute: typeof AuthCarteirasRoute
   AuthFavoritosRoute: typeof AuthFavoritosRoute
   AuthPagamentoRoute: typeof AuthPagamentoRoute
   AuthPerfilRoute: typeof AuthPerfilRoute
@@ -254,6 +274,7 @@ interface AuthRouteChildren {
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthCarteirasRoute: AuthCarteirasRoute,
   AuthFavoritosRoute: AuthFavoritosRoute,
   AuthPagamentoRoute: AuthPagamentoRoute,
   AuthPerfilRoute: AuthPerfilRoute,

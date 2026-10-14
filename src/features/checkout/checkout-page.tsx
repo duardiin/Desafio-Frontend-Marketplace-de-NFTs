@@ -94,7 +94,8 @@ function initialValues(userId: string, profile: Profile, wallets: Wallet[]): Che
     network: wallet?.networks[0] ?? 'ethereum',
     secondaryWallet: '',
     referralCode: '',
-    ensName: '',
+    // O campo do Pagamento aceita só o nome .eth; vem do perfil quando houver.
+    ensName: profile.ensName.endsWith('.eth') ? profile.ensName.slice(0, -'.eth'.length) : '',
     note: '',
     // O rascunho salvo (ex.: antes de a sessão expirar) tem prioridade.
     ...draft,

@@ -1,11 +1,11 @@
+import { Link } from '@tanstack/react-router'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import radioOther from '@/assets/figma/radio-other-wallet.svg'
 import { NETWORK_LABELS } from '@/api/contracts/common'
 import type { Wallet } from '@/api/contracts/wallets'
 import { WALLET_PROVIDER_LABELS } from '@/api/contracts/wallets'
-import { InputField, SelectField, TextAreaField } from '@/features/checkout/fields'
+import { InputField, SelectField, TextAreaField } from '@/components/form/outlined-fields'
 import { selectWallet, type CheckoutFormValues } from '@/features/checkout/schema'
-import { ComingSoon } from '@/features/layout/coming-soon'
 
 interface CollectorFormProps {
   form: UseFormReturn<CheckoutFormValues>
@@ -93,11 +93,14 @@ export function CollectorForm({ form, wallets }: CollectorFormProps) {
         </div>
       </div>
 
-      <div className="mt-3 flex items-center gap-2 text-body-15">
+      {/* O rascunho do pagamento fica salvo: ao voltar das carteiras, o formulário é restaurado. */}
+      <Link
+        to="/carteiras"
+        className="mt-3 flex w-fit items-center gap-2 rounded-sm text-body-15 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+      >
         <img src={radioOther} alt="" width={15} height={15} />
-        {/* Cadastro de carteiras entra no bloco de conta (P8). */}
-        <ComingSoon>Usar outra carteira?</ComingSoon>
-      </div>
+        Usar outra carteira?
+      </Link>
 
       <TextAreaField
         label="Observação do colecionador (opcional)"

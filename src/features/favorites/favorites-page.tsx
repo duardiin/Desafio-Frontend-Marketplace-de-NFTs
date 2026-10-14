@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { AccountLayout } from '@/features/account/account-layout'
 import { useCurrentUser } from '@/features/auth/session-query'
 import { NftCard, NftCardSkeleton } from '@/features/catalog/nft-card'
 import { favoritesQueryOptions } from '@/features/favorites/api'
@@ -9,20 +10,24 @@ import { favoritesQueryOptions } from '@/features/favorites/api'
 export function FavoritesPage() {
   const user = useCurrentUser()
   if (!user) return null
-  return <FavoritesContent userId={user.id} />
+  return (
+    <AccountLayout active="favoritos">
+      <FavoritesContent userId={user.id} />
+    </AccountLayout>
+  )
 }
 
 function FavoritesContent({ userId }: { userId: string }) {
   const favorites = useQuery(favoritesQueryOptions(userId))
 
   return (
-    <section className="container-page mt-8 flex flex-col gap-8" aria-labelledby="favoritos-titulo">
-      <h1 id="favoritos-titulo" className="text-heading-28 font-bold">
+    <section className="flex flex-col gap-8" aria-labelledby="favoritos-titulo">
+      <h1 id="favoritos-titulo" className="text-body-16 leading-4 font-bold">
         Meus favoritos
       </h1>
 
       {favorites.isPending && (
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4" aria-busy="true">
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3" aria-busy="true">
           {Array.from({ length: 4 }, (_, index) => (
             <li key={index}>
               <NftCardSkeleton />
@@ -53,7 +58,7 @@ function FavoritesContent({ userId }: { userId: string }) {
       )}
 
       {favorites.isSuccess && favorites.data.items.length > 0 && (
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3">
           {favorites.data.items.map((nft) => (
             <li key={nft.id}>
               <NftCard nft={nft} />

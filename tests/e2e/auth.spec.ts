@@ -1,6 +1,11 @@
 import { expect, test, type Page } from '@playwright/test'
 import { openApp, useScenario } from './support/mock-api'
 
+/** E-mail exibido no formulário do perfil (campo editável). */
+function profileEmail(page: Page) {
+  return page.getByRole('main').getByRole('textbox', { name: 'E-mail', exact: true })
+}
+
 const PASSWORD = 'Kurio@123'
 
 /** Abre o login pelo header (desktop) ou pelo menu (mobile). */
@@ -110,7 +115,7 @@ test.describe('rotas protegidas', () => {
     await fillLogin(page, 'bruno@kurio.dev')
     await expect(page).toHaveURL(/\/perfil$/)
     await expect(page.getByRole('heading', { name: 'Perfil do colecionador' })).toBeVisible()
-    await expect(page.getByText('bruno@kurio.dev')).toBeVisible()
+    await expect(profileEmail(page)).toHaveValue('bruno@kurio.dev')
   })
 
   test('quem já está autenticado não vê o login', async ({ page }) => {
@@ -127,7 +132,7 @@ test.describe('expiração da sessão', () => {
   test('durante a navegação: avisa, leva ao login e retoma a tela', async ({ page }) => {
     await openApp(page, '/login?redirect=%2Fperfil')
     await fillLogin(page, 'ana@kurio.dev')
-    await expect(page.getByText('ana@kurio.dev')).toBeVisible()
+    await expect(profileEmail(page)).toHaveValue('ana@kurio.dev')
 
     await page.evaluate(() => window.__kurioMock?.expireSessions())
     // Navegar para outra rota privada revalida a sessão.
@@ -145,7 +150,7 @@ test.describe('expiração da sessão', () => {
     await page.clock.install()
     await openApp(page, '/login?redirect=%2Fperfil')
     await fillLogin(page, 'ana@kurio.dev')
-    await expect(page.getByText('ana@kurio.dev')).toBeVisible()
+    await expect(profileEmail(page)).toHaveValue('ana@kurio.dev')
 
     await page.clock.fastForward('00:35')
 
@@ -157,13 +162,13 @@ test.describe('expiração da sessão', () => {
   test('no carregamento: token expirado não abre a área privada', async ({ page }) => {
     await openApp(page, '/login?redirect=%2Fperfil')
     await fillLogin(page, 'ana@kurio.dev')
-    await expect(page.getByText('ana@kurio.dev')).toBeVisible()
+    await expect(profileEmail(page)).toHaveValue('ana@kurio.dev')
 
     await page.evaluate(() => window.__kurioMock?.expireSessions())
     await page.reload()
 
     await expect(page).toHaveURL(/\/login\?redirect=%2Fperfil&motivo=expirada/)
-    await expect(page.getByText('ana@kurio.dev')).toHaveCount(0)
+    await expect(profileEmail(page)).toHaveCount(0)
   })
 })
 
@@ -171,7 +176,7 @@ test.describe('logout e troca de usuário', () => {
   test('logout limpa os dados privados e a troca de usuário não mostra dados do anterior', async ({ page, isMobile }) => {
     await openApp(page, '/login?redirect=%2Fperfil')
     await fillLogin(page, 'ana@kurio.dev')
-    await expect(page.getByText('ana@kurio.dev')).toBeVisible()
+    await expect(profileEmail(page)).toHaveValue('ana@kurio.dev')
 
     await logout(page, isMobile)
     await expect(page).toHaveURL(/\/$/)
@@ -181,8 +186,7 @@ test.describe('logout e troca de usuário', () => {
     await page.goto('/perfil')
     await expect(page).toHaveURL(/\/login/)
     await fillLogin(page, 'bruno@kurio.dev')
-    await expect(page.getByText('bruno@kurio.dev')).toBeVisible()
-    await expect(page.getByText('ana@kurio.dev')).toHaveCount(0)
+    await expect(profileEmail(page)).toHaveValue('bruno@kurio.dev')
     await expect(page.getByText('Ana Ribeiro')).toHaveCount(0)
   })
 })
