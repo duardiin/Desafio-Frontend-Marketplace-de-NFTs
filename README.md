@@ -27,6 +27,7 @@ Um checkout limpo roda sem `.env`: os valores padrão ficam em `src/config/env.t
 | `VITE_API_URL` | `/api` | Base das chamadas REST do cliente Axios. |
 | `VITE_MOCK_SCENARIO` | `default` | Cenário inicial dos mocks (ver abaixo). |
 | `VITE_HTTP_TIMEOUT_MS` | `10000` | Timeout das chamadas REST. Os testes E2E usam 3000. |
+| `VITE_REALTIME_URL` | `wss://realtime.kurio.local` | Servidor Socket.IO. Com mocks, o MSW o intercepta antes da rede. |
 
 ## Credenciais fictícias
 
@@ -96,6 +97,16 @@ As falhas usam os cenários da tabela acima:
 | Carteira desconectada | `?cenario=carteira-desconectada` | A revisão fecha; reconectar e confirmar conclui sem duplicar |
 
 Para o clique repetido, dê um duplo clique em **Confirmar pagamento**: só um pedido é criado. Recarregar a página do pedido enquanto ele está pendente retoma o acompanhamento.
+
+## Como reproduzir o tempo real
+
+Os eventos passam pelo `socket.io-client`. Com mocks, o servidor Socket.IO é simulado pelo MSW. No console:
+
+- **Preço ou disponibilidade:** com um NFT aberto (ou no carrinho), rode `__kurioMock.updateNft('nft-002', { priceEth: '1.79' })` ou `{ available: 0, editionId: '1-1' }`. A tela atualiza sem recarregar e, se o item estiver no carrinho, aparece um aviso.
+- **Cotação desatualizada no checkout:** com a revisão do pagamento aberta, mude o preço de um item do carrinho e clique em **Confirmar pagamento**. A revisão mostra o que mudou e exige nova confirmação.
+- **Duplicata e evento antigo:** `__kurioMock.realtime.replayLast()` não repete o efeito, e `__kurioMock.realtime.emitStale('nft-001', '0.10')` não altera o preço.
+- **Queda com pedido pendente:** logo depois de confirmar o pagamento, rode `__kurioMock.realtime.goOffline(4000)`. Ao reconectar, o pedido aparece confirmado, sem nova compra.
+- **Conexões ativas:** `__kurioMock.realtime.connections()`.
 
 ## Estado do catálogo na URL
 

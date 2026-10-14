@@ -135,3 +135,16 @@ Carteiras:
 - **Limite:** no máximo uma `principal` e uma `secundaria`. Trocar o papel de uma carteira troca o da outra.
 - **Endereço:** EVM usa `0x` + 40 hex; Solana usa base58 de 32 a 44 caracteres.
 - **Redes:** Solana não se combina com redes EVM.
+
+## Eventos em tempo real (Socket.IO)
+
+Tipos em [`src/api/contracts/events.ts`](../src/api/contracts/events.ts). Endereço: `VITE_REALTIME_URL` (padrão `wss://realtime.kurio.local`), caminho `/socket.io`, transporte `websocket`. Com mocks, o servidor é simulado pelo MSW.
+
+| Direção | Evento | Payload |
+|---|---|---|
+| cliente → servidor | `session:join` | `{ token: string | null }` (associa a conexão ao usuário; `null` = visitante) |
+| servidor → cliente | `session:joined` | `{ userId: string | null }` |
+| servidor → cliente | `nft.updated` | Envelope com `data: { id, name, priceEth, previousPriceEth, editions, soldOut, version }`. Vai para todos. |
+| servidor → cliente | `order.updated` | Envelope com `userId` e `data: Order`. Vai só para as conexões do dono. |
+
+Envelope: `{ id, type, resource: { type, id }, version, occurredAt, data }`. O `id` é estável (`<recurso>:<id>:v<versão>`), então duplicatas têm o mesmo id. O cliente ignora ids já vistos e eventos com versão menor ou igual à do dado em cache. Depois de reconectar, recarrega pelo REST os recursos ativos.

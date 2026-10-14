@@ -128,6 +128,22 @@ Detalhe completo em [`docs/09-DECISOES-P6.md`](docs/09-DECISOES-P6.md).
 - **Estados do pedido:** `/pedidos/$id` consulta a cada 1,5 s enquanto o pedido está pendente; no P7 isso vira evento `order.updated` + reconciliação. A confirmação (modal) só aparece com `confirmed`. O recibo é o snapshot do pedido. A saída de pendente invalida carrinho, pedidos e catálogo e avisa por `aria-live`.
 - **Rascunho do pagamento** no `sessionStorage` por usuário: sobrevive a refresh e à expiração da sessão.
 
+### Tempo real (P7)
+Detalhe completo em [`docs/10-DECISOES-P7.md`](docs/10-DECISOES-P7.md).
+
+- **Transporte:**
+  - O cliente usa `socket.io-client`, só com `websocket`, em `VITE_REALTIME_URL` (`wss://realtime.kurio.local`).
+  - O servidor é simulado pelo MSW (`ws.link`) com `@mswjs/socket.io-binding`.
+  - O cliente é importado sob demanda, porque o `engine.io-client` guarda a referência ao `WebSocket` ao carregar, e precisa pegar o `WebSocket` já interceptado.
+  - Há heartbeat simulado e timeout de conexão de 3 s.
+- **Eventos** `nft.updated` (para todos) e `order.updated` (só para o dono), gerados pelo mesmo `onDbChange` do banco simulado que alimenta o REST. Envelope com `id` estável (`<recurso>:<id>:v<versão>`), `resource` e `version`.
+- **Reconciliação:**
+  - **Duplicatas:** ignoradas pelo `id`.
+  - **Eventos antigos:** só aplicados se a versão for maior que a do dado em cache, item a item.
+  - **Carrinho afetado:** recarrega da API e avisa por `aria-live`.
+  - **Após reconectar:** as consultas ativas são invalidadas e recarregadas do REST.
+- **Isolamento:** um socket por sessão, recriado no login, logout e troca de usuário, com os listeners liberados. O servidor filtra `order.updated` pelo dono e o cliente confere o `userId` de novo.
+
 ## Desvios do Figma
 
 - **Header mobile:** frame não extraído. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
@@ -150,8 +166,11 @@ Detalhe completo em [`docs/09-DECISOES-P6.md`](docs/09-DECISOES-P6.md).
 - `npm run lighthouse` ainda não audita: o runner é implementado no bloco P9 e, por enquanto, sai com código 1 e uma mensagem explícita (não simula sucesso).
 - Playwright usa o servidor de desenvolvimento. Regressão visual, relógio controlado e cenários por teste entram no P9.
 - "Usar outra carteira?" do pagamento está "em breve" até o P8 (cadastro de carteiras).
-- O acompanhamento do pedido pendente é por consulta periódica até o P7 (Socket.IO).
 - Bundle inicial de ~337 KB (106 KB gzip), depois do code-splitting por rota. O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
+- **Limitações do tempo real simulado:**
+  - não há rooms nem namespaces (filtro por usuário feito à mão);
+  - não há long-polling;
+  - o servidor de eventos roda na aba, então eventos não atravessam abas.
 - **Limitações do ambiente de mocks:**
   - O estado vive no `localStorage` de cada navegador, então duas abas compartilham os dados, mas dois navegadores não.
   - A liquidação dos pedidos usa o relógio do navegador.

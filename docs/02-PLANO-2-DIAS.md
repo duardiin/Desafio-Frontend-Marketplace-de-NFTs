@@ -47,11 +47,11 @@ Prazo: `16/10 às 09:14h` (fechamento a partir de 16/10 06:14). Reserve as **úl
 - [x] Revalidação antes de confirmar (mudança exige nova confirmação)
 - [x] Pedido idempotente (mesma chave = mesmo pedido; conteúdo diferente = conflito)
 - [x] Estados pendente/confirmado/recusado, recuperação após refresh, recibo como snapshot, remover do carrinho só o comprado
-- [ ] Socket.IO: `socket.io-client` + `@mswjs/socket.io-binding`; `nft.updated` e `order.updated` com id, recurso e versão
-- [ ] Dedupe de duplicados/antigos, reconciliação com REST após reconexão, liberar listeners, isolar por sessão
-- [ ] Cenário: NFT no carrinho muda de preço, UI avisa, resumo atualiza, checkout bloqueia cotação antiga
-- [ ] Cenário: queda de conexão com pedido pendente e retomada sem nova compra
-- [ ] E2E: compra completa, pagamento recusado, clique repetido, timeout com recuperação, eventos via socket
+- [x] Socket.IO: `socket.io-client` + `@mswjs/socket.io-binding`; `nft.updated` e `order.updated` com id, recurso e versão
+- [x] Dedupe de duplicados/antigos, reconciliação com REST após reconexão, liberar listeners, isolar por sessão
+- [x] Cenário: NFT no carrinho muda de preço, UI avisa, resumo atualiza, checkout bloqueia cotação antiga
+- [x] Cenário: queda de conexão com pedido pendente e retomada sem nova compra
+- [x] E2E: compra completa, pagamento recusado, clique repetido, timeout com recuperação, eventos via socket
 - **Pronto quando:** compra completa funciona e os dois cenários de tempo real passam em E2E.
 
 ### Bloco 5 · Conta, qualidade e entrega (~5h) · prompts P8, P9
@@ -85,7 +85,7 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 | 1 Fundação | 14/10 | 14/10 | Concluído | Setup, P0, tokens e P1 concluídos (tema, layout, nav mobile, 404, skeleton, Router file-based, Query, Axios + ApiError; 17 E2E passando). Decisões em docs/04-DECISOES-P1.md. Deploy conferido (fonte local, 404 em acesso direto, sem overflow em 390). Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
 | 2 Contratos, MSW, sessão | 14/10 | 14/10 | Concluído | P2: contratos tipados, MSW com 47 NFTs, 2 usuários, 15 cenários, reset, idempotência e liquidação de pedidos (16 E2E). P3: login/cadastro em modal com rota, sessão por token, expiração em 3 pontos, rotas protegidas com retorno, cache privado por usuário, avisos aria-live (9 E2E × desktop/mobile). Decisões em docs/05 e docs/06. Perfil só leitura até o P8. |
 | 3 Descoberta e carrinho | 14/10 | 14/10 | Concluído | P5: carrinho na API (visitante por X-Guest-Id, mescla no login), cotação como única fonte de valores, cupom, avisos de preço/esgotado, badge no header, COMPRAR no detalhe; 96 E2E passando. Decisões em docs/08. P4: Início completa (hero, catálogo com estado na URL, destaque, promos, blog), detalhe do Figma 10:244 (3ª chamada ao MCP) com edições por NFT, favoritos otimistas, imagens WebP; 84 E2E passando. Decisões em docs/07. Falta P5 (carrinho e cotação). |
-| 4 Compra e tempo real | 14/10 | | Em andamento | P6 concluído: pagamento do Figma 11:2862 (4ª chamada ao MCP), conexão de carteira simulada (recusa/desconexão), revisão com revalidação, pedido idempotente (clique repetido, timeout), estados e recibo, rascunho após expiração; 116 E2E passando. Decisões em docs/09. Falta P7 (Socket.IO). |
+| 4 Compra e tempo real | 14/10 | 14/10 | Concluído | P7: Socket.IO real no cliente + servidor simulado no MSW (binding), nft.updated/order.updated com id/recurso/versão, dedupe e versão por item, reconciliação após reconexão, socket por sessão; os 2 cenários do enunciado em E2E; 121 E2E passando. Decisões em docs/10. P6: pagamento do Figma 11:2862 (4ª chamada ao MCP), conexão de carteira simulada (recusa/desconexão), revisão com revalidação, pedido idempotente (clique repetido, timeout), estados e recibo, rascunho após expiração; 116 E2E passando. Decisões em docs/09. Falta P7 (Socket.IO). |
 | 5 Conta, qualidade, entrega | | | | |
 
 ### Decisões tomadas (copie para ARCHITECTURE.md)
@@ -93,7 +93,6 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 
 ### Pendências / dívidas técnicas
 - "Usar outra carteira?" do pagamento "em breve" até o P8.
-- Pedido pendente acompanhado por consulta periódica até o P7.
 - E2E do skeleton com reduced motion entra no P4.
 - Bundle inicial de ~337 KB + chunk do MSW de ~420 KB antes do render (medir no P9).
 
