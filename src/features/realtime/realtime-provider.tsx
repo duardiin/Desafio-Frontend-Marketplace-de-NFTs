@@ -54,13 +54,15 @@ export function RealtimeProvider() {
     socket.on('connect', () => {
       socket.emit(SESSION_JOIN, { token } satisfies SessionJoinPayload)
       setRealtimeStatus('connected')
-      if (wasConnected) {
-        // Reconectou: eventos podem ter se perdido. Reconcilia com o REST.
-        void queryClient.invalidateQueries({ queryKey: ['nfts'] })
-        void queryClient.invalidateQueries({ queryKey: ['cart'] })
-        if (userId) void queryClient.invalidateQueries({ queryKey: ['private', userId] })
-        if (lostNotified) notify('Conexão em tempo real restabelecida. Os dados foram atualizados.', 'info')
-      }
+      // Reconcilia com o REST a cada conexão, inclusive a primeira: eventos emitidos
+      // antes dela (entre a resposta REST da página e o socket conectar) ou durante
+      // uma queda se perderam. Só as consultas ativas recarregam, e as requisições em
+      // andamento não são canceladas (um loader de rota cancelado viraria tela de erro).
+      const reconcile = { cancelRefetch: false } as const
+      void queryClient.invalidateQueries({ queryKey: ['nfts'] }, reconcile)
+      void queryClient.invalidateQueries({ queryKey: ['cart'] }, reconcile)
+      if (userId) void queryClient.invalidateQueries({ queryKey: ['private', userId] }, reconcile)
+      if (wasConnected && lostNotified) notify('Conexão em tempo real restabelecida. Os dados foram atualizados.', 'info')
       wasConnected = true
       lostNotified = false
     })
