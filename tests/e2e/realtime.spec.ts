@@ -40,6 +40,29 @@ test.describe('tempo real', () => {
     await expect(page.getByRole('radio', { name: '1/10 (esgotada)' })).toBeDisabled()
   })
 
+  test('mudança entre o carregamento da página e a primeira conexão do socket é reconciliada', async ({ page }) => {
+    // O "servidor" recusa conexões nos primeiros 4 s, assim que os mocks sobem:
+    // a página carrega pelo REST, mas o socket ainda não conectou nenhuma vez.
+    await page.addInitScript(() => {
+      const timer = setInterval(() => {
+        if (!window.__kurioMock) return
+        clearInterval(timer)
+        window.__kurioMock.realtime.goOffline(4000)
+      }, 10)
+    })
+    await openApp(page, '/nft/nft-001')
+    const main = page.getByRole('main')
+    await expect(main).toContainText('Preço: 1.19 ETH')
+    expect(await page.evaluate(() => window.__kurioMock?.realtime.connections().length)).toBe(0)
+
+    // A mudança acontece sem nenhuma conexão: o evento se perde.
+    await page.evaluate(() => window.__kurioMock?.updateNft('nft-001', { priceEth: '2.50' }))
+
+    // Na primeira conexão, a reconciliação com o REST traz o preço atual.
+    await waitForSocket(page, null)
+    await expect(main).toContainText('Preço: 2.50 ETH')
+  })
+
   test('catálogo: o card muda de preço sem recarregar', async ({ page }) => {
     await openApp(page)
     await waitForSocket(page, null)
