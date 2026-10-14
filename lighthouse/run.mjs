@@ -63,7 +63,22 @@ function stopPreview(child) {
   }
 }
 
-async function audit(url, formFactor) {
+/**
+ * O Lighthouse às vezes perde a conexão com o Chrome ("Target closed") dentro de
+ * um handler de evento, fora da promessa da auditoria: o erro chega como
+ * rejeição não tratada. Ela é convertida em falha desta medição (que é repetida).
+ */
+function audit(url, formFactor) {
+  return new Promise((resolve, reject) => {
+    const onStray = (reason) => reject(reason instanceof Error ? reason : new Error(String(reason)))
+    process.once('unhandledRejection', onStray)
+    runAudit(url, formFactor)
+      .then(resolve, reject)
+      .finally(() => process.off('unhandledRejection', onStray))
+  })
+}
+
+async function runAudit(url, formFactor) {
   const chrome = await chromeLauncher.launch({
     chromePath: chromium.executablePath(),
     chromeFlags: ['--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check'],
