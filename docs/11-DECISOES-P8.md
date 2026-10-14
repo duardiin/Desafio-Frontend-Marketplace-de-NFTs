@@ -127,7 +127,50 @@ O tablet (768 px) e o desktop não mudaram.
 - Os testes mobile que entravam pelo menu do header partem do Carrinho ou usam a tab bar.
 - `waitForCatalogIdle` passou a esperar também o skeleton da primeira carga. A busca do topo, mais rápida que o diálogo, revelou essa corrida no helper.
 
-## 6. Testes
+## 6. Passada de responsividade (parte 2)
+
+**Como foi feita:**
+- O E2E `responsive.spec.ts` percorre **14 telas**: públicas, privadas com sessão, confirmação de pedido e recibo. Usa **390 px** (projeto mobile, com `isMobile`) e **768 e 1440 px** (desktop).
+- Para cada tela, verifica três coisas:
+  - `innerWidth` igual à largura pedida (com `isMobile`, o Chrome alarga a viewport em vez de rolar);
+  - `scrollWidth` menor ou igual a `clientWidth`;
+  - nenhum elemento passando da borda direita fora de um contêiner rolável.
+- Com `SHOTS_DIR`, salva capturas de página inteira. Elas foram revisadas uma a uma.
+
+**Achados** (listados antes da correção, como pede o P8):
+
+| # | Achado | Correção |
+|---|---|---|
+| R1 | Detalhe em 390 px: a aba "Avaliações de colecionadores" quebrava para a segunda linha e ficava sobre o texto. | Abas numa linha só, roláveis no mobile (15 px), como as do catálogo. |
+| R2 | Confirmação de pedido: aviso falso "A edição 1/1 … esgotou." depois da própria compra. O `nft.updated` chegava com o carrinho em cache ainda contendo o item. | O aviso de disponibilidade só é dado depois de recarregar o carrinho da API, se o item **ainda** estiver lá. O aviso de preço continua imediato. |
+| R3 | Início em 768 px: título do hero em 3 linhas desiguais. | Tamanho intermediário (26/40) entre 768 e 1023 px. |
+| R4 | Pagamento em 390 px: endereço só leitura cortado sem indicação. | `text-overflow: ellipsis` em campos só leitura e `title` com o endereço completo. |
+
+Nenhuma das 42 combinações (14 telas × 3 larguras) tem overflow horizontal.
+
+**Armadilha encontrada nos testes:** o primeiro teste de R2 passava **também no código antigo**. `toHaveCount(0)` repete a checagem até 10 s, e o aviso some sozinho em 6 s. A checagem passou a ser instantânea (`count()`), e o teste foi confirmado contra o código antigo (falha) e o novo (passa 3 vezes seguidas).
+
+## 7. Passada de acessibilidade (parte 2)
+
+**Como foi feita:**
+- O E2E `a11y.spec.ts` usa `@axe-core/playwright` (instalação autorizada). Regras: WCAG 2.0, 2.1 e 2.2, níveis A e AA, mais as boas práticas do axe.
+- Cobre 10 telas e o diálogo de edição de carteira aberto, em desktop e mobile. **Qualquer violação reprova.**
+
+**Achados:**
+
+| # | Achado | Correção |
+|---|---|---|
+| A1 | `landmark-unique` (Perfil, Carteiras, Favoritos): duas navegações "Meu perfil" (barra lateral e coluna do rodapé). | A barra lateral passou a se chamar "Minha conta" para leitores de tela; o título visível continua "Meu perfil". |
+| A2 | `heading-order` (Favoritos): os cards usam `h3` logo depois do `h1`. | `h2` oculto "NFTs favoritados", o mesmo padrão do catálogo. |
+
+**Fora do alcance do axe e já cobertos por E2E:**
+- foco preso e devolvido em diálogos e drawers;
+- foco no primeiro campo com erro e erros ligados por `aria-describedby`;
+- `aria-live` em mutations e eventos;
+- link "Pular para o conteúdo";
+- teclas de seta nas abas (Radix).
+
+## 8. Testes
 
 - **`profile.spec.ts` (desktop e mobile):**
   - edição de todos os campos, com persistência após refresh;
@@ -150,4 +193,8 @@ O tablet (768 px) e o desktop não mudaram.
   - selo RARO;
   - atalhos que exigem login;
   - contagem do carrinho.
-- **Resultado:** 143 E2E passando (4 só no mobile).
+- **`responsive.spec.ts` e `a11y.spec.ts`:** ver seções 6 e 7.
+- **Tempo real:**
+  - "edição esgotada por outra pessoa avisa";
+  - "a própria compra não gera falso alarme".
+- **Resultado:** 151 E2E passando, duas vezes seguidas.

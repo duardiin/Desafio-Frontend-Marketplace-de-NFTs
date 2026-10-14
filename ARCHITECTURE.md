@@ -152,6 +152,11 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 - **Avatar:** o navegador recorta e reduz para 256 px em WebP antes do envio (limite de 300 KB da API). É salvo na hora, por endpoint próprio, com remoção por `DELETE /me/avatar`.
 - **Carteiras:** cadastro e edição num diálogo, com as mesmas regras da API (redes EVM ou Solana, formato do endereço). O `PATCH` devolve a lista inteira, porque trocar o papel muda as duas carteiras. A lista usa a mesma chave de cache do Pagamento.
 
+### Responsividade e acessibilidade (P8)
+- `responsive.spec.ts` verifica a ausência de overflow horizontal em 14 telas, em 390, 768 e 1440 px. Também pega overflow escondido, comparando `innerWidth` com a largura pedida.
+- `a11y.spec.ts` roda o axe (WCAG 2.0/2.1/2.2 A e AA, mais boas práticas) em 10 telas e num diálogo, em desktop e mobile, sem tolerar violações.
+- O aviso de edição esgotada no carrinho só aparece depois de recarregar o carrinho da API, para não dar alarme falso na própria compra.
+
 ## Desvios do Figma
 
 - **Início mobile** (`14:5226`, extraído no P8): abaixo de 768 px, o Início não tem header, como no frame. No lugar dele há busca e filtros no topo e tab bar fixa (presente em todas as telas mobile). O botão central da tab bar fica só visual (função não definida) e o selo "RARO" vem do atributo do NFT. Detalhes em docs/11.
