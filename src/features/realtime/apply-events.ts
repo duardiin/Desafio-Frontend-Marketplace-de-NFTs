@@ -61,17 +61,28 @@ export function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent
           'info',
         )
       }
-      const edition = event.data.editions.find((entry) => entry.id === item.edition.id)
-      if (edition && edition.available !== null && edition.available < item.quantity) {
-        notify(
-          edition.available === 0
-            ? `A edição ${edition.label} de "${event.data.name}" esgotou.`
-            : `Restam ${edition.available} unidade(s) da edição ${edition.label} de "${event.data.name}".`,
-          'error',
-        )
-      }
     }
-    void queryClient.invalidateQueries({ queryKey: key })
+    // Disponibilidade: só avisa depois de recarregar o carrinho. Se a baixa veio
+    // de uma compra da própria pessoa, o item já saiu do carrinho e não há o
+    // que avisar ("esgotou" seria um falso alarme na tela de confirmação).
+    void queryClient
+      .invalidateQueries({ queryKey: key, refetchType: 'all' })
+      .then(() => warnAvailability(queryClient.getQueryData<Cart>(key), event))
+  }
+}
+
+function warnAvailability(cart: Cart | undefined, event: NftUpdatedEvent) {
+  for (const item of cart?.items ?? []) {
+    if (item.nft.id !== event.resource.id) continue
+    const edition = event.data.editions.find((entry) => entry.id === item.edition.id)
+    if (edition && edition.available !== null && edition.available < item.quantity) {
+      notify(
+        edition.available === 0
+          ? `A edição ${edition.label} de "${event.data.name}" esgotou.`
+          : `Restam ${edition.available} unidade(s) da edição ${edition.label} de "${event.data.name}".`,
+        'error',
+      )
+    }
   }
 }
 
