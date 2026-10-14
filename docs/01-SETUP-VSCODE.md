@@ -6,7 +6,7 @@ Tempo estimado: 45 a 60 minutos. Faça tudo nesta ordem.
 
 ## 0. Antes de tudo
 - [ ] Mande mensagem ao recrutador: confirmar **horário exato do prazo**, se **ferramentas de IA são permitidas** e (opcional) pedir 2 a 3 dias a mais.
-- [ ] Anote o prazo aqui: `____/____ às ____h`
+- [x] Anote o prazo aqui: `16/10 às 09:14h`
 
 ## 1. Pré-requisitos na máquina
 - [ ] **Node.js LTS** (`node -v`) e npm.

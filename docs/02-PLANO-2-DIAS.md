@@ -1,6 +1,6 @@
 # 02 · Plano de 2 dias + registro de progresso
 
-Prazo: `____/____ às ____h` (preencha). Reserve as **últimas 3 horas** só para fechamento e teste de checkout limpo. Se o prazo real for menor, corte pela "ordem de corte" no final.
+Prazo: `16/10 às 09:14h` (fechamento a partir de 16/10 06:14). Reserve as **últimas 3 horas** só para fechamento e teste de checkout limpo. Se o prazo real for menor, corte pela "ordem de corte" no final.
 
 ## Regras do jogo
 1. Eliminatórios primeiro (stack efetiva, fluxos funcionais, compra só confirmada pela simulação, isolamento entre usuários, eventos via `socket.io-client`, E2E executável).
@@ -15,7 +15,7 @@ Prazo: `____/____ às ____h` (preencha). Reserve as **últimas 3 horas** só par
 ### Bloco 1 · Fundação (~3h) · prompts P0, P1
 - [x] Setup completo (`01-SETUP-VSCODE.md`) e deploy vazio na Vercel funcionando
 - [x] Scripts do `package.json`
-- [ ] Tokens do Figma em `docs/design-tokens.md` e no tema do Tailwind/shadcn
+- [~] Tokens do Figma em `docs/design-tokens.md` (feito) e no tema do Tailwind/shadcn (P1)
 - [ ] Layout base (header, footer, nav mobile), skeleton com shimmer, rota 404
 - [ ] Router + Query + Axios configurados (cliente único)
 - **Pronto quando:** app sobe local e na Vercel, tema bate com o Figma, typecheck e lint passam.
@@ -82,7 +82,7 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 
 | Bloco | Início | Fim | Status | Observações / o que ficou de fora |
 |---|---|---|---|---|
-| 1 Fundação | 14/10 | | Em andamento | Setup + P0 concluídos. Falta P1 (tema, layout, skeleton, Router/Query/Axios). Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
+| 1 Fundação | 14/10 | | Em andamento | Setup + P0 + tokens do Figma concluídos. Falta P1 (tema, layout, skeleton, Router/Query/Axios). Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
 | 2 Contratos, MSW, sessão | | | | |
 | 3 Descoberta e carrinho | | | | |
 | 4 Compra e tempo real | | | | |
