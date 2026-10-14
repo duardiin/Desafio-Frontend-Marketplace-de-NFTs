@@ -117,6 +117,17 @@ Detalhe completo em [`docs/08-DECISOES-P5.md`](docs/08-DECISOES-P5.md).
 - **Mutations do carrinho** (quantidade, remoção, cupom) não são otimistas: gravam o carrinho devolvido pela API e invalidam a cotação.
 - **Avisos** de preço alterado (`priceWhenAddedEth`) e de itens bloqueados (`quote.blockers`) aparecem na linha e no resumo.
 
+### Pagamento, pedido e recibo (P6)
+Detalhe completo em [`docs/09-DECISOES-P6.md`](docs/09-DECISOES-P6.md).
+
+- **Fluxo:** formulário → conexão simulada da carteira (`POST /checkout/wallet-connection`) → revisão em diálogo → envio. A cotação é revalidada ao abrir a revisão e ao confirmar. Uma mudança mostra o que mudou e exige nova confirmação. `QUOTE_OUTDATED` da API cai no mesmo aviso.
+- **Idempotência:**
+  - `Idempotency-Key` por tentativa (corpo do pedido), salva com o corpo no `sessionStorage`.
+  - Clique repetido e "Tentar de novo" depois de timeout reenviam a **mesma** tentativa, sem revalidar, porque a confirmação pode já ter alterado o carrinho.
+  - Uma trava síncrona (`ref`) cobre o intervalo antes do `isPending`.
+- **Estados do pedido:** `/pedidos/$id` consulta a cada 1,5 s enquanto o pedido está pendente; no P7 isso vira evento `order.updated` + reconciliação. A confirmação (modal) só aparece com `confirmed`. O recibo é o snapshot do pedido. A saída de pendente invalida carrinho, pedidos e catálogo e avisa por `aria-live`.
+- **Rascunho do pagamento** no `sessionStorage` por usuário: sobrevive a refresh e à expiração da sessão.
+
 ## Desvios do Figma
 
 - **Header mobile:** frame não extraído. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
@@ -129,6 +140,8 @@ Detalhe completo em [`docs/08-DECISOES-P5.md`](docs/08-DECISOES-P5.md).
 - **Banner em destaque** com nome e preço sobre a imagem, porque o banner é clicável e precisa dizer o destino.
 - **Detalhe:** os textos de "Contrato" e "Direitos autorais" estão trocados no Figma; o código os pareia corretamente. A galeria repete a arte principal, como no próprio frame (só há 4 artes). "Mais desta coleção" não pagina, porque mostra os 5 itens de uma vez.
 - **Carrinho** (frame `11:1278` não extraído, por decisão de guardar a chamada para o Pagamento): segue o padrão do Detalhe, com a lista de itens e o resumo em cartão de 380 px. COMPRAR adiciona e abre o carrinho.
+- **Pagamento** (`11:2862`): Código de indicação e Nome ENS são opcionais (no Figma, obrigatórios). O endereço vem da carteira escolhida (só leitura). "Usar outra carteira?" está "em breve" até o P8. O chip de provedores é um cabeçalho, e não uma opção. O resumo mostra a edição no lugar do ID do token. "Confirmar compra" abre a revisão, e o envio é em "Confirmar pagamento".
+- **Confirmação** (`11:4385`, não extraída): modal sobre a página do pedido (`/pedidos/<id>`), e não sobre o Pagamento, para sobreviver a refresh.
 - **Valores ETH com ponto** em todo lugar ("1.19 ETH"), como nos cards do Figma. O filtro de preço do Figma usa vírgula.
 - **Avisos (toasts):** estado não desenhado. Seguem `surface-card`, raio 8 e borda por tom, com prefixo "Erro:" nos erros.
 
@@ -136,7 +149,8 @@ Detalhe completo em [`docs/08-DECISOES-P5.md`](docs/08-DECISOES-P5.md).
 
 - `npm run lighthouse` ainda não audita: o runner é implementado no bloco P9 e, por enquanto, sai com código 1 e uma mensagem explícita (não simula sucesso).
 - Playwright usa o servidor de desenvolvimento. Regressão visual, relógio controlado e cenários por teste entram no P9.
-- "Finalizar compra" do carrinho está "em breve" até o P6.
+- "Usar outra carteira?" do pagamento está "em breve" até o P8 (cadastro de carteiras).
+- O acompanhamento do pedido pendente é por consulta periódica até o P7 (Socket.IO).
 - Bundle inicial de ~337 KB (106 KB gzip), depois do code-splitting por rota. O MSW soma outro chunk de ~420 KB (160 KB gzip), que precisa carregar antes do primeiro render. A otimização e a análise de impacto no Lighthouse ficam para o P9. O enunciado exige auditar com os mocks ativos.
 - **Limitações do ambiente de mocks:**
   - O estado vive no `localStorage` de cada navegador, então duas abas compartilham os dados, mas dois navegadores não.

@@ -18,7 +18,7 @@ Base: `VITE_API_URL` (padrão `/api`). Todas as respostas são JSON.
 | 401 | `session` | `SESSION_REQUIRED`, `SESSION_EXPIRED` |
 | 403 | `permission` | `FORBIDDEN` (recurso de outro usuário) |
 | 404 | `not-found` | `NFT_NOT_FOUND`, `CART_ITEM_NOT_FOUND`, `ORDER_NOT_FOUND`, `WALLET_NOT_FOUND` |
-| 409 | `conflict` | `EMAIL_TAKEN`, `EDITION_SOLD_OUT`, `QUANTITY_LIMIT`, `QUOTE_OUTDATED`, `IDEMPOTENCY_CONFLICT`, `WALLET_LIMIT`, `WALLET_NETWORK_MISMATCH` |
+| 409 | `conflict` | `EMAIL_TAKEN`, `EDITION_SOLD_OUT`, `QUANTITY_LIMIT`, `QUOTE_OUTDATED`, `IDEMPOTENCY_CONFLICT`, `WALLET_LIMIT`, `WALLET_NETWORK_MISMATCH`, `WALLET_REJECTED`, `WALLET_DISCONNECTED` |
 | rede, timeout, 408, 429, 5xx | `transient` | `SERVICE_UNAVAILABLE`, `INTERNAL_ERROR` |
 
 O cliente Axios converte qualquer falha num `ApiError` ([`src/api/api-error.ts`](../src/api/api-error.ts)). O TanStack Query só repete automaticamente erros `transient`.
@@ -89,6 +89,15 @@ Cada linha do carrinho é NFT + edição (`lineId = <nftId>__<editionId>`). `Car
 - O `id` deriva do conteúdo: mudou preço, quantidade, cupom ou taxa, o `id` muda.
 - `blockers` lista os itens esgotados ou acima do limite.
 
+## Conexão de carteira (exige sessão)
+
+| Método | Caminho | Corpo | Resposta |
+|---|---|---|---|
+| POST | `/checkout/wallet-connection` | `{ walletId, network }` | 201 `{ id, walletId, network, address, expiresAt }` · 403 · 404 · 409 `WALLET_NETWORK_MISMATCH` / `WALLET_REJECTED` |
+| DELETE | `/checkout/wallet-connection/:id` | | 204 |
+
+A conexão simula a extensão/app da carteira (sem blockchain) e vale 10 minutos. Cada usuário tem uma conexão ativa por vez.
+
 ## Pedidos (exige sessão)
 
 | Método | Caminho | Resposta |
@@ -97,12 +106,12 @@ Cada linha do carrinho é NFT + edição (`lineId = <nftId>__<editionId>`). `Car
 | GET | `/orders/:id` | 200 `Order` · 403 · 404 |
 | GET | `/orders?status=pending` | 200 `{ items: Order[] }` |
 
-Corpo: `{ quoteId, walletId, network, buyer: { fullName, email } }`.
+Corpo: `{ quoteId, walletId, network, connectionId, buyer: { fullName, email, username, profileName, referralCode?, ensName?, secondaryWallet?, note? } }`.
 
 Regras da criação:
 1. **Idempotência:** a mesma chave com o mesmo corpo devolve o mesmo pedido. A mesma chave com outro corpo dá 409 `IDEMPOTENCY_CONFLICT`.
 2. **Revalidação:** o servidor recalcula a cotação. Item esgotado ou acima do limite dá 409 `EDITION_SOLD_OUT` / `QUANTITY_LIMIT`. Um `quoteId` diferente da cotação atual dá 409 `QUOTE_OUTDATED`.
-3. **Carteira:** precisa pertencer ao usuário (senão 403) e operar na rede escolhida (senão 409 `WALLET_NETWORK_MISMATCH`).
+3. **Carteira:** precisa pertencer ao usuário (senão 403), operar na rede escolhida (senão 409 `WALLET_NETWORK_MISMATCH`) e estar conectada, com uma `connectionId` válida da mesma carteira e rede (senão 409 `WALLET_DISCONNECTED`).
 4. **Estados:** o pedido nasce `pending` e a simulação resolve em ~2,5 s.
    - `confirmed`: baixa as edições, remove do carrinho só as quantidades compradas e gera `transaction.hash`.
    - `declined`: preserva o carrinho e preenche `failureReason`.

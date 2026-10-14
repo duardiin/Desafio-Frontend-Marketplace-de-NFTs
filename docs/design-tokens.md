@@ -203,3 +203,20 @@ Estrutura (container 1200, gap de 96 entre blocos, header com "Mercado" ativo e 
 - Tokens novos vistos nesta tela: `color/surface-raised` `#2F1D15` (fundo do botão de zoom); estilo `Title/20 Regular` (20/28, número da quantidade).
 
 Diferenças de conteúdo do footer nesta extração (o mesmo componente): "Conheça artistas, estúdios e comunidades que moldam a cultura digital **na** rede", "novidades **de listas** de acesso", "**Política** do mercado" e newsletter com o botão **Enviar** colado ao input (raio só à direita, 18 Bold).
+
+## Pagamento · desktop (node `11:2862`, extraído em 14/10, 4ª chamada ao MCP)
+
+Header com "Mercado" ativo e sem divisória. Trilha "Início / Mercado / Pagamento" (15 Bold). Duas colunas com gap de 32: formulário (flex 1) e resumo (405 px).
+
+**Formulário "Perfil do colecionador"** (17 Bold), duas colunas de campos com gap de 24 (12 entre campos):
+- Rótulo 15 Regular `foreground` + asterisco obrigatório **22 Regular na cor `text-coral` `#F0805F`** (token novo).
+- Campo: altura 40, **borda 1 px `border` (#3F2319), raio 3, fundo transparente**; placeholder 14 Regular `secondary` (#B39463). Selects com seta `select-arrow-down.svg` (18 px) à direita.
+- Coluna 1: Nome de exibição*, Rede* (select "Selecione uma rede"), Endereço da carteira* ("Endereço 0x da carteira"), Tipo de carteira* (select "Selecione uma carteira"), E-mail*.
+- Coluna 2: Nome de usuário*, Nome do perfil*, campo sem rótulo "ENS ou carteira secundária (opcional)", Código de indicação*, Nome ENS* (select de 78 px com ".eth").
+- Abaixo: opção "Usar outra carteira?" (círculo de 15 px) e "Observação do colecionador (opcional)" (textarea 350 × 152).
+
+**Resumo "Seus NFTs"** (17 Bold): cabeçalho "NFTs | Subtotal" (16 Bold/Medium) + divisória 0,3 px; linhas `surface-card` de 70 px com arte 70 px (raio 8), nome 16 Bold, "ID do token: #0042" 14 `secondary`, "(x 2)" 14 `text-secondary` e total da linha 18 Bold `text-accent`. Depois: "Tem um código promocional? Aplique aqui" (14, centralizado), Subtotal (15 / valor 18), "Desconto do lançamento" "(-) 00.00", Taxa de rede + nota "Taxa estimada" (12 `text-accent`, centralizada), divisória, **Total** (16 Bold / 18 Bold `text-accent`).
+
+**"Carteira e rede"** (17 Bold, centralizado): opções em caixas de 45 px (borda `border`, raio 3; selecionada com borda `primary`), círculo de rádio de 16 px: chip "METAMASK • WALLETCONNECT • COINBASE", "MetaMask", "Coinbase Wallet" (selecionada: rádio preenchido `radio-selected.svg`; vazio: `radio-empty.svg`). Botão **Confirmar compra**: 45 px, `primary`, **raio 8**, 15 Bold `ink`.
+
+Observação: o componente "Checkout Page" é compartilhado com a Confirmação (`11:4385`), que é um modal sobre esta tela.

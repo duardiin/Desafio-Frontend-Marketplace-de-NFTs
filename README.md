@@ -62,6 +62,8 @@ O estado da API simulada fica no `localStorage` do navegador e sobrevive ao refr
 | `pedido-timeout` | O pedido é gravado, mas a 1ª resposta estoura o timeout; reenviar com a mesma chave recupera o pedido |
 | `preco-alterado` | O preço de um item sobe ao enviar o pedido (409 `QUOTE_OUTDATED`) |
 | `edicao-esgotada` | Um item esgota ao enviar o pedido (409 `EDITION_SOLD_OUT`) |
+| `carteira-recusada` | A carteira recusa a conexão |
+| `carteira-desconectada` | A conexão com a carteira cai no primeiro envio do pedido; reconectar resolve |
 
 Os casos de negócio vêm dos dados e funcionam em qualquer cenário:
 
@@ -75,6 +77,25 @@ Os casos de negócio vêm dos dados e funcionam em qualquer cenário:
 - **Itens do visitante preservados:** com itens no carrinho, entre como Ana. Os itens se juntam ao carrinho dela.
 - **Cupom:** `KURIO10` (10%), `EXPIRADO` e qualquer outro código para inválido.
 - **Preço alterado e esgotado:** com a Ana logada, rode `window.__kurioMock.updateNft('nft-002', { priceEth: '1.79' })` ou `{ available: 0 }` e recarregue o carrinho.
+
+## Como reproduzir a compra e as falhas
+
+1. Entre como Ana e abra `/pagamento` (ou use "Finalizar compra" no carrinho).
+2. Clique em **Conectar carteira**, depois em **Confirmar compra** (abre a revisão) e em **Confirmar pagamento**.
+3. O pedido aparece em `/pedidos/<id>` como "Aguardando confirmação" e, em ~2,5 s, como confirmado, com o recibo.
+
+As falhas usam os cenários da tabela acima:
+
+| Fluxo | Cenário | O que observar |
+|---|---|---|
+| Pagamento recusado | `?cenario=pagamento-recusado` | Motivo da recusa; o carrinho fica intacto |
+| Timeout com recuperação | `?cenario=pedido-timeout` | "Não recebemos a confirmação"; **Tentar de novo** recupera o mesmo pedido |
+| Preço alterado na confirmação | `?cenario=preco-alterado` | A revisão mostra o que mudou e pede **Confirmar novos valores** |
+| Edição esgotada na confirmação | `?cenario=edicao-esgotada` | Erro com link para revisar o carrinho |
+| Carteira recusada | `?cenario=carteira-recusada` | Erro na conexão |
+| Carteira desconectada | `?cenario=carteira-desconectada` | A revisão fecha; reconectar e confirmar conclui sem duplicar |
+
+Para o clique repetido, dê um duplo clique em **Confirmar pagamento**: só um pedido é criado. Recarregar a página do pedido enquanto ele está pendente retoma o acompanhamento.
 
 ## Estado do catálogo na URL
 
