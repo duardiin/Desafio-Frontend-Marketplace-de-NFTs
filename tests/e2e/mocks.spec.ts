@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { callApi, login, openApp, useScenario } from './support/mock-api'
 
 interface ListBody {
@@ -19,7 +19,18 @@ interface OrderBody {
 const ORDER_BODY = {
   walletId: 'wal-ana-1',
   network: 'ethereum',
-  buyer: { fullName: 'Ana Ribeiro', email: 'ana@kurio.dev' },
+  buyer: { fullName: 'Ana Ribeiro', email: 'ana@kurio.dev', username: 'anaribeiro', profileName: 'Ana Ribeiro' },
+}
+
+/** Conecta a carteira principal da Ana (exigido para criar pedido). */
+async function connectWallet(page: Page, token: string): Promise<string> {
+  const result = await callApi<{ id: string }>(page, '/checkout/wallet-connection', {
+    method: 'POST',
+    token,
+    body: { walletId: 'wal-ana-1', network: 'ethereum' },
+  })
+  expect(result.status).toBe(201)
+  return result.body.id
 }
 
 // Contratos e estado da API simulada: não dependem do viewport.
@@ -250,7 +261,7 @@ test.describe('pedidos', () => {
     await openApp(page)
     const token = await login(page, 'ana@kurio.dev')
     const quote = await callApi<{ id: string; totalEth: string }>(page, '/cart/quote', { token })
-    const body = { ...ORDER_BODY, quoteId: quote.body.id }
+    const body = { ...ORDER_BODY, quoteId: quote.body.id, connectionId: await connectWallet(page, token) }
     const headers = { 'Idempotency-Key': 'e2e-key-1' }
 
     const first = await callApi<OrderBody>(page, '/orders', { method: 'POST', token, headers, body })
@@ -296,7 +307,7 @@ test.describe('pedidos', () => {
       method: 'POST',
       token,
       headers: { 'Idempotency-Key': 'e2e-key-2' },
-      body: { ...ORDER_BODY, quoteId: quote.body.id },
+      body: { ...ORDER_BODY, quoteId: quote.body.id, connectionId: await connectWallet(page, token) },
     })
     expect(result.status).toBe(409)
     expect(result.body.code).toBe('QUOTE_OUTDATED')
@@ -311,7 +322,7 @@ test.describe('pedidos', () => {
       method: 'POST',
       token,
       headers: { 'Idempotency-Key': 'e2e-key-3' },
-      body: { ...ORDER_BODY, quoteId: quote.body.id },
+      body: { ...ORDER_BODY, quoteId: quote.body.id, connectionId: await connectWallet(page, token) },
     })
     expect(created.status).toBe(201)
 

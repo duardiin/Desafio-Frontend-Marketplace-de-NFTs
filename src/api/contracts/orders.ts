@@ -5,9 +5,17 @@ export const ORDER_STATUSES = ['pending', 'confirmed', 'declined'] as const
 /** `confirmed` e `declined` são terminais. */
 export type OrderStatus = (typeof ORDER_STATUSES)[number]
 
+/** Dados do colecionador informados no pagamento (campos do Figma). */
 export interface Buyer {
+  /** "Nome de exibição". */
   fullName: string
   email: string
+  username: string
+  profileName: string
+  referralCode?: string
+  ensName?: string
+  secondaryWallet?: string
+  note?: string
 }
 
 /**
@@ -16,11 +24,14 @@ export interface Buyer {
  * - mesma chave + mesmo corpo → 200 com o mesmo pedido
  * - mesma chave + corpo diferente → 409 IDEMPOTENCY_CONFLICT
  * - cotação desatualizada → 409 QUOTE_OUTDATED
+ * - conexão com a carteira caiu/expirou → 409 WALLET_DISCONNECTED
  */
 export interface CreateOrderRequest {
   quoteId: string
   walletId: string
   network: Network
+  /** Conexão ativa com a carteira (POST /checkout/wallet-connection). */
+  connectionId: string
   buyer: Buyer
 }
 

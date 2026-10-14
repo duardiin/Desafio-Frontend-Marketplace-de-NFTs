@@ -10,7 +10,7 @@ import {
 
 const STORAGE_KEY = 'kurio:mock-db'
 /** Aumente ao mudar o formato do banco: estados antigos são descartados. */
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 3
 
 type Listener = (changes: DbChange[]) => void
 
@@ -29,6 +29,7 @@ export function createSeedDb(): MockDb {
     wallets: createWalletFixtures(),
     orders: [],
     idempotency: {},
+    walletConnections: [],
     coupons: createCouponFixtures(),
   }
 }

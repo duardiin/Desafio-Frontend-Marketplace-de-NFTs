@@ -14,6 +14,7 @@ export type EndpointGroup =
   | 'orders'
   | 'profile'
   | 'wallets'
+  | 'checkout'
 
 const DEFAULT_LATENCY_MS = 150
 const SLOW_LATENCY_MS = 2500

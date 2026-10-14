@@ -1,4 +1,4 @@
-import type { EthAmount, IsoDateTime } from '@/api/contracts/common'
+import type { EthAmount, IsoDateTime, Network } from '@/api/contracts/common'
 import type { NftDetail } from '@/api/contracts/nfts'
 import type { Order } from '@/api/contracts/orders'
 import type { Wallet } from '@/api/contracts/wallets'
@@ -58,6 +58,14 @@ export interface IdempotencyRecord {
   orderId: string
 }
 
+export interface WalletConnectionRecord {
+  id: string
+  userId: string
+  walletId: string
+  network: Network
+  expiresAt: IsoDateTime
+}
+
 export interface CouponRecord {
   code: string
   percentOff: number
@@ -74,6 +82,7 @@ export interface MockDb {
   wallets: WalletRecord[]
   orders: OrderRecord[]
   idempotency: Record<string, IdempotencyRecord>
+  walletConnections: WalletConnectionRecord[]
   coupons: CouponRecord[]
 }
 

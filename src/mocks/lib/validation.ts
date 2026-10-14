@@ -53,6 +53,20 @@ export function validateBio(value: unknown, field = 'bio'): FieldErrors {
   return text.length > 280 ? error(field, 'Use no máximo 280 caracteres.') : {}
 }
 
+/** Código de indicação: opcional; se informado, 4 a 12 letras/números. */
+export function validateOptionalCode(value: unknown, field = 'referralCode'): FieldErrors {
+  const text = typeof value === 'string' ? value.trim() : ''
+  if (!text) return {}
+  return /^[A-Za-z0-9]{4,12}$/.test(text) ? {} : error(field, 'Use de 4 a 12 letras ou números.')
+}
+
+/** Nome ENS: opcional; se informado, só letras minúsculas, números e hífen (sem o ".eth"). */
+export function validateOptionalEns(value: unknown, field = 'ensName'): FieldErrors {
+  const text = typeof value === 'string' ? value.trim() : ''
+  if (!text) return {}
+  return /^[a-z0-9-]{3,32}$/.test(text) ? {} : error(field, 'Use de 3 a 32 letras minúsculas, números ou hífen.')
+}
+
 export function isWalletProvider(value: unknown): value is WalletProvider {
   return typeof value === 'string' && (WALLET_PROVIDERS as readonly string[]).includes(value)
 }

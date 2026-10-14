@@ -21,6 +21,8 @@ export const SCENARIOS = {
   'pedido-timeout': 'A criação do pedido grava, mas a 1ª resposta estoura o timeout',
   'preco-alterado': 'O preço de um item muda ao enviar o pedido (cotação desatualizada)',
   'edicao-esgotada': 'Um item esgota ao enviar o pedido',
+  'carteira-recusada': 'A carteira recusa a conexão',
+  'carteira-desconectada': 'A conexão com a carteira cai ao enviar o pedido (reconectar resolve)',
 } as const
 
 export type ScenarioName = keyof typeof SCENARIOS

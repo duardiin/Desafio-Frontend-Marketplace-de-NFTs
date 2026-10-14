@@ -14,7 +14,15 @@ import {
 import { api } from '@/mocks/handlers/paths'
 import { fnv1a } from '@/mocks/lib/hash'
 import { apiError, nowIso, readJson, requireUser, validationError } from '@/mocks/lib/http'
-import { isNetwork, validateDisplayName, validateEmail } from '@/mocks/lib/validation'
+import {
+  isNetwork,
+  validateBio,
+  validateDisplayName,
+  validateEmail,
+  validateOptionalCode,
+  validateOptionalEns,
+  validateUsername,
+} from '@/mocks/lib/validation'
 import { withNetwork } from '@/mocks/network'
 import { getActiveScenario } from '@/mocks/scenarios'
 import Decimal from 'decimal.js'
@@ -75,6 +83,11 @@ export const orderHandlers = [
       const fieldErrors = {
         ...validateDisplayName(body.buyer?.fullName, 'buyer.fullName'),
         ...validateEmail(body.buyer?.email, 'buyer.email'),
+        ...validateUsername(body.buyer?.username, 'buyer.username'),
+        ...validateDisplayName(body.buyer?.profileName, 'buyer.profileName'),
+        ...validateOptionalCode(body.buyer?.referralCode, 'buyer.referralCode'),
+        ...validateOptionalEns(body.buyer?.ensName, 'buyer.ensName'),
+        ...validateBio(body.buyer?.note, 'buyer.note'),
         ...(isNetwork(body.network) ? {} : { network: ['Selecione uma rede.'] }),
       }
       if (Object.keys(fieldErrors).length > 0) return validationError(fieldErrors)
@@ -84,6 +97,22 @@ export const orderHandlers = [
       if (wallet.userId !== user.id) return apiError(403, 'FORBIDDEN', 'Esta carteira não pertence à sua conta.')
       if (!isNetwork(body.network) || !wallet.networks.includes(body.network)) {
         return apiError(409, 'WALLET_NETWORK_MISMATCH', 'A carteira escolhida não opera nesta rede.')
+      }
+
+      // A carteira precisa estar conectada (conexão simulada, com validade).
+      if (getActiveScenario() === 'carteira-desconectada' && fireOnce('carteira-desconectada')) {
+        db.walletConnections = db.walletConnections.filter((item) => item.id !== body.connectionId)
+        commit()
+      }
+      const connection = db.walletConnections.find((item) => item.id === body.connectionId)
+      if (
+        !connection ||
+        connection.userId !== user.id ||
+        connection.walletId !== wallet.id ||
+        connection.network !== body.network ||
+        Date.parse(connection.expiresAt) <= Date.now()
+      ) {
+        return apiError(409, 'WALLET_DISCONNECTED', 'A conexão com a carteira caiu. Conecte novamente para continuar.')
       }
 
       const cart = getCart(db, `user:${user.id}`)
@@ -121,7 +150,16 @@ export const orderHandlers = [
         couponCode: quote.coupon?.code ?? null,
         network: body.network,
         wallet: { id: wallet.id, label: wallet.label, provider: wallet.provider, address: wallet.address },
-        buyer: { fullName: String(body.buyer?.fullName).trim(), email: String(body.buyer?.email).trim() },
+        buyer: {
+          fullName: String(body.buyer?.fullName).trim(),
+          email: String(body.buyer?.email).trim(),
+          username: String(body.buyer?.username).trim(),
+          profileName: String(body.buyer?.profileName).trim(),
+          referralCode: body.buyer?.referralCode?.trim() || undefined,
+          ensName: body.buyer?.ensName?.trim() || undefined,
+          secondaryWallet: body.buyer?.secondaryWallet?.trim() || undefined,
+          note: body.buyer?.note?.trim() || undefined,
+        },
         transaction: null,
         failureReason: null,
         settleAt: new Date(Date.now() + SETTLE_DELAY_MS).toISOString(),
