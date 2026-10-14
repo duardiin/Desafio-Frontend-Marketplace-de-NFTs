@@ -10,7 +10,7 @@ import {
 
 const STORAGE_KEY = 'kurio:mock-db'
 /** Aumente ao mudar o formato do banco: estados antigos são descartados. */
-const SCHEMA_VERSION = 3
+const SCHEMA_VERSION = 4
 
 type Listener = (changes: DbChange[]) => void
 

@@ -21,10 +21,12 @@ import {
   validateBio,
   validateDisplayName,
   validateEmail,
+  validateEns,
   validateNewPassword,
   validateUsername,
   validateWalletAddress,
   validateWalletNetworks,
+  validateWalletNickname,
 } from '@/mocks/lib/validation'
 import { withNetwork } from '@/mocks/network'
 
@@ -37,6 +39,8 @@ function toProfile(user: UserRecord): Profile {
     displayName: user.displayName,
     username: user.username,
     email: user.email,
+    ensName: user.ensName,
+    walletNickname: user.walletNickname,
     bio: user.bio,
     avatarUrl: user.avatarUrl,
   }
@@ -70,6 +74,8 @@ export const accountHandlers = [
         ...(body.displayName !== undefined ? validateDisplayName(body.displayName) : {}),
         ...(body.username !== undefined ? validateUsername(body.username) : {}),
         ...(body.email !== undefined ? validateEmail(body.email) : {}),
+        ...(body.ensName !== undefined ? validateEns(body.ensName) : {}),
+        ...(body.walletNickname !== undefined ? validateWalletNickname(body.walletNickname) : {}),
         ...(body.bio !== undefined ? validateBio(body.bio) : {}),
       }
       if (Object.keys(fieldErrors).length > 0) return validationError(fieldErrors)
@@ -89,6 +95,8 @@ export const accountHandlers = [
       if (body.displayName !== undefined) user.displayName = body.displayName.trim()
       if (username) user.username = username
       if (email) user.email = email
+      if (body.ensName !== undefined) user.ensName = body.ensName.trim()
+      if (body.walletNickname !== undefined) user.walletNickname = body.walletNickname.trim()
       if (body.bio !== undefined) user.bio = body.bio
       commit()
       return HttpResponse.json(toProfile(user))
@@ -109,6 +117,16 @@ export const accountHandlers = [
         return validationError({ avatar: ['A imagem precisa ter no máximo 300 KB.'] })
       }
       user.avatarUrl = dataUrl
+      commit()
+      return HttpResponse.json(toProfile(user))
+    }),
+  ),
+
+  http.delete(
+    api('/me/avatar'),
+    withNetwork('profile', ({ request }) => {
+      const user = requireUser(request)
+      user.avatarUrl = null
       commit()
       return HttpResponse.json(toProfile(user))
     }),

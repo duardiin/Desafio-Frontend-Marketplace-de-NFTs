@@ -62,6 +62,8 @@ export const authHandlers = [
         displayName: String(body.displayName).trim(),
         username: usernameFromEmail(email, new Set(db.users.map((item) => item.username))),
         email,
+        ensName: '',
+        walletNickname: '',
         bio: '',
         avatarUrl: null,
         passwordSalt: salt,

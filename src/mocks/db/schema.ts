@@ -10,6 +10,8 @@ export interface UserRecord {
   displayName: string
   username: string
   email: string
+  ensName: string
+  walletNickname: string
   bio: string
   avatarUrl: string | null
   passwordSalt: string

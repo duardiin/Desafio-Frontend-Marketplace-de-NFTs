@@ -1,5 +1,6 @@
 import type { Network } from '@/api/contracts/common'
 import { NETWORKS } from '@/api/contracts/common'
+import { ENS_SUFFIXES } from '@/api/contracts/profile'
 import type { WalletProvider } from '@/api/contracts/wallets'
 import { WALLET_PROVIDERS } from '@/api/contracts/wallets'
 
@@ -65,6 +66,24 @@ export function validateOptionalEns(value: unknown, field = 'ensName'): FieldErr
   const text = typeof value === 'string' ? value.trim() : ''
   if (!text) return {}
   return /^[a-z0-9-]{3,32}$/.test(text) ? {} : error(field, 'Use de 3 a 32 letras minúsculas, números ou hífen.')
+}
+
+/** Nome ENS do perfil: obrigatório, `nome.eth` ou `nome.box` (3 a 32 letras minúsculas, números ou hífen). */
+export function validateEns(value: unknown, field = 'ensName'): FieldErrors {
+  const text = typeof value === 'string' ? value.trim() : ''
+  if (!text) return error(field, 'Informe seu nome ENS.')
+  const dot = text.lastIndexOf('.')
+  const name = dot === -1 ? text : text.slice(0, dot)
+  const suffix = dot === -1 ? '' : text.slice(dot + 1)
+  if (!(ENS_SUFFIXES as readonly string[]).includes(suffix)) return error(field, 'Escolha o domínio .eth ou .box.')
+  return /^[a-z0-9-]{3,32}$/.test(name) ? {} : error(field, 'Use de 3 a 32 letras minúsculas, números ou hífen.')
+}
+
+export function validateWalletNickname(value: unknown, field = 'walletNickname'): FieldErrors {
+  const text = typeof value === 'string' ? value.trim() : ''
+  if (text.length < 2) return error(field, 'Informe o apelido da carteira (mínimo de 2 caracteres).')
+  if (text.length > 40) return error(field, 'Use no máximo 40 caracteres.')
+  return {}
 }
 
 export function isWalletProvider(value: unknown): value is WalletProvider {
