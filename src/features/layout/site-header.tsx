@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import cartIcon from '@/assets/figma/icon-cart.svg'
-import loginIcon from '@/assets/figma/icon-login.svg'
 import searchIcon from '@/assets/figma/icon-search.svg'
+import { AccountEntry } from '@/features/auth/account-entry'
 import { ComingSoon } from '@/features/layout/coming-soon'
 import { MobileNav } from '@/features/layout/mobile-nav'
 import { NAV_ITEMS, type NavItem, type NavSection } from '@/features/layout/navigation'
@@ -28,17 +28,16 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-5 lg:gap-7">
-          {/* Busca e carrinho ganham comportamento nos blocos de catálogo e carrinho. */}
+          {/* Busca e carrinho ganham comportamento nos blocos de catálogo (P4) e carrinho (P5). */}
           <ComingSoon className="inline-flex size-6 items-center justify-center">
             <img src={searchIcon} alt="Buscar" width={20} height={20} />
           </ComingSoon>
           <ComingSoon className="inline-flex size-6 items-center justify-center">
             <img src={cartIcon} alt="Carrinho" width={24} height={24} />
           </ComingSoon>
-          <ComingSoon className="hidden h-[35px] w-[100px] items-center justify-center gap-1 rounded-md bg-primary text-body-16 font-medium text-ink lg:inline-flex">
-            <img src={loginIcon} alt="" width={20} height={20} className="size-5 p-px" />
-            Entrar
-          </ComingSoon>
+          <div className="hidden lg:block">
+            <AccountEntry />
+          </div>
           <MobileNav activeSection={activeSection} className="lg:hidden" />
         </div>
       </div>

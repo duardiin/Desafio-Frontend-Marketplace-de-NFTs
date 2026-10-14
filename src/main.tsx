@@ -3,6 +3,7 @@ import { RouterProvider } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { env } from '@/config/env'
+import { installSessionLifecycle } from '@/features/auth/session-lifecycle'
 import { createQueryClient } from '@/lib/query-client'
 import { createAppRouter } from '@/router'
 import './index.css'
@@ -16,6 +17,7 @@ async function bootstrap() {
 
   const queryClient = createQueryClient()
   const router = createAppRouter(queryClient)
+  installSessionLifecycle(router, queryClient)
 
   createRoot(document.getElementById('root')!).render(
     <StrictMode>

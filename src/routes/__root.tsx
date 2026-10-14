@@ -1,5 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import { NotificationRegion } from '@/features/feedback/notification-region'
 import { NotFoundPage } from '@/features/layout/not-found-page'
 import { SiteFooter } from '@/features/layout/site-footer'
 import { SiteHeader } from '@/features/layout/site-header'
@@ -27,6 +28,7 @@ function RootLayout() {
         <Outlet />
       </main>
       <SiteFooter />
+      <NotificationRegion />
     </div>
   )
 }

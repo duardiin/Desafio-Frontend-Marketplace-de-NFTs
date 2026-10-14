@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { toApiError } from '@/api/api-error'
+import { authToken, notifySessionRejected } from '@/api/auth-token'
 import { env } from '@/config/env'
 
 /**
@@ -12,7 +13,24 @@ export const httpClient = axios.create({
   headers: { Accept: 'application/json' },
 })
 
+httpClient.interceptors.request.use((config) => {
+  const token = authToken.get()
+  if (token) config.headers.set('Authorization', `Bearer ${token}`)
+  return config
+})
+
 httpClient.interceptors.response.use(
   (response) => response,
-  (error: unknown) => Promise.reject(toApiError(error)),
+  (error: unknown) => {
+    const apiError = toApiError(error)
+    const config = axios.isAxiosError(error) ? error.config : undefined
+    const sentToken = Boolean(config?.headers?.Authorization)
+    const isAuthEndpoint = config?.url?.startsWith('/auth/') ?? false
+
+    // 401 numa chamada autenticada = sessão expirada/revogada durante o uso.
+    // Endpoints de /auth tratam o próprio 401 (ex.: consulta da sessão no carregamento).
+    if (apiError.kind === 'session' && sentToken && !isAuthEndpoint) notifySessionRejected()
+
+    return Promise.reject(apiError)
+  },
 )

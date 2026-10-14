@@ -10,6 +10,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import { useCurrentUser } from '@/features/auth/session-query'
+import { useLogout } from '@/features/auth/use-auth-actions'
+import { useReturnHref } from '@/features/auth/use-return-href'
 import { NAV_ITEMS, type NavSection } from '@/features/layout/navigation'
 import { cn } from '@/lib/utils'
 
@@ -25,6 +28,9 @@ interface MobileNavProps {
  */
 export function MobileNav({ activeSection, className }: MobileNavProps) {
   const [open, setOpen] = useState(false)
+  const user = useCurrentUser()
+  const returnHref = useReturnHref()
+  const logout = useLogout()
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -73,13 +79,35 @@ export function MobileNav({ activeSection, className }: MobileNavProps) {
           </ul>
         </nav>
 
-        <div className="mt-auto p-6">
-          <span
-            aria-disabled="true"
-            className="flex h-10 w-full cursor-not-allowed items-center justify-center rounded-md bg-primary/60 text-body-16 font-medium text-ink"
-          >
-            Entrar <span className="ml-2 text-caption-12">(em breve)</span>
-          </span>
+        <div className="mt-auto flex flex-col gap-3 p-6">
+          {user ? (
+            <>
+              <p className="text-body-14 text-muted-foreground">
+                Conectado como <span className="font-bold text-foreground">{user.displayName}</span>
+              </p>
+              <Button asChild variant="outline" className="w-full">
+                <Link to="/perfil" onClick={() => setOpen(false)}>
+                  Meu perfil
+                </Link>
+              </Button>
+              <Button
+                className="w-full"
+                disabled={logout.isPending}
+                onClick={() => {
+                  setOpen(false)
+                  logout.mutate()
+                }}
+              >
+                Sair
+              </Button>
+            </>
+          ) : (
+            <Button asChild className="w-full">
+              <Link to="/login" search={{ redirect: returnHref }} onClick={() => setOpen(false)}>
+                Entrar
+              </Link>
+            </Button>
+          )}
         </div>
       </SheetContent>
     </Sheet>
