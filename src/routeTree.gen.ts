@@ -15,8 +15,11 @@ import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthFavoritosRouteImport } from './routes/_auth/favoritos'
+import { Route as AuthPagamentoRouteImport } from './routes/_auth/pagamento'
 import { Route as AuthPerfilRouteImport } from './routes/_auth/perfil'
 import { Route as NftIdRouteImport } from './routes/nft.$id'
+import { Route as TransacoesHashRouteImport } from './routes/transacoes.$hash'
+import { Route as AuthPedidosIdRouteImport } from './routes/_auth/pedidos/$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,6 +50,11 @@ const AuthFavoritosRoute = AuthFavoritosRouteImport.update({
   path: '/favoritos',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthPagamentoRoute = AuthPagamentoRouteImport.update({
+  id: '/pagamento',
+  path: '/pagamento',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthPerfilRoute = AuthPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -57,6 +65,16 @@ const NftIdRoute = NftIdRouteImport.update({
   path: '/nft/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TransacoesHashRoute = TransacoesHashRouteImport.update({
+  id: '/transacoes/$hash',
+  path: '/transacoes/$hash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthPedidosIdRoute = AuthPedidosIdRouteImport.update({
+  id: '/pedidos/$id',
+  path: '/pedidos/$id',
+  getParentRoute: () => AuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -64,8 +82,11 @@ export interface FileRoutesByFullPath {
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
   '/favoritos': typeof AuthFavoritosRoute
+  '/pagamento': typeof AuthPagamentoRoute
   '/perfil': typeof AuthPerfilRoute
   '/nft/$id': typeof NftIdRoute
+  '/transacoes/$hash': typeof TransacoesHashRoute
+  '/pedidos/$id': typeof AuthPedidosIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -73,8 +94,11 @@ export interface FileRoutesByTo {
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
   '/favoritos': typeof AuthFavoritosRoute
+  '/pagamento': typeof AuthPagamentoRoute
   '/perfil': typeof AuthPerfilRoute
   '/nft/$id': typeof NftIdRoute
+  '/transacoes/$hash': typeof TransacoesHashRoute
+  '/pedidos/$id': typeof AuthPedidosIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -84,8 +108,11 @@ export interface FileRoutesById {
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
   '/_auth/favoritos': typeof AuthFavoritosRoute
+  '/_auth/pagamento': typeof AuthPagamentoRoute
   '/_auth/perfil': typeof AuthPerfilRoute
   '/nft/$id': typeof NftIdRoute
+  '/transacoes/$hash': typeof TransacoesHashRoute
+  '/_auth/pedidos/$id': typeof AuthPedidosIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -95,8 +122,11 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/login'
     | '/favoritos'
+    | '/pagamento'
     | '/perfil'
     | '/nft/$id'
+    | '/transacoes/$hash'
+    | '/pedidos/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -104,8 +134,11 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/login'
     | '/favoritos'
+    | '/pagamento'
     | '/perfil'
     | '/nft/$id'
+    | '/transacoes/$hash'
+    | '/pedidos/$id'
   id:
     | '__root__'
     | '/'
@@ -114,8 +147,11 @@ export interface FileRouteTypes {
     | '/carrinho'
     | '/login'
     | '/_auth/favoritos'
+    | '/_auth/pagamento'
     | '/_auth/perfil'
     | '/nft/$id'
+    | '/transacoes/$hash'
+    | '/_auth/pedidos/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -125,6 +161,7 @@ export interface RootRouteChildren {
   CarrinhoRoute: typeof CarrinhoRoute
   LoginRoute: typeof LoginRoute
   NftIdRoute: typeof NftIdRoute
+  TransacoesHashRoute: typeof TransacoesHashRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -171,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthFavoritosRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/pagamento': {
+      id: '/_auth/pagamento'
+      path: '/pagamento'
+      fullPath: '/pagamento'
+      preLoaderRoute: typeof AuthPagamentoRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/perfil': {
       id: '/_auth/perfil'
       path: '/perfil'
@@ -185,17 +229,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NftIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/transacoes/$hash': {
+      id: '/transacoes/$hash'
+      path: '/transacoes/$hash'
+      fullPath: '/transacoes/$hash'
+      preLoaderRoute: typeof TransacoesHashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/pedidos/$id': {
+      id: '/_auth/pedidos/$id'
+      path: '/pedidos/$id'
+      fullPath: '/pedidos/$id'
+      preLoaderRoute: typeof AuthPedidosIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
 interface AuthRouteChildren {
   AuthFavoritosRoute: typeof AuthFavoritosRoute
+  AuthPagamentoRoute: typeof AuthPagamentoRoute
   AuthPerfilRoute: typeof AuthPerfilRoute
+  AuthPedidosIdRoute: typeof AuthPedidosIdRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthFavoritosRoute: AuthFavoritosRoute,
+  AuthPagamentoRoute: AuthPagamentoRoute,
   AuthPerfilRoute: AuthPerfilRoute,
+  AuthPedidosIdRoute: AuthPedidosIdRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
@@ -207,6 +269,7 @@ const rootRouteChildren: RootRouteChildren = {
   CarrinhoRoute: CarrinhoRoute,
   LoginRoute: LoginRoute,
   NftIdRoute: NftIdRoute,
+  TransacoesHashRoute: TransacoesHashRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -41,9 +41,12 @@ export function cartItemCount(cart: Cart | undefined): number {
 function useApplyCartResult() {
   const queryClient = useQueryClient()
   const user = useCurrentUser()
-  return (cart: Cart) => {
+  return async (cart: Cart) => {
     // Chave calculada agora: o id do visitante pode ter nascido nesta mutation.
     const keys = cartKeys(user?.id, guestId.get())
+    // Uma leitura do carrinho iniciada durante a mutation responderia o estado
+    // antigo DEPOIS desta gravação; cancelá-la evita sobrescrever o resultado.
+    await queryClient.cancelQueries({ queryKey: keys.cart, exact: true })
     queryClient.setQueryData(keys.cart, cart)
     void queryClient.invalidateQueries({ queryKey: keys.quote })
   }
@@ -76,8 +79,8 @@ export function useRemoveCartItem() {
   const applyResult = useApplyCartResult()
   return useMutation({
     mutationFn: ({ lineId }: { lineId: string; name: string }) => cartApi.removeCartItem(lineId),
-    onSuccess: (cart, { name }) => {
-      applyResult(cart)
+    onSuccess: async (cart, { name }) => {
+      await applyResult(cart)
       notify(`"${name}" saiu do carrinho.`, 'info')
     },
     onError: (error) => notify(toApiError(error).message, 'error'),
@@ -88,8 +91,8 @@ export function useApplyCoupon() {
   const applyResult = useApplyCartResult()
   return useMutation({
     mutationFn: (code: string) => cartApi.applyCoupon(code),
-    onSuccess: (cart) => {
-      applyResult(cart)
+    onSuccess: async (cart) => {
+      await applyResult(cart)
       notify(`Cupom ${cart.couponCode} aplicado.`, 'success')
     },
   })
@@ -99,8 +102,8 @@ export function useRemoveCoupon() {
   const applyResult = useApplyCartResult()
   return useMutation({
     mutationFn: () => cartApi.removeCoupon(),
-    onSuccess: (cart) => {
-      applyResult(cart)
+    onSuccess: async (cart) => {
+      await applyResult(cart)
       notify('Cupom removido.', 'info')
     },
     onError: (error) => notify(toApiError(error).message, 'error'),

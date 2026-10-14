@@ -41,6 +41,7 @@
     --color-highlight: var(--highlight);
     --color-subtle: var(--subtle);
     --color-border-soft: var(--border-soft);
+    --color-coral: var(--coral);
 
     /* Raios do Figma */
     --radius-xs: 4px;
@@ -111,6 +112,8 @@
     --highlight: #e89b55;
     --subtle: #b39463;
     --border-soft: #55321f;
+    /* Asterisco de campo obrigatório (Figma, tela de Pagamento). */
+    --coral: #f0805f;
 
     /* shadcn/ui */
     --background: var(--ink);

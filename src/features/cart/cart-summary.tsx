@@ -1,8 +1,8 @@
+import { Link } from '@tanstack/react-router'
 import type { Quote } from '@/api/contracts/cart'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { CouponForm } from '@/features/cart/coupon-form'
-import { ComingSoon } from '@/features/layout/coming-soon'
 import { formatEth } from '@/lib/eth'
 
 interface CartSummaryProps {
@@ -73,10 +73,15 @@ export function CartSummary({ quote, isLoading, isRefreshing, isError, onRetry, 
         </p>
       )}
 
-      {/* Pagamento e pedido entram no bloco P6. */}
-      <ComingSoon className="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary/60 text-body-16 font-bold text-ink">
-        Finalizar compra
-      </ComingSoon>
+      {blocked || isLoading ? (
+        <Button className="w-full" disabled>
+          Finalizar compra
+        </Button>
+      ) : (
+        <Button asChild className="w-full">
+          <Link to="/pagamento">Finalizar compra</Link>
+        </Button>
+      )}
     </section>
   )
 }
