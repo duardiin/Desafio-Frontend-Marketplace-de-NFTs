@@ -13,8 +13,8 @@ Prazo: `____/____ às ____h` (preencha). Reserve as **últimas 3 horas** só par
 ## DIA 1
 
 ### Bloco 1 · Fundação (~3h) · prompts P0, P1
-- [ ] Setup completo (`01-SETUP-VSCODE.md`) e deploy vazio na Vercel funcionando
-- [ ] Scripts do `package.json`
+- [x] Setup completo (`01-SETUP-VSCODE.md`) e deploy vazio na Vercel funcionando
+- [x] Scripts do `package.json`
 - [ ] Tokens do Figma em `docs/design-tokens.md` e no tema do Tailwind/shadcn
 - [ ] Layout base (header, footer, nav mobile), skeleton com shimmer, rota 404
 - [ ] Router + Query + Axios configurados (cliente único)
@@ -82,14 +82,14 @@ Pode simplificar (e registrar): upload de avatar simulado simples, tablet só co
 
 | Bloco | Início | Fim | Status | Observações / o que ficou de fora |
 |---|---|---|---|---|
-| 1 Fundação | | | | |
+| 1 Fundação | 14/10 | | Em andamento | Setup + P0 concluídos. Falta P1 (tema, layout, skeleton, Router/Query/Axios). Repo: github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs · Deploy: desafio-frontend-marketplace-de-nf-alpha.vercel.app |
 | 2 Contratos, MSW, sessão | | | | |
 | 3 Descoberta e carrinho | | | | |
 | 4 Compra e tempo real | | | | |
 | 5 Conta, qualidade, entrega | | | | |
 
 ### Decisões tomadas (copie para ARCHITECTURE.md)
--
+- Ver ARCHITECTURE.md (seção "Decisões"). Resumo: MSW fixado em 2.x; oxlint no lugar de ESLint; shadcn com base Radix; defaults de env no código; .gitattributes com LF.
 
 ### Pendências / dívidas técnicas
 -
