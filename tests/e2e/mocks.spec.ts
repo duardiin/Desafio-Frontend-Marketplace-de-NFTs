@@ -85,7 +85,8 @@ test.describe('cenários', () => {
 
   test('falha-temporaria: primeira chamada 503, a seguinte funciona', async ({ page }) => {
     await useScenario(page, 'falha-temporaria')
-    await openApp(page)
+    // Rota sem consulta ao catálogo: a 1ª chamada fica para o teste.
+    await openApp(page, '/rota-inexistente')
     expect((await callApi(page, '/nfts')).status).toBe(503)
     expect((await callApi(page, '/nfts')).status).toBe(200)
   })
@@ -219,25 +220,25 @@ test.describe('carrinho, cupom e cotação', () => {
     const soldOut = await callApi<{ code: string }>(page, '/cart/items', {
       method: 'POST',
       headers,
-      body: { nftId: 'nft-044', quantity: 1 },
+      body: { nftId: 'nft-044', editionId: '1-1', quantity: 1 },
     })
     expect(soldOut.body.code).toBe('EDITION_SOLD_OUT')
     const added = await callApi(page, '/cart/items', {
       method: 'POST',
       headers,
-      body: { nftId: 'nft-007', quantity: 2 },
+      body: { nftId: 'nft-007', editionId: '1-10', quantity: 2 },
     })
     expect(added.status).toBe(200)
 
     const token = await login(page, 'ana@kurio.dev')
-    const merged = await callApi<{ items: { nft: { id: string }; quantity: number }[] }>(page, '/cart/merge', {
+    const merged = await callApi<{ items: { lineId: string; quantity: number }[] }>(page, '/cart/merge', {
       method: 'POST',
       token,
       body: { guestId },
     })
-    expect(merged.body.items.map((item) => [item.nft.id, item.quantity])).toEqual([
-      ['nft-002', 1],
-      ['nft-007', 2],
+    expect(merged.body.items.map((item) => [item.lineId, item.quantity])).toEqual([
+      ['nft-002__1-1', 1],
+      ['nft-007__1-10', 2],
     ])
     const guestCart = await callApi<{ items: unknown[] }>(page, '/cart', { headers })
     expect(guestCart.body.items).toHaveLength(0)

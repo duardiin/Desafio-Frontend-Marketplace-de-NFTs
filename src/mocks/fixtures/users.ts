@@ -72,7 +72,7 @@ export function createFavoriteFixtures(): Record<string, string[]> {
 export function createCartFixtures(): Record<CartOwner, CartRecord> {
   return {
     'user:usr-ana': {
-      lines: [{ nftId: 'nft-002', quantity: 1, priceWhenAddedEth: '1.69' }],
+      lines: [{ nftId: 'nft-002', editionId: '1-1', quantity: 1, priceWhenAddedEth: '1.69' }],
       couponCode: null,
       version: 1,
     },

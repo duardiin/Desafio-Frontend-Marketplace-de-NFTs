@@ -2,7 +2,8 @@ import { delay, http, HttpResponse } from 'msw'
 import type { OrderListResponse, CreateOrderRequest } from '@/api/contracts/orders'
 import { env } from '@/config/env'
 import { commit, getDb } from '@/mocks/db/store'
-import type { DbChange, OrderRecord } from '@/mocks/db/schema'
+import type { CartLineRecord, DbChange, OrderRecord } from '@/mocks/db/schema'
+import { findEdition, touchNft } from '@/mocks/domain/catalog'
 import { buildQuote, getCart } from '@/mocks/domain/cart'
 import {
   scheduleSettlement,
@@ -30,20 +31,21 @@ function fireOnce(name: string): boolean {
 }
 
 /** Cenários "preco-alterado" e "edicao-esgotada": mudam o NFT antes da validação do pedido. */
-function applyPurchaseScenario(nftId: string | undefined): DbChange[] {
+function applyPurchaseScenario(line: CartLineRecord | undefined): DbChange[] {
   const scenario = getActiveScenario()
   const db = getDb()
-  const nft = db.nfts.find((item) => item.id === nftId)
-  if (!nft) return []
+  const nft = db.nfts.find((item) => item.id === line?.nftId)
+  const edition = nft && line && findEdition(nft, line.editionId)
+  if (!nft || !edition) return []
 
   if (scenario === 'preco-alterado' && fireOnce(scenario)) {
     nft.priceEth = toEth(new Decimal(nft.priceEth).plus('0.10'))
   } else if (scenario === 'edicao-esgotada' && fireOnce(scenario)) {
-    nft.editions.available = 0
+    edition.available = 0
   } else {
     return []
   }
-  nft.version += 1
+  touchNft(nft)
   return [{ type: 'nft.updated', nftId: nft.id }]
 }
 
@@ -85,7 +87,7 @@ export const orderHandlers = [
       }
 
       const cart = getCart(db, `user:${user.id}`)
-      const scenarioChanges = applyPurchaseScenario(cart.lines[0]?.nftId)
+      const scenarioChanges = applyPurchaseScenario(cart.lines[0])
       if (scenarioChanges.length > 0) commit(scenarioChanges)
 
       const quote = buildQuote(db, cart)
@@ -108,9 +110,9 @@ export const orderHandlers = [
         version: 1,
         createdAt: now,
         updatedAt: now,
-        lines: quote.lines.map((line) => {
+        lines: quote.lines.map(({ lineId: _lineId, ...line }) => {
           const nft = db.nfts.find((item) => item.id === line.nftId)
-          return { ...line, image: nft?.image ?? { src: '', alt: line.name } }
+          return { ...line, image: nft?.image ?? { src: '', alt: line.name, width: 1, height: 1, variants: [] } }
         }),
         subtotalEth: quote.subtotalEth,
         discountEth: quote.discountEth,

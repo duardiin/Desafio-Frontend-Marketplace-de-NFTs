@@ -66,7 +66,8 @@ async function applyNetwork(group: EndpointGroup, request: Request): Promise<Res
       await delay(DEFAULT_LATENCY_MS)
       return undefined
     case 'favorito-falha':
-      await delay(DEFAULT_LATENCY_MS)
+      // Mais lento para o estado otimista ficar visível antes do rollback.
+      await delay(group === 'favorites' && !isRead ? 800 : DEFAULT_LATENCY_MS)
       return group === 'favorites' && !isRead
         ? apiError(500, 'INTERNAL_ERROR', 'Não foi possível atualizar seus favoritos.')
         : undefined

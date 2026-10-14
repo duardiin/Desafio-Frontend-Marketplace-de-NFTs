@@ -43,9 +43,28 @@ export interface Creator {
   handle: string
 }
 
-export interface Editions {
-  total: number
-  available: number
+/**
+ * Opção de edição (tiragem) de um NFT. Cada edição tem disponibilidade própria.
+ * Edição aberta não tem tiragem fixa: só vale o limite por pedido.
+ */
+export interface EditionOption {
+  /** Ex.: "1-1", "1-10", "1-50", "aberta". */
+  id: string
+  /** Rótulo do Figma: "1/1", "1/10", "1/50", "Aberta". */
+  label: string
+  /** Tiragem total; `null` = edição aberta. */
+  supply: number | null
+  /** Unidades disponíveis; `null` = edição aberta (sem limite de tiragem). */
+  available: number | null
+}
+
+export interface Review {
+  id: string
+  author: string
+  /** De 1 a 5. */
+  rating: number
+  comment: string
+  createdAt: IsoDateTime
 }
 
 /** Item da listagem do catálogo. */
@@ -58,18 +77,31 @@ export interface NftSummary {
   priceEth: EthAmount
   /** Preço anterior (card com desconto). */
   previousPriceEth: EthAmount | null
-  editions: Editions
+  /** Todas as edições esgotadas. */
+  soldOut: boolean
   /** Versão do recurso; aumenta a cada mudança de preço ou disponibilidade. */
   version: number
 }
 
 /** Detalhe do NFT. */
 export interface NftDetail extends NftSummary {
+  /** Resumo ("Sobre este NFT"). */
   description: string
+  /** Texto longo da aba "Detalhes do NFT", em parágrafos. */
+  story: string[]
   creator: Creator
+  /** Série/coleção do criador (ex.: "Kurio Apes"); `collection` é a categoria do filtro. */
+  series: string
+  tokenId: string
+  attributes: string[]
+  royaltyPercent: number
   gallery: ImageAsset[]
-  /** Máximo por pedido, além do limite de edições disponíveis. */
+  editions: EditionOption[]
+  /** Máximo por pedido (vale para qualquer edição). */
   maxPerOrder: number
+  rating: { average: number; count: number }
+  /** Avaliações mais recentes (até 3). */
+  reviews: Review[]
   contractAddress: string
   tokenStandard: 'ERC-721' | 'ERC-1155' | 'SPL'
   listedAt: IsoDateTime

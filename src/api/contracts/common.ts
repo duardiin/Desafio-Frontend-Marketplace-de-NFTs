@@ -25,6 +25,12 @@ export const NETWORK_LABELS: Record<Network, string> = {
 }
 
 export interface ImageAsset {
+  /** Variante padrão (512 px). */
   src: string
   alt: string
+  /** Dimensões intrínsecas (proporção), para reservar espaço sem deslocar o layout. */
+  width: number
+  height: number
+  /** Variantes responsivas para `srcset`. */
+  variants: { width: number; src: string }[]
 }

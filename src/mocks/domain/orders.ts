@@ -2,6 +2,7 @@ import type { Order } from '@/api/contracts/orders'
 import type { DbChange, MockDb, OrderRecord } from '@/mocks/db/schema'
 import { commit, getDb } from '@/mocks/db/store'
 import { getCart, saveCart } from '@/mocks/domain/cart'
+import { findEdition, touchNft } from '@/mocks/domain/catalog'
 import { longHash } from '@/mocks/lib/hash'
 import { nowIso } from '@/mocks/lib/http'
 
@@ -17,18 +18,21 @@ function confirm(db: MockDb, order: OrderRecord, changes: DbChange[]) {
   // Revalida a disponibilidade no momento da liquidação.
   const shortage = order.lines.find((line) => {
     const nft = db.nfts.find((item) => item.id === line.nftId)
-    return !nft || nft.editions.available < line.quantity
+    const edition = nft && findEdition(nft, line.editionId)
+    return !edition || (edition.available !== null && edition.available < line.quantity)
   })
   if (shortage) {
-    decline(order, `A edição de "${shortage.name}" esgotou antes da confirmação.`)
+    decline(order, `A edição ${shortage.editionLabel} de "${shortage.name}" esgotou antes da confirmação.`)
     return
   }
 
   for (const line of order.lines) {
     const nft = db.nfts.find((item) => item.id === line.nftId)
-    if (!nft) continue
-    nft.editions.available -= line.quantity
-    nft.version += 1
+    const edition = nft && findEdition(nft, line.editionId)
+    if (!nft || !edition) continue
+    // Edição aberta não tem estoque a baixar, mas a versão muda (nova venda).
+    if (edition.available !== null) edition.available -= line.quantity
+    touchNft(nft)
     changes.push({ type: 'nft.updated', nftId: nft.id })
   }
 
@@ -37,7 +41,8 @@ function confirm(db: MockDb, order: OrderRecord, changes: DbChange[]) {
   const cart = getCart(db, owner)
   const lines = cart.lines
     .map((line) => {
-      const bought = order.lines.find((item) => item.nftId === line.nftId)?.quantity ?? 0
+      const bought =
+        order.lines.find((item) => item.nftId === line.nftId && item.editionId === line.editionId)?.quantity ?? 0
       return { ...line, quantity: line.quantity - bought }
     })
     .filter((line) => line.quantity > 0)

@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import type { Cart, Quote } from '@/api/contracts/cart'
-import type { CartOwner, CartRecord, CouponRecord, MockDb } from '@/mocks/db/schema'
-import { maxOrderable, toSummary } from '@/mocks/domain/catalog'
+import type { CartLineRecord, CartOwner, CartRecord, CouponRecord, MockDb, NftRecord } from '@/mocks/db/schema'
+import { findEdition, lineIdOf, maxOrderable, toSummary } from '@/mocks/domain/catalog'
 import { sumEth, toEth } from '@/mocks/lib/eth'
 import { fnv1a } from '@/mocks/lib/hash'
 
@@ -20,18 +20,27 @@ export function saveCart(db: MockDb, owner: CartOwner, cart: CartRecord) {
   db.carts[owner] = { ...cart, version: cart.version + 1 }
 }
 
+/** Resolve NFT e edição de uma linha; linhas órfãs (NFT removido) são ignoradas. */
+function resolveLine(db: MockDb, line: CartLineRecord) {
+  const nft: NftRecord | undefined = db.nfts.find((item) => item.id === line.nftId)
+  const edition = nft ? findEdition(nft, line.editionId) : undefined
+  return nft && edition ? { nft, edition } : undefined
+}
+
 export function toCartResponse(db: MockDb, cart: CartRecord): Cart {
   return {
     couponCode: cart.couponCode,
     version: cart.version,
     items: cart.lines.flatMap((line) => {
-      const nft = db.nfts.find((item) => item.id === line.nftId)
-      if (!nft) return []
+      const resolved = resolveLine(db, line)
+      if (!resolved) return []
       return [
         {
-          nft: toSummary(nft),
+          lineId: lineIdOf(line.nftId, line.editionId),
+          nft: toSummary(resolved.nft),
+          edition: { ...resolved.edition },
           quantity: line.quantity,
-          maxQuantity: maxOrderable(nft),
+          maxQuantity: maxOrderable(resolved.nft, resolved.edition),
           priceWhenAddedEth: line.priceWhenAddedEth,
         },
       ]
@@ -53,16 +62,20 @@ export function isCouponExpired(coupon: CouponRecord): boolean {
  */
 export function buildQuote(db: MockDb, cart: CartRecord): Quote {
   const lines = cart.lines.flatMap((line) => {
-    const nft = db.nfts.find((item) => item.id === line.nftId)
-    if (!nft) return []
+    const resolved = resolveLine(db, line)
+    if (!resolved) return []
+    const { nft, edition } = resolved
     return [
       {
+        lineId: lineIdOf(nft.id, edition.id),
         nftId: nft.id,
         name: nft.name,
+        editionId: edition.id,
+        editionLabel: edition.label,
         unitPriceEth: nft.priceEth,
         quantity: line.quantity,
         lineTotalEth: toEth(new Decimal(nft.priceEth).times(line.quantity)),
-        available: maxOrderable(nft),
+        available: maxOrderable(nft, edition),
       },
     ]
   })
@@ -76,8 +89,8 @@ export function buildQuote(db: MockDb, cart: CartRecord): Quote {
   const total = subtotal.minus(discount).plus(fee)
 
   const blockers = lines.flatMap((line): Quote['blockers'] => {
-    if (line.available === 0) return [{ nftId: line.nftId, reason: 'EDITION_SOLD_OUT' }]
-    if (line.quantity > line.available) return [{ nftId: line.nftId, reason: 'QUANTITY_LIMIT' }]
+    if (line.available === 0) return [{ lineId: line.lineId, reason: 'EDITION_SOLD_OUT' }]
+    if (line.quantity > line.available) return [{ lineId: line.lineId, reason: 'QUANTITY_LIMIT' }]
     return []
   })
 

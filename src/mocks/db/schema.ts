@@ -26,6 +26,7 @@ export type NftRecord = NftDetail
 
 export interface CartLineRecord {
   nftId: string
+  editionId: string
   quantity: number
   priceWhenAddedEth: EthAmount
 }

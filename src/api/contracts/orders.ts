@@ -28,6 +28,8 @@ export interface CreateOrderRequest {
 export interface OrderLine {
   nftId: string
   name: string
+  editionId: string
+  editionLabel: string
   image: ImageAsset
   unitPriceEth: EthAmount
   quantity: number

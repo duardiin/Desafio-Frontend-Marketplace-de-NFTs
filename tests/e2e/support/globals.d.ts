@@ -6,7 +6,7 @@ interface KurioMockControlsForTests {
   getScenario(): string
   setScenario(name: string): void
   reset(): void
-  updateNft(id: string, patch: { priceEth?: string; available?: number }): void
+  updateNft(id: string, patch: { priceEth?: string; available?: number; editionId?: string }): void
   expireSessions(): void
 }
 

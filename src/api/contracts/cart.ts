@@ -1,12 +1,15 @@
 import type { EthAmount } from '@/api/contracts/common'
-import type { NftSummary } from '@/api/contracts/nfts'
+import type { EditionOption, NftSummary } from '@/api/contracts/nfts'
 
 /**
  * O carrinho é do usuário autenticado (header Authorization) ou do visitante
  * (header `X-Guest-Id`, um UUID gerado no navegador).
  */
 export interface CartItem {
+  /** Identifica a linha: `<nftId>__<editionId>`. */
+  lineId: string
   nft: NftSummary
+  edition: EditionOption
   quantity: number
   /** Máximo que pode ser pedido agora (edições disponíveis e limite por pedido). */
   maxQuantity: number
@@ -27,10 +30,11 @@ export type CartResponse = Cart
 /** POST /cart/items → 200 `Cart` (409 EDITION_SOLD_OUT / QUANTITY_LIMIT, 404 NFT_NOT_FOUND). */
 export interface AddCartItemRequest {
   nftId: string
+  editionId: string
   quantity: number
 }
 
-/** PATCH /cart/items/:nftId → 200 `Cart`. */
+/** PATCH /cart/items/:lineId → 200 `Cart`. DELETE /cart/items/:lineId → 200 `Cart`. */
 export interface UpdateCartItemRequest {
   quantity: number
 }
@@ -46,8 +50,11 @@ export interface MergeCartRequest {
 }
 
 export interface QuoteLine {
+  lineId: string
   nftId: string
   name: string
+  editionId: string
+  editionLabel: string
   unitPriceEth: EthAmount
   quantity: number
   lineTotalEth: EthAmount
@@ -68,7 +75,7 @@ export interface Quote {
   totalEth: EthAmount
   coupon: { code: string; percentOff: number } | null
   /** Itens que não podem ser comprados como estão (esgotados ou acima do limite). */
-  blockers: { nftId: string; reason: 'EDITION_SOLD_OUT' | 'QUANTITY_LIMIT' }[]
+  blockers: { lineId: string; reason: 'EDITION_SOLD_OUT' | 'QUANTITY_LIMIT' }[]
 }
 
 export type QuoteResponse = Quote

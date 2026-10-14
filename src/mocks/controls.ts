@@ -1,5 +1,6 @@
 import type { EthAmount } from '@/api/contracts/common'
 import { commit, getDb, resetDb } from '@/mocks/db/store'
+import { touchNft } from '@/mocks/domain/catalog'
 import { toEth } from '@/mocks/lib/eth'
 import {
   getActiveScenario,
@@ -22,8 +23,11 @@ export interface KurioMockControls {
   setScenario(name: string): void
   /** Restaura integralmente o cenário inicial (dados das fixtures). */
   reset(): void
-  /** Muda preço e/ou disponibilidade de um NFT, como faria o servidor. */
-  updateNft(id: string, patch: { priceEth?: EthAmount; available?: number }): void
+  /**
+   * Muda preço e/ou disponibilidade de um NFT, como faria o servidor.
+   * `available` vale para a edição `editionId` ou, sem ela, para todas as edições limitadas.
+   */
+  updateNft(id: string, patch: { priceEth?: EthAmount; available?: number; editionId?: string }): void
   /** Expira todas as sessões ativas. */
   expireSessions(): void
 }
@@ -48,9 +52,14 @@ export function exposeMockControls() {
       if (!nft) throw new Error(`NFT inexistente: ${id}`)
       if (patch.priceEth !== undefined) nft.priceEth = toEth(patch.priceEth)
       if (patch.available !== undefined) {
-        nft.editions.available = Math.max(0, Math.min(nft.editions.total, Math.trunc(patch.available)))
+        const targets = nft.editions.filter((edition) =>
+          patch.editionId ? edition.id === patch.editionId : edition.supply !== null,
+        )
+        for (const edition of targets) {
+          edition.available = Math.max(0, Math.min(edition.supply ?? Infinity, Math.trunc(patch.available)))
+        }
       }
-      nft.version += 1
+      touchNft(nft)
       commit([{ type: 'nft.updated', nftId: id }])
     },
     expireSessions() {

@@ -6,8 +6,8 @@ import type {
   UpdateCartItemRequest,
 } from '@/api/contracts/cart'
 import { commit, getDb } from '@/mocks/db/store'
-import type { CartOwner } from '@/mocks/db/schema'
-import { maxOrderable } from '@/mocks/domain/catalog'
+import type { CartLineRecord, CartOwner, MockDb } from '@/mocks/db/schema'
+import { findEdition, lineIdOf, maxOrderable } from '@/mocks/domain/catalog'
 import {
   buildQuote,
   emptyCart,
@@ -37,6 +37,27 @@ function requireOwner(request: Request): CartOwner {
   return owner
 }
 
+function findLine(lines: CartLineRecord[], lineId: unknown) {
+  return lines.find((line) => lineIdOf(line.nftId, line.editionId) === lineId)
+}
+
+/** NFT + edição da linha, ou a resposta de erro adequada. */
+function resolveTarget(db: MockDb, nftId: unknown, editionId: unknown) {
+  const nft = db.nfts.find((item) => item.id === nftId)
+  if (!nft) throw apiError(404, 'NFT_NOT_FOUND', 'Este NFT não existe ou foi removido.')
+  const edition = findEdition(nft, String(editionId ?? ''))
+  if (!edition) throw validationError({ editionId: ['Escolha uma edição disponível.'] })
+  return { nft, edition }
+}
+
+function limitError(name: string, editionLabel: string, limit: number) {
+  return limit === 0
+    ? apiError(409, 'EDITION_SOLD_OUT', `A edição ${editionLabel} de "${name}" está esgotada.`)
+    : apiError(409, 'QUANTITY_LIMIT', `Você pode levar no máximo ${limit} da edição ${editionLabel} de "${name}".`)
+}
+
+const QUANTITY_ERROR = { quantity: ['A quantidade precisa ser um número inteiro maior que zero.'] }
+
 export const cartHandlers = [
   http.get(
     api('/cart'),
@@ -52,27 +73,19 @@ export const cartHandlers = [
     withNetwork('cart', async ({ request }) => {
       const owner = requireOwner(request)
       const body = await readJson<AddCartItemRequest>(request)
-      if (!isPositiveInteger(body.quantity)) {
-        return validationError({ quantity: ['A quantidade precisa ser um número inteiro maior que zero.'] })
-      }
+      if (!isPositiveInteger(body.quantity)) return validationError(QUANTITY_ERROR)
 
       const db = getDb()
-      const nft = db.nfts.find((item) => item.id === body.nftId)
-      if (!nft) return apiError(404, 'NFT_NOT_FOUND', 'Este NFT não existe ou foi removido.')
-
-      const limit = maxOrderable(nft)
-      if (limit === 0) return apiError(409, 'EDITION_SOLD_OUT', `"${nft.name}" está esgotado.`)
-
+      const { nft, edition } = resolveTarget(db, body.nftId, body.editionId)
+      const limit = maxOrderable(nft, edition)
       const cart = getCart(db, owner)
-      const existing = cart.lines.find((line) => line.nftId === nft.id)
+      const existing = cart.lines.find((line) => line.nftId === nft.id && line.editionId === edition.id)
       const quantity = (existing?.quantity ?? 0) + body.quantity
-      if (quantity > limit) {
-        return apiError(409, 'QUANTITY_LIMIT', `Você pode levar no máximo ${limit} de "${nft.name}".`)
-      }
+      if (quantity > limit) return limitError(nft.name, edition.label, limit)
 
       const lines = existing
-        ? cart.lines.map((line) => (line.nftId === nft.id ? { ...line, quantity } : line))
-        : [...cart.lines, { nftId: nft.id, quantity, priceWhenAddedEth: nft.priceEth }]
+        ? cart.lines.map((line) => (line === existing ? { ...line, quantity } : line))
+        : [...cart.lines, { nftId: nft.id, editionId: edition.id, quantity, priceWhenAddedEth: nft.priceEth }]
       saveCart(db, owner, { ...cart, lines })
       commit()
       return cartResponse(owner)
@@ -80,31 +93,25 @@ export const cartHandlers = [
   ),
 
   http.patch(
-    api('/cart/items/:nftId'),
+    api('/cart/items/:lineId'),
     withNetwork('cart', async ({ request, params }) => {
       const owner = requireOwner(request)
       const body = await readJson<UpdateCartItemRequest>(request)
-      if (!isPositiveInteger(body.quantity)) {
-        return validationError({ quantity: ['A quantidade precisa ser um número inteiro maior que zero.'] })
-      }
+      if (!isPositiveInteger(body.quantity)) return validationError(QUANTITY_ERROR)
 
       const db = getDb()
       const cart = getCart(db, owner)
-      const line = cart.lines.find((item) => item.nftId === params.nftId)
-      const nft = db.nfts.find((item) => item.id === params.nftId)
-      if (!line || !nft) return apiError(404, 'CART_ITEM_NOT_FOUND', 'Este item não está mais no carrinho.')
+      const line = findLine(cart.lines, params.lineId)
+      if (!line) return apiError(404, 'CART_ITEM_NOT_FOUND', 'Este item não está mais no carrinho.')
 
-      const limit = maxOrderable(nft)
-      if (body.quantity > limit) {
-        return limit === 0
-          ? apiError(409, 'EDITION_SOLD_OUT', `"${nft.name}" está esgotado.`)
-          : apiError(409, 'QUANTITY_LIMIT', `Você pode levar no máximo ${limit} de "${nft.name}".`)
-      }
+      const { nft, edition } = resolveTarget(db, line.nftId, line.editionId)
+      const limit = maxOrderable(nft, edition)
+      if (body.quantity > limit) return limitError(nft.name, edition.label, limit)
 
       const quantity = body.quantity
       saveCart(db, owner, {
         ...cart,
-        lines: cart.lines.map((item) => (item.nftId === nft.id ? { ...item, quantity } : item)),
+        lines: cart.lines.map((item) => (item === line ? { ...item, quantity } : item)),
       })
       commit()
       return cartResponse(owner)
@@ -112,15 +119,15 @@ export const cartHandlers = [
   ),
 
   http.delete(
-    api('/cart/items/:nftId'),
+    api('/cart/items/:lineId'),
     withNetwork('cart', ({ request, params }) => {
       const owner = requireOwner(request)
       const db = getDb()
       const cart = getCart(db, owner)
-      if (!cart.lines.some((line) => line.nftId === params.nftId)) {
-        return apiError(404, 'CART_ITEM_NOT_FOUND', 'Este item não está mais no carrinho.')
-      }
-      const lines = cart.lines.filter((line) => line.nftId !== params.nftId)
+      const line = findLine(cart.lines, params.lineId)
+      if (!line) return apiError(404, 'CART_ITEM_NOT_FOUND', 'Este item não está mais no carrinho.')
+
+      const lines = cart.lines.filter((item) => item !== line)
       saveCart(db, owner, { ...cart, lines, couponCode: lines.length > 0 ? cart.couponCode : null })
       commit()
       return cartResponse(owner)
@@ -178,10 +185,13 @@ export const cartHandlers = [
         const lines = [...userCart.lines]
         for (const guestLine of guestCart.lines) {
           const nft = db.nfts.find((item) => item.id === guestLine.nftId)
-          if (!nft) continue
-          const index = lines.findIndex((line) => line.nftId === guestLine.nftId)
-          // Soma as quantidades respeitando o limite atual do NFT.
-          const merged = Math.min(maxOrderable(nft), (lines[index]?.quantity ?? 0) + guestLine.quantity)
+          const edition = nft && findEdition(nft, guestLine.editionId)
+          if (!nft || !edition) continue
+          const index = lines.findIndex(
+            (line) => line.nftId === guestLine.nftId && line.editionId === guestLine.editionId,
+          )
+          // Soma as quantidades respeitando o limite atual da edição.
+          const merged = Math.min(maxOrderable(nft, edition), (lines[index]?.quantity ?? 0) + guestLine.quantity)
           if (merged <= 0) continue
           if (index >= 0) lines[index] = { ...lines[index], quantity: merged }
           else lines.push({ ...guestLine, quantity: merged })
