@@ -1,10 +1,41 @@
 /**
- * Corpo de erro devolvido pela API (simulada pelo MSW).
- * O contrato completo de cada endpoint é definido no bloco P2.
+ * Códigos de erro estáveis devolvidos pela API (simulada pelo MSW).
+ * A UI decide a mensagem e a ação a partir do `kind` (ver ApiErrorKind)
+ * e, quando precisa de detalhe, do `code`.
  */
+export type ApiErrorCode =
+  // 400/422 · validação
+  | 'VALIDATION_FAILED'
+  | 'COUPON_INVALID'
+  | 'COUPON_EXPIRED'
+  | 'INVALID_CREDENTIALS'
+  | 'WRONG_PASSWORD'
+  // 401 · sessão
+  | 'SESSION_REQUIRED'
+  | 'SESSION_EXPIRED'
+  // 403 · permissão
+  | 'FORBIDDEN'
+  // 404 · inexistente
+  | 'NFT_NOT_FOUND'
+  | 'CART_ITEM_NOT_FOUND'
+  | 'ORDER_NOT_FOUND'
+  | 'WALLET_NOT_FOUND'
+  | 'NOT_FOUND'
+  // 409 · conflito
+  | 'EMAIL_TAKEN'
+  | 'EDITION_SOLD_OUT'
+  | 'QUANTITY_LIMIT'
+  | 'QUOTE_OUTDATED'
+  | 'IDEMPOTENCY_CONFLICT'
+  | 'WALLET_LIMIT'
+  | 'WALLET_NETWORK_MISMATCH'
+  // 5xx · transitório
+  | 'SERVICE_UNAVAILABLE'
+  | 'INTERNAL_ERROR'
+
+/** Corpo de erro devolvido pela API. */
 export interface ApiErrorBody {
-  /** Código estável, legível por máquina (ex.: "CART_ITEM_UNAVAILABLE"). */
-  code: string
+  code: ApiErrorCode
   /** Mensagem em pt-BR, apresentável ao usuário. */
   message: string
   /** Erros de validação por campo (formulários). */
