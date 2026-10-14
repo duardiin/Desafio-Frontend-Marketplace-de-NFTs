@@ -140,10 +140,10 @@ export function TextAreaField({ label, required, error, hint, className, ...text
 type PasswordFieldProps = Omit<ComponentProps<'input'>, 'id' | 'type'> & Omit<FieldShellProps, 'children'>
 
 /** "Password Input" (Figma, Perfil): campo com o botão de mostrar/ocultar a senha à direita. */
-export function PasswordField({ label, required, error, hint, className, ...input }: PasswordFieldProps) {
+export function PasswordField({ label, required, error, hint, srOnlyLabel, className, ...input }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false)
   return (
-    <FieldShell label={label} required={required} error={error} hint={hint} className={className}>
+    <FieldShell label={label} required={required} error={error} hint={hint} srOnlyLabel={srOnlyLabel} className={className}>
       {({ id, describedBy }) => (
         <div className="relative">
           <input

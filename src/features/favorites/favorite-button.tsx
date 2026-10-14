@@ -1,12 +1,11 @@
 import { useMutationState } from '@tanstack/react-query'
-import { useNavigate } from '@tanstack/react-router'
 import { HeartIcon } from 'lucide-react'
 import heartIcon from '@/assets/figma/icon-heart.svg'
 import mobileHeartIcon from '@/assets/figma/m-fav-outline.svg'
 import type { NftSummary } from '@/api/contracts/nfts'
 import { Button } from '@/components/ui/button'
 import { useCurrentUser } from '@/features/auth/session-query'
-import { useReturnHref } from '@/features/auth/use-return-href'
+import { openAuthDialog } from '@/features/auth/auth-dialog-store'
 import { useFavoriteIds, useToggleFavorite } from '@/features/favorites/use-favorites'
 import { cn } from '@/lib/utils'
 
@@ -20,8 +19,6 @@ interface FavoriteButtonProps {
 /** Favoritar exige conta: o visitante vai para o login e volta para a mesma tela. */
 export function FavoriteButton({ nft, variant, className }: FavoriteButtonProps) {
   const user = useCurrentUser()
-  const navigate = useNavigate()
-  const returnHref = useReturnHref()
   const favoriteIds = useFavoriteIds()
   const toggle = useToggleFavorite()
   const isFavorite = favoriteIds.has(nft.id)
@@ -32,7 +29,8 @@ export function FavoriteButton({ nft, variant, className }: FavoriteButtonProps)
 
   function handleClick() {
     if (!user) {
-      void navigate({ to: '/login', search: { redirect: returnHref } })
+      // Visitante: abre o login sobre a tela atual; depois de entrar, é só favoritar.
+      openAuthDialog('login')
       return
     }
     // Ignora cliques repetidos enquanto a mudança anterior não termina.

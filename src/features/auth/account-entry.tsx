@@ -12,21 +12,19 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useCurrentUser } from '@/features/auth/session-query'
 import { useLogout } from '@/features/auth/use-auth-actions'
-import { useReturnHref } from '@/features/auth/use-return-href'
+import { openAuthDialog } from '@/features/auth/auth-dialog-store'
 
 /** "Entrar" (Figma) para visitantes; menu da conta para quem está autenticado. */
 export function AccountEntry() {
   const user = useCurrentUser()
-  const returnHref = useReturnHref()
   const logout = useLogout()
 
   if (!user) {
     return (
-      <Button asChild size="sm" className="w-[100px]">
-        <Link to="/login" search={{ redirect: returnHref }}>
-          <img src={loginIcon} alt="" width={20} height={20} className="size-5 p-px" />
-          Entrar
-        </Link>
+      // Abre o balão de login (Figma) sobre a tela atual, sem trocar de página.
+      <Button size="sm" className="w-[100px]" aria-haspopup="dialog" onClick={() => openAuthDialog('login')}>
+        <img src={loginIcon} alt="" width={20} height={20} className="size-5 p-px" />
+        Entrar
       </Button>
     )
   }

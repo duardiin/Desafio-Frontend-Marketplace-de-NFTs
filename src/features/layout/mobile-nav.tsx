@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sheet'
 import { useCurrentUser } from '@/features/auth/session-query'
 import { useLogout } from '@/features/auth/use-auth-actions'
-import { useReturnHref } from '@/features/auth/use-return-href'
+import { openAuthDialog } from '@/features/auth/auth-dialog-store'
 import { NAV_ITEMS, type NavSection } from '@/features/layout/navigation'
 import { cn } from '@/lib/utils'
 
@@ -29,7 +29,6 @@ interface MobileNavProps {
 export function MobileNav({ activeSection, className }: MobileNavProps) {
   const [open, setOpen] = useState(false)
   const user = useCurrentUser()
-  const returnHref = useReturnHref()
   const logout = useLogout()
 
   return (
@@ -112,10 +111,15 @@ export function MobileNav({ activeSection, className }: MobileNavProps) {
               </Button>
             </>
           ) : (
-            <Button asChild className="w-full">
-              <Link to="/login" search={{ redirect: returnHref }} onClick={() => setOpen(false)}>
-                Entrar
-              </Link>
+            <Button
+              className="w-full"
+              onClick={() => {
+                // Fecha o menu e abre o balão de login sobre a tela atual.
+                setOpen(false)
+                openAuthDialog('login')
+              }}
+            >
+              Entrar
             </Button>
           )}
         </div>
