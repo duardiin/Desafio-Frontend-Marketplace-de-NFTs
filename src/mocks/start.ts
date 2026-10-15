@@ -27,6 +27,31 @@ function applyUrlOptions() {
   window.history.replaceState(window.history.state, '', url)
 }
 
+/** A cada 10 s com a aba visível; com a aba em segundo plano, o navegador espaça os timers. */
+const REACTIVATE_INTERVAL_MS = 10_000
+
+/**
+ * Mantém esta aba registrada no service worker do MSW.
+ *
+ * O MSW guarda as abas que usam os mocks só na memória do service worker
+ * (`activeClientIds`). Com a aba em segundo plano, o navegador encerra o
+ * service worker ocioso; ele volta na próxima requisição com a lista vazia e
+ * passa a mandar tudo para a rede real (na Vercel, o HTML do site). Reenviar
+ * "MOCK_ACTIVATE" (a mesma mensagem que o `worker.start()` envia) ao voltar
+ * para a aba, e de tempos em tempos, registra a aba de novo.
+ */
+function keepMocksActive() {
+  const reactivate = () => navigator.serviceWorker?.controller?.postMessage('MOCK_ACTIVATE')
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') reactivate()
+  })
+  window.addEventListener('focus', reactivate)
+  window.addEventListener('pageshow', reactivate)
+  window.setInterval(() => {
+    if (document.visibilityState === 'visible') reactivate()
+  }, REACTIVATE_INTERVAL_MS)
+}
+
 export async function startMocks() {
   applyUrlOptions()
 
@@ -36,6 +61,7 @@ export async function startMocks() {
     quiet: import.meta.env.PROD,
     serviceWorker: { url: '/mockServiceWorker.js' },
   })
+  keepMocksActive()
 
   const { startRealtimeEvents, realtimeControls } = await import('@/mocks/realtime')
   startRealtimeEvents()

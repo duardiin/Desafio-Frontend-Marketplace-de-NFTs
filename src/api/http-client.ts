@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { toApiError } from '@/api/api-error'
+import { ApiError, toApiError } from '@/api/api-error'
 import { authToken, notifySessionRejected } from '@/api/auth-token'
 import { guestId } from '@/api/guest-id'
 import { env } from '@/config/env'
@@ -23,9 +23,29 @@ httpClient.interceptors.request.use((config) => {
   return config
 })
 
+/**
+ * A API responde JSON. Uma página HTML no lugar dela (ex.: o fallback de SPA do
+ * servidor quando a requisição não chega à API) é falha de infraestrutura, não
+ * dado: vira erro transitório, que as consultas repetem sozinhas.
+ */
+function isHtmlResponse(headers: unknown): boolean {
+  const contentType = (headers as { 'content-type'?: unknown } | undefined)?.['content-type']
+  return typeof contentType === 'string' && contentType.includes('text/html')
+}
+
+function unreachableApi(cause: unknown) {
+  return new ApiError({
+    kind: 'transient',
+    code: 'API_UNREACHABLE',
+    message: 'Não foi possível falar com o servidor. Tente novamente.',
+    cause,
+  })
+}
+
 httpClient.interceptors.response.use(
-  (response) => response,
+  (response) => (isHtmlResponse(response.headers) ? Promise.reject(unreachableApi(response)) : response),
   (error: unknown) => {
+    if (axios.isAxiosError(error) && isHtmlResponse(error.response?.headers)) return Promise.reject(unreachableApi(error))
     const apiError = toApiError(error)
     const config = axios.isAxiosError(error) ? error.config : undefined
     const sentToken = Boolean(config?.headers?.Authorization)
