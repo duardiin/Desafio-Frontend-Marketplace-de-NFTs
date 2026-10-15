@@ -232,7 +232,29 @@ Nenhuma das 42 combinações (14 telas × 3 larguras) tem overflow horizontal.
   - os testes do carrinho e da compra passaram a cobrir a versão de cada viewport ("Comprar NFT" ou "COMPRAR", "Conectar e finalizar" ou "Finalizar compra", contagem pelo badge ou na tela);
   - os testes que usavam o Carrinho como "tela com header no mobile" passaram a usar a 404.
 
-### 9.3 Corrida encontrada no caminho: resposta REST antiga sobrescrevendo evento novo
+### 9.3 Pagamento
+- **Fiel ao frame:**
+  - voltar e "Pagamento com carteira";
+  - "Carteira conectada" com "Trocar carteira" (leva às Carteiras; o rascunho é restaurado na volta) e as carteiras em cartões selecionáveis, com "⋮" para editar;
+  - "Carteira e rede" com WalletConnect, MetaMask e Coinbase Wallet;
+  - total da cotação e **Confirmar compra** fixos embaixo.
+  O fluxo é o mesmo do desktop: validação, conexão simulada, revisão com revalidação, idempotência e estados.
+- **Mapeamento do frame para o modelo da API:**
+  - No contrato, o provedor é uma propriedade da carteira. Por isso a opção marcada em "Carteira e rede" é o provedor da carteira escolhida, e escolher outro provedor seleciona a carteira dele.
+  - Sem carteira de um provedor, a opção fica indisponível, com o link "Cadastre em Carteiras".
+  - A **rede** aparece em chips dentro da carteira escolhida, quando ela opera em mais de uma.
+- **Requisitos do enunciado que o frame não mostra:**
+  - A **conexão simulada** ("Conectar carteira" / "Conectada", com recusa e desconexão) fica logo abaixo dos provedores.
+  - Os **dados do colecionador** e os **itens com os valores** ficam em seções recolhíveis, fechadas por padrão. Os dados já vêm preenchidos pelo perfil, e a seção abre sozinha se algum campo tiver erro.
+  - Os campos de carteira, rede e endereço do formulário desktop não aparecem no mobile (`CollectorForm compact`): são escolhidos nas seções do frame, e dois controles no mesmo campo entrariam em conflito.
+- **Ícone da Coinbase:** o frame tem um ícone de carteira sem asset exportado; foi usado o `WalletIcon` do Lucide.
+- **Testes:**
+  - os testes do pagamento abrem a seção recolhível no mobile antes de usar os campos;
+  - o link "Usar outra carteira?" vira "Trocar carteira" no mobile;
+  - novo teste mobile: cartões, provedor que seleciona a carteira, chips de rede, conexão e revisão;
+  - baselines do Pagamento (página inteira e primeira tela).
+
+### 9.4 Corrida encontrada no caminho: resposta REST antiga sobrescrevendo evento novo
 **Problema:** com a reconciliação na primeira conexão do socket (ajuste do P7), a consulta REST disparada ao conectar podia chegar **depois** de um evento `nft.updated` mais novo e sobrescrever o preço com o valor antigo. Um teste de tempo real pegou o caso de forma intermitente.
 
 **Correção:** a regra de versão passou a valer também para as respostas REST. Detalhe, listas do catálogo e favoritos usam `structuralSharing` (`src/lib/versioned-cache.ts`): um recurso com versão menor que a do cache não o substitui. A suíte de tempo real passou 3 vezes seguidas.

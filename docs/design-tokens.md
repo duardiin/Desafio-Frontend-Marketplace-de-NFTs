@@ -289,3 +289,12 @@ Sem chamada ao MCP: medidas tiradas de um print de 414 × 896.
   - Subtotal, "Desconto do lançamento" ("(-) …") e Taxa de rede (15), com a nota "Taxa estimada" (12 `text-accent`) sob o valor;
   - **Total** (16 Bold / 20 Bold `text-accent`);
   - **Conectar e finalizar** (pílula de 60 px em degradê).
+
+## Pagamento · mobile (node `16:748`, a partir de print do frame, 14/10)
+
+- **Topo:** voltar (32 px) e "Pagamento com carteira" (20 Bold). Sem header nem tab bar.
+- **"Carteira conectada"** (17 Bold) e **"Trocar carteira"** (15 Bold `text-accent`) à direita.
+  - Cartões `surface-card` (raio 16, padding 16) com rádio de 16 px à esquerda, rótulo (16 Bold), ENS ou endereço curto (14 `text-secondary`), "Rede …" (14) e "⋮" `primary` à direita.
+- **"Carteira e rede"** (17 Bold): opções de 64 px (raio 16) com selo redondo de 40 px (`surface-raised`, borda `border`, letra `primary`: "W", "M" e um ícone de carteira), nome (15) e rádio à direita. Ordem: WalletConnect, MetaMask, Coinbase Wallet.
+- **Total** "Total:" (16 Bold) e valor (20 Bold `text-accent`), alinhados à direita.
+- **Confirmar compra:** pílula de 60 px em degradê, fixa embaixo.

@@ -213,6 +213,7 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 ## Desvios do Figma
 
 - **Início mobile** (`14:5226`, extraído no P8): abaixo de 768 px, o Início não tem header, como no frame. No lugar dele há busca e filtros no topo e tab bar fixa (presente em todas as telas mobile). O botão central da tab bar fica só visual (função não definida) e o selo "RARO" vem do atributo do NFT. Detalhes em docs/11.
+- **Detalhe, Carrinho e Pagamento mobile** (`15:5536`, `16:360`, `16:748`, a partir de prints): sem header e sem tab bar, com voltar no topo e barra de ação fixa. O que o enunciado exige e os frames não mostram foi mantido com o mesmo visual: carrossel da galeria; abas e relacionados abaixo do detalhe; conexão da carteira, dados do colecionador e itens em seções recolhíveis no pagamento. Detalhes em docs/11, seção 9.
 - **Header mobile nas demais telas:** sem frame. Abaixo de 1024 px, a navegação vai para um drawer (Radix Dialog) aberto por um botão de menu (ícone Lucide). A nav completa só aparece a partir de 1024 px, porque em 768 não cabe com folga.
 - **Divisória do header:** 1 px a 50% de opacidade em vez de 0,3 px, para renderização estável.
 - **Footer em 390/768:** mesma ordem e cores, com fluxo empilhado. Contato fictício exibido como texto, sem `mailto:`/`tel:`.
