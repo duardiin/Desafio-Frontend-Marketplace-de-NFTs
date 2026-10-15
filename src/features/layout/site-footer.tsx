@@ -3,6 +3,8 @@ import instagramIcon from '@/assets/figma/social-instagram.svg'
 import linkedinIcon from '@/assets/figma/social-linkedin.svg'
 import twitterIcon from '@/assets/figma/social-twitter.svg'
 import youtubeIcon from '@/assets/figma/social-youtube.svg'
+import { Link } from '@tanstack/react-router'
+import { COLLECTION_LABELS, type Collection } from '@/api/contracts/nfts'
 import { ComingSoon } from '@/features/layout/coming-soon'
 import { NewsletterForm } from '@/features/layout/newsletter-form'
 
@@ -24,28 +26,42 @@ const HIGHLIGHTS = [
   },
 ] as const
 
-// Links editoriais e de conta: ganham destino quando as telas existirem
-// (perfil no bloco de conta, coleções como filtro do catálogo).
-const LINK_COLUMNS = [
+type FooterLink =
+  | { label: string; to: '/perfil' | '/favoritos' }
+  | { label: string; colecao: Collection }
+  | { label: string }
+
+// Itens com tela na entrega levam ao destino (conta e filtros do catálogo);
+// os editoriais e de ajuda ficam "em breve", sem aparentar funcionar.
+const LINK_COLUMNS: { title: string; links: FooterLink[] }[] = [
   {
     title: 'Meu perfil',
-    links: ['Meu perfil', 'Minha coleção', 'Atividade', 'Estúdio do criador', 'Lista de interesse'],
+    links: [
+      { label: 'Meu perfil', to: '/perfil' },
+      { label: 'Minha coleção' },
+      { label: 'Atividade' },
+      { label: 'Estúdio do criador' },
+      { label: 'Lista de interesse', to: '/favoritos' },
+    ],
   },
   {
     title: 'Central de ajuda',
     links: [
-      'Central de ajuda',
-      'Como comprar NFTs',
-      'Carteira e segurança',
-      'Política do mercado',
-      'Denunciar item',
+      { label: 'Central de ajuda' },
+      { label: 'Como comprar NFTs' },
+      { label: 'Carteira e segurança' },
+      { label: 'Política do mercado' },
+      { label: 'Denunciar item' },
     ],
   },
   {
     title: 'Coleções',
-    links: ['Arte digital', 'Fotografia', 'Música', 'Arte 3D', 'Utilidade'],
+    links: (['arte-digital', 'fotografia', 'musica', 'arte-3d', 'utilidade'] as const).map((colecao) => ({
+      label: COLLECTION_LABELS[colecao],
+      colecao,
+    })),
   },
-] as const
+]
 
 const SOCIAL_LINKS = [
   { label: 'Facebook', icon: facebookIcon },
@@ -97,9 +113,9 @@ export function SiteFooter() {
           <nav key={column.title} aria-label={column.title}>
             <h2 className="mb-2 text-body-18 font-bold">{column.title}</h2>
             <ul className="text-body-14 leading-[30px] text-muted-foreground">
-              {column.links.map((label) => (
-                <li key={label}>
-                  <ComingSoon>{label}</ComingSoon>
+              {column.links.map((link) => (
+                <li key={link.label}>
+                  <FooterLinkItem link={link} />
                 </li>
               ))}
             </ul>
@@ -133,4 +149,24 @@ export function SiteFooter() {
       </p>
     </footer>
   )
+}
+
+const FOOTER_LINK = 'rounded-sm hover:text-highlight hover:underline focus-visible:outline-2 focus-visible:outline-ring'
+
+function FooterLinkItem({ link }: { link: FooterLink }) {
+  if ('to' in link) {
+    return (
+      <Link to={link.to} className={FOOTER_LINK}>
+        {link.label}
+      </Link>
+    )
+  }
+  if ('colecao' in link) {
+    return (
+      <Link to="/" search={{ colecao: link.colecao }} hash="catalogo" className={FOOTER_LINK}>
+        {link.label}
+      </Link>
+    )
+  }
+  return <ComingSoon>{link.label}</ComingSoon>
 }

@@ -50,6 +50,16 @@ test.describe('layout base', () => {
     await expect(page.getByRole('link', { name: /Como comprar NFTs/ })).toHaveCount(0)
   })
 
+  test('links do footer com tela na entrega levam ao destino (coleção filtra o catálogo)', async ({ page }) => {
+    await page.goto('/carrinho')
+    const footer = page.getByRole('contentinfo')
+    await expect(footer.getByRole('link', { name: 'Lista de interesse' })).toHaveAttribute('href', '/favoritos')
+    await expect(footer.getByRole('link', { name: 'Meu perfil' })).toHaveAttribute('href', '/perfil')
+    await footer.getByRole('link', { name: 'Música' }).click()
+    await expect(page).toHaveURL(/\/\?colecao=musica#catalogo$/)
+    await expect(page.locator('#catalogo')).toContainText('NFTs encontrados')
+  })
+
   test('newsletter informa que não está disponível em vez de simular sucesso', async ({ page }) => {
     await page.goto('/')
     await page.getByLabel('Antecipe-se ao próximo lançamento').fill('colecionador@exemplo.com')
