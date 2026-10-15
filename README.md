@@ -2,6 +2,8 @@
 
 Desafio frontend: marketplace de NFTs em React + TypeScript seguindo o Figma "GreenMint". APIs, autenticação, carteiras, pagamentos e eventos em tempo real são **simulados com MSW**, na camada de rede. Não há blockchain, extensão de carteira ou gateway reais.
 
+> **Avaliando o projeto?** Comece pelo [guia COMO-FOI-FEITO.md](COMO-FOI-FEITO.md): visão geral, roteiro de 15 minutos, como cada fluxo funciona por dentro e onde está a prova de cada critério.
+
 - **Deploy:** https://desafio-frontend-marketplace-de-nf-alpha.vercel.app
 - **Repositório:** https://github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs
 - **Arquitetura e decisões:** [ARCHITECTURE.md](ARCHITECTURE.md). Contratos REST e eventos: [docs/contratos-api.md](docs/contratos-api.md). Decisões por etapa: `docs/04` a `docs/11`.
