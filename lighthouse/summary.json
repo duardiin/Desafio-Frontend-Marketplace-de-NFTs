@@ -1,6 +1,6 @@
 {
   "environment": {
-    "date": "2026-10-14T23:08:57.642Z",
+    "date": "2026-10-15T12:55:16.197Z",
     "lighthouse": "13.5.0",
     "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
     "node": "v24.21.0",
@@ -21,58 +21,58 @@
       "formFactor": "mobile",
       "median": {
         "scores": {
-          "performance": 79,
+          "performance": 78,
           "accessibility": 100,
           "best-practices": 100,
           "seo": 100
         },
         "metrics": {
-          "LCP": 4301.9456,
+          "LCP": 4295.9259999999995,
           "CLS": 0.0009476011214101156,
-          "TBT": 51
+          "TBT": 38.5
         }
       },
       "runs": [
         {
           "file": "inicio-mobile-1",
           "scores": {
-            "performance": 79,
+            "performance": 78,
             "accessibility": 100,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "LCP": 4301.9456,
+            "LCP": 4297.6916,
             "CLS": 0.0009476011214101156,
-            "TBT": 52
+            "TBT": 36.5
           }
         },
         {
           "file": "inicio-mobile-2",
           "scores": {
-            "performance": 79,
+            "performance": 78,
             "accessibility": 100,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "LCP": 4306.1816,
+            "LCP": 4295.7456,
             "CLS": 0.0009476011214101156,
-            "TBT": 51
+            "TBT": 39
           }
         },
         {
           "file": "inicio-mobile-3",
           "scores": {
-            "performance": 79,
+            "performance": 78,
             "accessibility": 100,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "LCP": 4294.552,
+            "LCP": 4295.9259999999995,
             "CLS": 0.0009476011214101156,
-            "TBT": 45.5
+            "TBT": 38.5
           }
         }
       ]
@@ -89,7 +89,7 @@
           "seo": 100
         },
         "metrics": {
-          "LCP": 997.3878,
+          "LCP": 1014.0540000000001,
           "CLS": 0.01874688834002918,
           "TBT": 0
         }
@@ -104,7 +104,7 @@
             "seo": 100
           },
           "metrics": {
-            "LCP": 958.0446000000001,
+            "LCP": 1016.4142,
             "CLS": 0.01874688834002918,
             "TBT": 0
           }
@@ -118,7 +118,7 @@
             "seo": 100
           },
           "metrics": {
-            "LCP": 997.3878,
+            "LCP": 1013.3306000000001,
             "CLS": 0.01874688834002918,
             "TBT": 0
           }
@@ -132,7 +132,7 @@
             "seo": 100
           },
           "metrics": {
-            "LCP": 1000.1590000000001,
+            "LCP": 1014.0540000000001,
             "CLS": 0.01874688834002918,
             "TBT": 0
           }
@@ -145,58 +145,58 @@
       "formFactor": "mobile",
       "median": {
         "scores": {
-          "performance": 76,
+          "performance": 77,
           "accessibility": 100,
           "best-practices": 100,
           "seo": 100
         },
         "metrics": {
-          "LCP": 4346.2541,
-          "CLS": 0.00003204020455161061,
-          "TBT": 175.5
+          "LCP": 4309.115975000001,
+          "CLS": 0.002924890682740588,
+          "TBT": 104.5
         }
       },
       "runs": [
         {
           "file": "detalhe-mobile-1",
           "scores": {
-            "performance": 75,
+            "performance": 77,
             "accessibility": 100,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "LCP": 4292.0627,
-            "CLS": 0.00003204020455161061,
-            "TBT": 192
+            "LCP": 4314.5592,
+            "CLS": 0.002924890682740588,
+            "TBT": 108.5
           }
         },
         {
           "file": "detalhe-mobile-2",
           "scores": {
-            "performance": 76,
+            "performance": 77,
             "accessibility": 100,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "LCP": 4346.2541,
-            "CLS": 0.00003204020455161061,
-            "TBT": 162
+            "LCP": 4309.115975000001,
+            "CLS": 0.002924890682740588,
+            "TBT": 104.5
           }
         },
         {
           "file": "detalhe-mobile-3",
           "scores": {
-            "performance": 76,
+            "performance": 77,
             "accessibility": 100,
             "best-practices": 100,
             "seo": 100
           },
           "metrics": {
-            "LCP": 4369.11405,
-            "CLS": 0.00003204020455161061,
-            "TBT": 175.5
+            "LCP": 4308.107375,
+            "CLS": 0.002924890682740588,
+            "TBT": 103.5
           }
         }
       ]
@@ -213,9 +213,9 @@
           "seo": 100
         },
         "metrics": {
-          "LCP": 965.3408999999999,
+          "LCP": 961.207575,
           "CLS": 0.00190373692988653,
-          "TBT": 0.5
+          "TBT": 0
         }
       },
       "runs": [
@@ -228,9 +228,9 @@
             "seo": 100
           },
           "metrics": {
-            "LCP": 966.15965,
+            "LCP": 963.7008,
             "CLS": 0.00190373692988653,
-            "TBT": 0.5
+            "TBT": 0
           }
         },
         {
@@ -242,9 +242,9 @@
             "seo": 100
           },
           "metrics": {
-            "LCP": 963.6319499999997,
+            "LCP": 955.4577499999999,
             "CLS": 0.00190373692988653,
-            "TBT": 0.5
+            "TBT": 0
           }
         },
         {
@@ -256,9 +256,9 @@
             "seo": 100
           },
           "metrics": {
-            "LCP": 965.3408999999999,
+            "LCP": 961.207575,
             "CLS": 0.00190373692988653,
-            "TBT": 1.5
+            "TBT": 0
           }
         }
       ]

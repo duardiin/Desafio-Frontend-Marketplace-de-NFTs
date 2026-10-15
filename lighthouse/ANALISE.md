@@ -5,12 +5,12 @@ Resultados medidos em [`RESULTADOS.md`](RESULTADOS.md). Relatórios por mediçã
 ## Resumo
 
 - **Desktop:** Início e Detalhe cumprem as metas nas quatro categorias. Performance fica em ~98, e Accessibility, Best Practices e SEO em 100.
-- **Mobile:** Accessibility, Best Practices e SEO estão em 100. **Performance fica abaixo da meta de 90** (~79 no Início e ~76 no Detalhe, mediana de 3).
+- **Mobile:** Accessibility, Best Practices e SEO estão em 100. **Performance fica abaixo da meta de 90** (~78 no Início e ~77 no Detalhe, mediana de 3, medida de 15/10 com as telas mobile finais).
 - **CLS e TBT** estão bons nos dois perfis (CLS ≤ 0,02; TBT ≤ ~180 ms). O que falta no mobile é **FCP e LCP**, ambos em ~3,2 a 4,5 s.
 
 ## Por que o mobile fica abaixo de 90
 
-O perfil mobile do Lighthouse simula **4G lento** (~1,6 Mbps, RTT de 150 ms) e **CPU 4× mais lenta**. Nessas condições, o tempo até o primeiro conteúdo é dominado pelo **volume de JavaScript baixado antes do primeiro render**: ~**419 KB** (gzip) de JS e CSS na primeira visita ao Início.
+O perfil mobile do Lighthouse simula **4G lento** (~1,6 Mbps, RTT de 150 ms) e **CPU 4× mais lenta**. Nessas condições, o tempo até o primeiro conteúdo é dominado pelo **volume de JavaScript baixado antes do primeiro render**: ~**426 KB** (gzip) de JS e CSS na primeira visita ao Início.
 
 | Parte | Tamanho (gzip) | Observação |
 |---|---|---|
@@ -31,6 +31,7 @@ O perfil mobile do Lighthouse simula **4G lento** (~1,6 Mbps, RTT de 150 ms) e *
 |---|---|---|
 | `public/robots.txt` (o preview respondia com o HTML do app) | SEO 92 → **100** nas 4 combinações | Sim |
 | Validação das variáveis de ambiente sem zod (tira ~25 KB do carregamento inicial) | Performance +2 (77 → 79 no Início; 74 → 76 no Detalhe) | Sim |
+| Login (balão e tela cheia) carregado só ao abrir. Ao entrar na raiz do app, os formulários tinham levado react-hook-form e zod ao carregamento inicial (419 → 467 KB) | Recuperou a queda: Início 75 → 78, Detalhe 74 → 77 (426 KB) | Sim |
 | Imagens WebP em 256/512/900 com `srcset`/`sizes` e `fetchpriority="high"` na imagem principal (P4) | Imagens deixam de pesar no LCP | Sim |
 | Hero mobile monta só a versão visível (`useMediaQuery`), sem baixar a imagem grande do desktop | Evita ~60 KB de imagem no celular | Sim |
 | **Experimento:** desenhar a tela antes de o MSW subir (as requisições esperam o MSW) | Início 77 → 82; Detalhe sem ganho | **Não.** Criou corridas: um loader de rota cancelado (`CancelledError` na tela) e três testes intermitentes. Correção vem antes de 5 pontos. |

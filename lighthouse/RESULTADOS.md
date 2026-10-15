@@ -1,13 +1,13 @@
 # Resultados do Lighthouse
 
-Gerado por `npm run lighthouse` em 2026-10-14T23:08:57.642Z. Mediana de 3 medições por página e perfil; ⚠️ = abaixo da meta.
+Gerado por `npm run lighthouse` em 2026-10-15T12:55:16.197Z. Mediana de 3 medições por página e perfil; ⚠️ = abaixo da meta.
 
 | Página | Perfil | Performance (≥ 90) | Accessibility (≥ 95) | Best Practices (≥ 95) | SEO (≥ 90) | LCP | CLS | TBT |
 |---|---|---|---|---|---|---|---|---|
-| Início | mobile | 79 ⚠️ | 100 | 100 | 100 | 4302 ms | 0.001 | 51 ms |
-| Início | desktop | 98 | 100 | 100 | 100 | 997 ms | 0.019 | 0 ms |
-| Detalhe do NFT | mobile | 76 ⚠️ | 100 | 100 | 100 | 4346 ms | 0.000 | 176 ms |
-| Detalhe do NFT | desktop | 98 | 100 | 100 | 100 | 965 ms | 0.002 | 1 ms |
+| Início | mobile | 78 ⚠️ | 100 | 100 | 100 | 4296 ms | 0.001 | 39 ms |
+| Início | desktop | 98 | 100 | 100 | 100 | 1014 ms | 0.019 | 0 ms |
+| Detalhe do NFT | mobile | 77 ⚠️ | 100 | 100 | 100 | 4309 ms | 0.003 | 105 ms |
+| Detalhe do NFT | desktop | 98 | 100 | 100 | 100 | 961 ms | 0.002 | 0 ms |
 
 ## Ambiente e condições
 
