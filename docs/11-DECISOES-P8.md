@@ -254,7 +254,15 @@ Nenhuma das 42 combinações (14 telas × 3 larguras) tem overflow horizontal.
   - novo teste mobile: cartões, provedor que seleciona a carteira, chips de rede, conexão e revisão;
   - baselines do Pagamento (página inteira e primeira tela).
 
-### 9.4 Corrida encontrada no caminho: resposta REST antiga sobrescrevendo evento novo
+### 9.4 Login e cadastro em tela cheia (15/10)
+- **Origem:** prints dos frames `16:1022` (login) e `16:1228` (cadastro).
+- **Abaixo de 768 px:** o balão vira tela cheia, fiel aos frames. KURIO no topo, título, campos de 50 px, botão de 60 px, login social "em breve" e o link do rodapé para alternar entre entrar e criar perfil. Em `/login` e `/cadastro`, o link troca de rota mantendo o `redirect`. O desktop continua com o balão (`9:115`).
+- **Continua sendo um diálogo:** foco preso, Esc fecha e o foco inicial vai para o primeiro campo. O frame não tem como sair por toque, então foi acrescentado o "voltar" redondo das outras telas mobile.
+- **"Nome de usuário" no cadastro:** o frame usa esse texto. O valor vira o nome de exibição (a API de cadastro recebe `displayName`), e o @usuário é gerado a partir do e-mail, editável no Perfil. O nome acessível do campo é igual ao texto visível (WCAG 2.5.3).
+- **Texto dos campos em 16 px:** o frame usa 14. Abaixo de 16 px, o iPhone dá zoom na página ao tocar no campo, o que quebraria a tela cheia.
+- **Testes:** os testes do balão rodam só no desktop. Há um teste novo da tela cheia (largura total, sem abas, foco no e-mail, link do rodapé com troca de rota, voltar), e o teste de cadastro usa os textos de cada viewport.
+
+### 9.5 Corrida encontrada no caminho: resposta REST antiga sobrescrevendo evento novo
 **Problema:** com a reconciliação na primeira conexão do socket (ajuste do P7), a consulta REST disparada ao conectar podia chegar **depois** de um evento `nft.updated` mais novo e sobrescrever o preço com o valor antigo. Um teste de tempo real pegou o caso de forma intermitente.
 
 **Correção:** a regra de versão passou a valer também para as respostas REST. Detalhe, listas do catálogo e favoritos usam `structuralSharing` (`src/lib/versioned-cache.ts`): um recurso com versão menor que a do cache não o substitui. A suíte de tempo real passou 3 vezes seguidas.

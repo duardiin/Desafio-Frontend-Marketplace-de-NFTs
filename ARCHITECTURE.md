@@ -218,6 +218,7 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 - **Divisória do header:** 1 px a 50% de opacidade em vez de 0,3 px, para renderização estável.
 - **Footer em 390/768:** mesma ordem e cores, com fluxo empilhado. Contato fictício exibido como texto, sem `mailto:`/`tel:`.
 - **Skip link** "Pular para o conteúdo" adicionado (não está no Figma).
+- **Login e cadastro no mobile** (`16:1022` e `16:1228`, pelos prints): tela cheia no lugar do balão, com KURIO, título, campos de 50 px e o link do rodapé para alternar. Foi acrescentado o "voltar" das telas mobile. Os campos usam texto de 16 px (o frame usa 14) para o iPhone não dar zoom. Detalhes em docs/11, seção 9.4.
 - **Login e cadastro** (`9:115` pelo print do frame; o cadastro `9:1022` não foi visto e segue o mesmo padrão, com nome, e-mail, senha e confirmação, compatível com os 656 px do frame):
   - Os campos mostram só o placeholder, como no Figma, com rótulo para leitores de tela.
   - "Esqueceu a senha?", Google e Facebook mantêm o visual, mas ficam "em breve" (fora do escopo).

@@ -298,3 +298,12 @@ Sem chamada ao MCP: medidas tiradas de um print de 414 × 896.
 - **"Carteira e rede"** (17 Bold): opções de 64 px (raio 16) com selo redondo de 40 px (`surface-raised`, borda `border`, letra `primary`: "W", "M" e um ícone de carteira), nome (15) e rádio à direita. Ordem: WalletConnect, MetaMask, Coinbase Wallet.
 - **Total** "Total:" (16 Bold) e valor (20 Bold `text-accent`), alinhados à direita.
 - **Confirmar compra:** pílula de 60 px em degradê, fixa embaixo.
+
+## Login e cadastro · mobile (nodes `16:1022` e `16:1228`, a partir de prints, 15/10)
+
+- **Tela cheia** `ink`, sem header nem tab bar. **KURIO** centralizado (32 Bold, tracking 3) a ~150 px do topo. Título a ~265 px: "Entrar" ou "Criar perfil de colecionador" (20 Bold).
+- **Campos** de largura total (margem de 28), 50 px de altura, raio 12, borda `border`, gap de 12. Placeholders: login "contato@email.com" e "Senha"; cadastro "Nome de usuário", "Digite seu e-mail", "Senha" e "Confirmar senha".
+- **Login:** "Esqueceu a senha?" (14 `text-accent`) à direita, sob a senha.
+- **Botão** de 60 px, raio 12, `primary` sólido, 16 Bold `ink`: "Entrar" ou "Criar perfil".
+- **"Ou continue com"** com linhas laterais (sem encostar nas bordas), Google e Facebook (40 px, gap 16).
+- **Rodapé** (15 `text-secondary`): "Novo na Kurio? Crie uma conta" ou "Já tem uma conta? Entre".
