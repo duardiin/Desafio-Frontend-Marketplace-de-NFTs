@@ -101,7 +101,38 @@ test.describe('login', () => {
   })
 })
 
+test.describe('login e cadastro em tela cheia no mobile (Figma 16:1022 e 16:1228)', () => {
+  test.skip(({ isMobile }) => !isMobile, 'no desktop é o balão (Figma 9:115)')
+
+  test('ocupa a tela, alterna entre entrar e criar perfil pelo link do rodapé e "Voltar" sai', async ({ page }) => {
+    await openApp(page, '/rota-inexistente')
+    await page.goto('/login?redirect=%2Fperfil')
+    const login = page.getByRole('dialog', { name: 'Entrar' })
+    await expect(login).toBeVisible()
+    const box = await login.boundingBox()
+    expect(box?.width).toBe(page.viewportSize()?.width)
+    await expect(page.getByRole('tab')).toHaveCount(0)
+    await expect(login.getByLabel('E-mail')).toBeFocused()
+    await expect(login.getByText('Continuar com Google')).toHaveAttribute('aria-disabled', 'true')
+
+    await login.getByRole('button', { name: 'Crie uma conta' }).click()
+    await expect(page).toHaveURL(/\/cadastro\?redirect=%2Fperfil$/)
+    const register = page.getByRole('dialog', { name: 'Criar perfil de colecionador' })
+    await expect(register.getByLabel('Nome de usuário', { exact: true })).toHaveAttribute('placeholder', 'Nome de usuário')
+    await expect(register.getByRole('button', { name: 'Criar perfil' })).toBeVisible()
+
+    await register.getByRole('button', { name: 'Entre' }).click()
+    await expect(page).toHaveURL(/\/login\?redirect=%2Fperfil$/)
+    // Acesso direto ao /login (sem histórico dentro do app): "Voltar" leva ao Início, como o "X" do desktop.
+    await page.getByRole('dialog', { name: 'Entrar' }).getByRole('button', { name: 'Voltar' }).click()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(page).toHaveURL(/\/$/)
+  })
+})
+
 test.describe('balão de login (Figma)', () => {
+  test.skip(({ isMobile }) => isMobile, 'no mobile, login e cadastro são tela cheia (Figma 16:1022 e 16:1228)')
+
   test('abre sobre a tela atual; entrar mantém a página; abas trocam entre login e cadastro', async ({ page, isMobile }) => {
     const path = pageWithHeader(isMobile)
     await openApp(page, path)
@@ -142,22 +173,26 @@ test.describe('balão de login (Figma)', () => {
 test.describe('cadastro', () => {
   test('conflito de e-mail vindo da API fica no campo; cadastro novo entra na conta', async ({ page, isMobile }) => {
     await openApp(page, '/cadastro')
-    const dialog = page.getByRole('dialog', { name: 'Criar conta' })
-    await dialog.getByLabel('Nome').fill('Carla Souza')
+    // Textos do balão (desktop, Figma 9:1022) ou da tela cheia (mobile, 16:1228).
+    const texts = isMobile
+      ? { title: 'Criar perfil de colecionador', name: 'Nome de usuário', submit: 'Criar perfil' }
+      : { title: 'Criar conta', name: 'Nome', submit: 'Criar conta' }
+    const dialog = page.getByRole('dialog', { name: texts.title })
+    await dialog.getByLabel(texts.name, { exact: true }).fill('Carla Souza')
     await dialog.getByLabel('E-mail').fill('ana@kurio.dev')
     await dialog.getByLabel('Senha', { exact: true }).fill('Segredo123')
     await dialog.getByLabel('Confirmar senha', { exact: true }).fill('Segredo321')
-    await dialog.getByRole('button', { name: 'Criar conta' }).click()
+    await dialog.getByRole('button', { name: texts.submit, exact: true }).click()
     await expect(dialog.getByLabel('Confirmar senha', { exact: true })).toHaveAccessibleDescription('As senhas não conferem.')
 
     await dialog.getByLabel('Confirmar senha', { exact: true }).fill('Segredo123')
-    await dialog.getByRole('button', { name: 'Criar conta' }).click()
+    await dialog.getByRole('button', { name: texts.submit, exact: true }).click()
     const emailField = dialog.getByLabel('E-mail')
     await expect(emailField).toHaveAccessibleDescription(/já está cadastrado/)
     await expect(emailField).toBeFocused()
 
     await emailField.fill('carla@kurio.dev')
-    await dialog.getByRole('button', { name: 'Criar conta' }).click()
+    await dialog.getByRole('button', { name: texts.submit, exact: true }).click()
     await expect(dialog).toBeHidden()
     await expectSignedInAs(page, 'Carla', isMobile)
   })
