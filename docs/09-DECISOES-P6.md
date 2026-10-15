@@ -56,6 +56,7 @@ Registro do que foi feito de forma diferente do esperado, do Figma ou do padrão
 ### 2.4 Retomada após refresh
 **O que foi feito:**
 - A página do pedido (`/pedidos/$id`) busca o estado na API e consulta a cada 1,5 s enquanto o pedido está pendente.
+  > **Atualização (P7):** o caminho principal passou a ser o evento `order.updated`, e a consulta virou uma rede de segurança a cada 15 s.
 - No pagamento, um aviso mostra se há pedido pendente, com link para acompanhar, ou se há uma tentativa sem resposta, com o botão "Verificar tentativa", que reenvia a mesma tentativa.
 
 **Por quê:** o enunciado pede recuperar o estado depois de refresh ou reconexão sem criar outra compra. A consulta periódica é provisória: no P7, a atualização vem pelo evento `order.updated` (Socket.IO) e a consulta passa a ser reconciliação.

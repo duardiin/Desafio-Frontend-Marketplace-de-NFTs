@@ -150,6 +150,8 @@ Erros 5xx são repetidos automaticamente 2 vezes antes de aparecer o erro, confo
 ### 6.5 "COMPRAR" em breve até o P5
 **Por quê:** comprar significa adicionar ao carrinho, que é o P5, o bloco seguinte. Até lá o botão fica marcado como "em breve", para não aparentar funcionar.
 
+> **Atualização:** resolvido no P5. COMPRAR adiciona ao carrinho e abre o carrinho.
+
 ### 6.6 Compartilhar com destinos reais
 **O que foi feito:** LinkedIn, e-mail e Twitter usam as URLs públicas de compartilhamento e abrem em nova aba, com aviso para leitores de tela.
 

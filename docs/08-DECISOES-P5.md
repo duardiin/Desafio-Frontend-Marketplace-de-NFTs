@@ -87,6 +87,8 @@ Um carrinho no `localStorage` do cliente duplicaria essas regras e criaria duas 
 ### 3.5 "Finalizar compra" em breve até o P6
 **Por quê:** o pagamento e o pedido são o P6. Um link para uma rota inexistente não compilaria, por causa do roteamento tipado, e um botão que não faz nada aparentaria sucesso.
 
+> **Atualização:** resolvido no P6. "Finalizar compra" leva ao pagamento.
+
 ---
 
 ## 4. Testes

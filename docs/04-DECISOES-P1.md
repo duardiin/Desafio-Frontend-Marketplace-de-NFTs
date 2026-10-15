@@ -122,6 +122,8 @@ Os tokens restantes seguem a tabela de mapeamento do `design-tokens.md` (`--prim
 
 **Temporário:** busca, carrinho e "Entrar" usam o mesmo componente (`ComingSoon`) até os blocos P3 (sessão), P4 (catálogo) e P5 (carrinho) criarem as rotas. Com o roteamento tipado, um `Link` para uma rota que ainda não existe nem compila. Nos links de Coleções do footer, a ideia é virarem filtros do catálogo no P4.
 
+> **Atualização (estado final):** busca, carrinho e "Entrar" ganharam destino nos blocos seguintes. No footer, "Meu perfil", "Lista de interesse" e as Coleções levam ao perfil, aos favoritos e ao catálogo filtrado (`/?colecao=…`). Os itens editoriais e de ajuda continuam "em breve".
+
 ### 3.7 Newsletter informa indisponibilidade
 **O que mudou:** o formulário existe e tem label, mas o envio mostra "A newsletter ainda não está disponível nesta versão." numa região `role="status"`.
 
