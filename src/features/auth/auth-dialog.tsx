@@ -1,5 +1,5 @@
 import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
-import { XIcon } from 'lucide-react'
+import { ChevronLeftIcon, XIcon } from 'lucide-react'
 import { useRef, type KeyboardEvent } from 'react'
 import facebookIcon from '@/assets/figma/login-facebook.svg'
 import googleIcon from '@/assets/figma/login-google.svg'
@@ -8,6 +8,7 @@ import { closeAuthDialog, openAuthDialog, useAuthDialogMode, type AuthMode } fro
 import { LoginForm } from '@/features/auth/login-form'
 import { RegisterForm } from '@/features/auth/register-form'
 import { ComingSoon } from '@/features/layout/coming-soon'
+import { useMediaQuery } from '@/lib/use-media-query'
 import { cn } from '@/lib/utils'
 
 export interface AuthSearch {
@@ -31,21 +32,101 @@ const DESCRIPTIONS: Record<AuthMode, string> = {
 }
 
 /**
- * Login e cadastro do Figma (9:115 e 9:1022): um "balão" de 500 px sobre a
- * tela, sem escurecer o fundo, com as abas "Entrar | Criar conta".
+ * Login e cadastro: "balão" sobre a tela no desktop (Figma 9:115) e tela
+ * cheia no mobile (16:1022 e 16:1228). Uma versão por vez.
  */
-function AuthDialogView({ mode, motivo, onModeChange, onClose, onSuccess }: AuthDialogViewProps) {
+function AuthDialogView(props: AuthDialogViewProps) {
+  const isDesktop = useMediaQuery('(min-width: 768px)')
+  return isDesktop ? <AuthBalloon {...props} /> : <AuthScreen {...props} />
+}
+
+/** Foco inicial no primeiro campo (e não no botão de fechar): é o que a pessoa vai preencher. */
+function focusFirstField(event: Event) {
+  event.preventDefault()
+  ;(event.currentTarget as HTMLElement).querySelector<HTMLInputElement>('form input')?.focus()
+}
+
+function SessionExpiredNotice({ motivo }: { motivo: AuthSearch['motivo'] }) {
+  if (motivo !== 'expirada') return null
+  return (
+    <p role="status" className="mt-4 rounded-[3px] border border-border-soft bg-surface-dark px-3 py-2 text-body-14">
+      Sua sessão expirou. Entre novamente para continuar de onde parou.
+    </p>
+  )
+}
+
+/**
+ * Mobile (Figma 16:1022 e 16:1228): login e cadastro em tela cheia, com KURIO
+ * no topo, título, campos de 50 px, botão de 60 px, login social "em breve" e
+ * o link para alternar entre entrar e criar conta. Continua sendo um diálogo
+ * (foco preso, Esc fecha); o "voltar" no topo segue o padrão das telas mobile.
+ */
+function AuthScreen({ mode, motivo, onModeChange, onClose, onSuccess }: AuthDialogViewProps) {
+  const isLogin = mode === 'login'
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        showCloseButton={false}
+        onOpenAutoFocus={focusFirstField}
+        overlayClassName="bg-ink supports-backdrop-filter:backdrop-blur-none"
+        className="top-0 left-0 h-dvh w-full max-w-none translate-x-0 translate-y-0 gap-0 overflow-y-auto rounded-none bg-ink p-0 ring-0 sm:max-w-none"
+      >
+        <div className="mx-auto flex min-h-full w-full max-w-[440px] flex-col px-7 pt-6 pb-10">
+          <BackButtonLike onClick={onClose} />
+          <p aria-hidden="true" className="mt-[clamp(24px,8dvh,90px)] text-center text-[32px] leading-10 font-bold tracking-[3px]">
+            KURIO
+          </p>
+          <DialogTitle className="mt-[clamp(32px,10dvh,100px)] text-center text-[20px] leading-7 font-bold">
+            {isLogin ? 'Entrar' : 'Criar perfil de colecionador'}
+          </DialogTitle>
+          <DialogDescription className="sr-only">{DESCRIPTIONS[mode]}</DialogDescription>
+          <SessionExpiredNotice motivo={motivo} />
+
+          <div className="mt-6">
+            {isLogin ? <LoginForm onSuccess={onSuccess} variant="screen" /> : <RegisterForm onSuccess={onSuccess} variant="screen" />}
+          </div>
+
+          <SocialSignIn variant="screen" />
+
+          <p className="mt-auto pt-10 text-center text-body-15 text-muted-foreground">
+            {isLogin ? 'Novo na Kurio? ' : 'Já tem uma conta? '}
+            <button
+              type="button"
+              onClick={() => onModeChange(isLogin ? 'cadastro' : 'login')}
+              className="rounded-sm underline-offset-4 outline-none hover:text-highlight hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {isLogin ? 'Crie uma conta' : 'Entre'}
+            </button>
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/** "Voltar" redondo das telas mobile (o frame do login não tem; mantém a saída por toque). */
+function BackButtonLike({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-label="Voltar"
+      onClick={onClick}
+      className="grid size-8 shrink-0 place-items-center rounded-full border border-border bg-surface-raised text-primary outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+    >
+      <ChevronLeftIcon className="size-4" strokeWidth={1.75} aria-hidden="true" />
+    </button>
+  )
+}
+
+/** Desktop (Figma 9:115): "balão" de 500 px sobre a tela, com as abas "Entrar | Criar conta". */
+function AuthBalloon({ mode, motivo, onModeChange, onClose, onSuccess }: AuthDialogViewProps) {
   const isLogin = mode === 'login'
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         showCloseButton={false}
-        // Foco inicial no primeiro campo (e não no "X"): é o que a pessoa vai preencher.
-        onOpenAutoFocus={(event) => {
-          event.preventDefault()
-          ;(event.currentTarget as HTMLElement).querySelector<HTMLInputElement>('form input')?.focus()
-        }}
+        onOpenAutoFocus={focusFirstField}
         overlayClassName="bg-transparent supports-backdrop-filter:backdrop-blur-none"
         className="top-4 max-h-[calc(100dvh-2rem)] translate-y-0 gap-0 overflow-y-auto rounded-none bg-surface-card p-0 shadow-2xl ring-0 sm:top-[clamp(1rem,calc(50dvh-300px),192px)] sm:max-w-[500px]"
       >
@@ -65,11 +146,7 @@ function AuthDialogView({ mode, motivo, onModeChange, onClose, onSuccess }: Auth
             {DESCRIPTIONS[mode]}
           </DialogDescription>
 
-          {motivo === 'expirada' && (
-            <p role="status" className="mt-4 rounded-[3px] border border-border-soft bg-surface-dark px-3 py-2 text-body-14">
-              Sua sessão expirou. Entre novamente para continuar de onde parou.
-            </p>
-          )}
+          <SessionExpiredNotice motivo={motivo} />
 
           <div className="mt-6">
             {isLogin ? <LoginForm onSuccess={onSuccess} /> : <RegisterForm onSuccess={onSuccess} />}
@@ -133,16 +210,19 @@ function AuthTabs({ mode, onModeChange }: { mode: AuthMode; onModeChange: (mode:
 }
 
 /** "Ou continue com" + Google e Facebook: login social está fora do escopo ("em breve"). */
-function SocialSignIn() {
+function SocialSignIn({ variant = 'balloon' }: { variant?: 'balloon' | 'screen' }) {
+  const screen = variant === 'screen'
   const button =
     'flex h-10 w-full items-center justify-center gap-2.5 rounded-[3px] border border-border text-caption-13 font-medium text-muted-foreground'
   return (
     <>
-      <div className="relative -mx-6 mt-6 flex justify-center sm:-mx-20">
+      <div className={cn('relative flex justify-center', screen ? 'mt-12' : '-mx-6 mt-6 sm:-mx-20')}>
         <span aria-hidden="true" className="absolute inset-x-0 top-1/2 h-px bg-border" />
-        <span className="relative bg-surface-card px-3 text-caption-13 leading-4 text-foreground">Ou continue com</span>
+        <span className={cn('relative px-3 text-caption-13 leading-4 text-foreground', screen ? 'bg-ink' : 'bg-surface-card')}>
+          Ou continue com
+        </span>
       </div>
-      <div className="mt-3 flex flex-col gap-3">
+      <div className={cn('flex flex-col', screen ? 'mt-5 gap-4' : 'mt-3 gap-3')}>
         <ComingSoon className={button}>
           <img src={googleIcon} alt="" width={20} height={20} />
           Continuar com Google

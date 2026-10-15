@@ -8,7 +8,13 @@ import { useRegister } from '@/features/auth/use-auth-actions'
 import { applyApiErrors } from '@/lib/form-errors'
 
 /** Cadastro no padrão do login do Figma (frame 9:1022, 656 px: nome, e-mail, senha e confirmação). */
-export function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
+/**
+ * `screen`: cadastro mobile em tela cheia (Figma 16:1228): "Nome de usuário",
+ * "Digite seu e-mail", senha e confirmação, e o botão "Criar perfil".
+ */
+export function RegisterForm({ onSuccess, variant = 'balloon' }: { onSuccess: () => void; variant?: 'balloon' | 'screen' }) {
+  const screen = variant === 'screen'
+  const input = screen ? 'h-[50px] rounded-xl px-4' : undefined
   const register = useRegister()
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -29,10 +35,11 @@ export function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
       <FormAlert message={errors.root?.server?.message} />
       <InputField
-        label="Nome"
+        label={screen ? 'Nome de usuário' : 'Nome'}
         srOnlyLabel
         autoComplete="name"
-        placeholder="Seu nome"
+        placeholder={screen ? 'Nome de usuário' : 'Seu nome'}
+        inputClassName={input}
         error={errors.displayName?.message}
         {...form.register('displayName')}
       />
@@ -41,7 +48,8 @@ export function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
         srOnlyLabel
         type="email"
         autoComplete="email"
-        placeholder="contato@email.com"
+        placeholder={screen ? 'Digite seu e-mail' : 'contato@email.com'}
+        inputClassName={input}
         error={errors.email?.message}
         {...form.register('email')}
       />
@@ -50,6 +58,7 @@ export function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
         srOnlyLabel
         autoComplete="new-password"
         placeholder="Senha"
+        inputClassName={input}
         error={errors.password?.message}
         {...form.register('password')}
       />
@@ -58,11 +67,16 @@ export function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
         srOnlyLabel
         autoComplete="new-password"
         placeholder="Confirmar senha"
+        inputClassName={input}
         error={errors.confirmPassword?.message}
         {...form.register('confirmPassword')}
       />
-      <Button type="submit" className="mt-3 h-[45px] w-full rounded-[3px]" disabled={isSubmitting}>
-        {isSubmitting ? 'Criando conta…' : 'Criar conta'}
+      <Button
+        type="submit"
+        className={screen ? 'mt-7 h-[60px] w-full rounded-xl text-body-16' : 'mt-3 h-[45px] w-full rounded-[3px]'}
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? 'Criando conta…' : screen ? 'Criar perfil' : 'Criar conta'}
       </Button>
     </form>
   )

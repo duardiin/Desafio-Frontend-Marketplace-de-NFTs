@@ -52,9 +52,12 @@ export function FieldShell({ label, required, error, hint, srOnlyLabel, classNam
 }
 
 type InputFieldProps = Omit<ComponentProps<'input'>, 'id'> &
-  Omit<FieldShellProps, 'children'>
+  Omit<FieldShellProps, 'children'> & {
+    /** Classes extras do campo (ex.: login mobile em tela cheia, 50 px e raio 12). */
+    inputClassName?: string
+  }
 
-export function InputField({ label, required, error, hint, srOnlyLabel, className, ...input }: InputFieldProps) {
+export function InputField({ label, required, error, hint, srOnlyLabel, className, inputClassName, ...input }: InputFieldProps) {
   return (
     <FieldShell label={label} required={required} error={error} hint={hint} srOnlyLabel={srOnlyLabel} className={className}>
       {({ id, describedBy }) => (
@@ -63,7 +66,7 @@ export function InputField({ label, required, error, hint, srOnlyLabel, classNam
           aria-required={required}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          className={CONTROL}
+          className={cn(CONTROL, inputClassName)}
           {...input}
         />
       )}
@@ -137,10 +140,11 @@ export function TextAreaField({ label, required, error, hint, className, ...text
   )
 }
 
-type PasswordFieldProps = Omit<ComponentProps<'input'>, 'id' | 'type'> & Omit<FieldShellProps, 'children'>
+type PasswordFieldProps = Omit<ComponentProps<'input'>, 'id' | 'type'> &
+  Omit<FieldShellProps, 'children'> & { inputClassName?: string }
 
 /** "Password Input" (Figma, Perfil): campo com o botão de mostrar/ocultar a senha à direita. */
-export function PasswordField({ label, required, error, hint, srOnlyLabel, className, ...input }: PasswordFieldProps) {
+export function PasswordField({ label, required, error, hint, srOnlyLabel, className, inputClassName, ...input }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false)
   return (
     <FieldShell label={label} required={required} error={error} hint={hint} srOnlyLabel={srOnlyLabel} className={className}>
@@ -152,7 +156,7 @@ export function PasswordField({ label, required, error, hint, srOnlyLabel, class
             aria-required={required}
             aria-invalid={error ? true : undefined}
             aria-describedby={describedBy}
-            className={cn(CONTROL, 'pr-12')}
+            className={cn(CONTROL, 'pr-12', inputClassName)}
             {...input}
           />
           <button
