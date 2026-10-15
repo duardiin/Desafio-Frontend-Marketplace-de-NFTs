@@ -52,8 +52,8 @@ interface QuantityStepperProps {
   /** Nome do item, para rótulos únicos quando há vários steppers (carrinho). */
   itemName?: string
   disabled?: boolean
-  /** `compact`: quadrados de 24 px (Figma mobile do Detalhe e do Carrinho). */
-  size?: 'default' | 'compact'
+  /** `compact`: quadrados de 24 px (Figma mobile do Detalhe). `compact-round`: círculos de 24 px (Carrinho mobile). */
+  size?: 'default' | 'compact' | 'compact-round'
 }
 
 const STEP_BUTTON = {
@@ -61,15 +61,17 @@ const STEP_BUTTON = {
     'grid size-[33px] place-items-center rounded-full border border-ink bg-primary shadow-[0_6.6px_9.9px_rgba(20,13,10,0.15)] disabled:cursor-not-allowed disabled:opacity-40',
   compact:
     'grid size-6 place-items-center rounded-md bg-primary disabled:cursor-not-allowed disabled:opacity-40 after:absolute after:-inset-2.5 relative',
+  'compact-round':
+    'grid size-6 place-items-center rounded-full bg-primary disabled:cursor-not-allowed disabled:opacity-40 after:absolute after:-inset-2.5 relative',
 }
 
 /** Quantidade inteira entre 1 e o máximo da edição (Figma: botões circulares e número 20/28). */
 export function QuantityStepper({ value, max, onChange, itemName, disabled = false, size = 'default' }: QuantityStepperProps) {
   const suffix = itemName ? ` de ${itemName}` : ''
   const button = STEP_BUTTON[size]
-  const icon = size === 'compact' ? 20 : 26
+  const icon = size === 'default' ? 26 : 20
   return (
-    <div className={size === 'compact' ? 'flex items-center gap-2.5' : 'flex items-center gap-3'} role="group" aria-label={`Quantidade${suffix}`}>
+    <div className={size === 'default' ? 'flex items-center gap-3' : 'flex items-center gap-2.5'} role="group" aria-label={`Quantidade${suffix}`}>
       <button
         type="button"
         className={button}
