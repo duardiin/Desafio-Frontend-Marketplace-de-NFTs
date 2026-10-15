@@ -120,6 +120,9 @@ export async function mergeGuestCartIntoAccount(queryClient: QueryClient, userId
   const guestCart = queryClient.getQueryData<Cart>(cartKeys(undefined, guest).cart)
   try {
     const merged = await cartApi.mergeGuestCart(guest)
+    // Ao entrar, o carrinho da conta já pode estar carregando (sem os itens do visitante).
+    // Se essa leitura chegasse depois, sobrescreveria a mescla: cancela antes de gravar.
+    await queryClient.cancelQueries({ queryKey: cartKeys(userId, null).cart, exact: true })
     queryClient.setQueryData(cartKeys(userId, null).cart, merged)
     void queryClient.invalidateQueries({ queryKey: cartKeys(userId, null).quote })
     guestId.clear()
