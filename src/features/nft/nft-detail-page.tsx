@@ -13,9 +13,11 @@ import { Gallery } from '@/features/nft/gallery'
 import { NftInfoTabs } from '@/features/nft/nft-info-tabs'
 import { EditionPicker, QuantityStepper } from '@/features/nft/purchase-options'
 import { Rating } from '@/features/nft/rating'
+import { MobileProduct } from '@/features/nft/mobile-product'
 import { RelatedNfts } from '@/features/nft/related-nfts'
 import { ShareLinks } from '@/features/nft/share-links'
 import { formatEth } from '@/lib/eth'
+import { useMediaQuery } from '@/lib/use-media-query'
 
 interface NftDetailPageProps {
   id: string
@@ -26,7 +28,8 @@ interface NftDetailPageProps {
 export function NftDetailPage({ id, editionId }: NftDetailPageProps) {
   const { data: nft } = useSuspenseQuery(nftDetailQueryOptions(id))
   return (
-    <div className="flex flex-col gap-16 lg:gap-24">
+    // Mobile: reserva o espaço da barra de compra fixa (Figma 15:5536).
+    <div className="flex flex-col gap-16 max-md:pb-[200px] lg:gap-24">
       {/* `key`: troca de NFT reinicia edição e quantidade. */}
       <ProductSection key={nft.id} nft={nft} editionId={editionId} />
       <section aria-label="Informações do NFT" className="container-page">
@@ -42,11 +45,26 @@ function ProductSection({ nft, editionId }: { nft: NftDetail; editionId: string 
   const edition = initialEdition(nft.editions, editionId)
   const max = maxForEdition(edition, nft.maxPerOrder)
   const [quantity, setQuantity] = useState(1)
+  const isDesktop = useMediaQuery('(min-width: 768px)')
   const safeQuantity = Math.min(Math.max(1, quantity), Math.max(1, max))
 
   function selectEdition(id: string) {
     setQuantity(1)
     void navigate({ to: '/nft/$id', params: { id: nft.id }, search: { edicao: id }, replace: true, resetScroll: false })
+  }
+
+  // Uma versão por vez: o frame mobile tem outra composição (e o mesmo h1).
+  if (!isDesktop) {
+    return (
+      <MobileProduct
+        nft={nft}
+        edition={edition}
+        max={max}
+        quantity={safeQuantity}
+        onQuantityChange={setQuantity}
+        onEditionChange={selectEdition}
+      />
+    )
   }
 
   return (

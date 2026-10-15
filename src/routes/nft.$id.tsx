@@ -5,7 +5,7 @@ import { NotFoundPage } from '@/features/layout/not-found-page'
 import { NftDetailPage, NftDetailSkeleton } from '@/features/nft/nft-detail-page'
 
 export const Route = createFileRoute('/nft/$id')({
-  staticData: { navSection: 'mercado', headerDivider: false },
+  staticData: { navSection: 'mercado', headerDivider: false, mobileHeader: false, mobileTabBar: false },
   validateSearch: (search: Record<string, unknown>): { edicao?: string } => ({
     edicao: typeof search.edicao === 'string' ? search.edicao : undefined,
   }),
