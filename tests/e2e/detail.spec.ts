@@ -46,10 +46,12 @@ test.describe('detalhe do NFT', () => {
     await expect(page.getByRole('button', { name: 'Aumentar quantidade' })).toBeDisabled()
   })
 
-  test('galeria troca a imagem e o zoom abre em diálogo com foco controlado', async ({ page }) => {
+  test('galeria troca a imagem e o zoom abre em diálogo com foco controlado', async ({ page, isMobile }) => {
     await openApp(page, '/nft/nft-001')
     await page.getByRole('button', { name: 'Ver imagem 3 de 4' }).click()
     await expect(page.getByRole('button', { name: 'Ver imagem 3 de 4' })).toHaveAttribute('aria-pressed', 'true')
+    // Mobile (Figma 15:5536): carrossel de deslizar, sem botão de zoom (o zoom é o do próprio celular).
+    if (isMobile) return
 
     const zoom = page.getByRole('button', { name: 'Ampliar imagem' })
     await zoom.click()
@@ -77,5 +79,34 @@ test.describe('detalhe do NFT', () => {
     await page.goto('/nft/nft-002')
     await expect(page.getByRole('status').filter({ hasText: 'Carregando NFT' })).toBeAttached()
     await expect(page.getByRole('heading', { level: 1, name: 'Sage Nomad #089' })).toBeVisible({ timeout: 10_000 })
+  })
+})
+
+test.describe('detalhe mobile (Figma 15:5536)', () => {
+  test.skip(({ isMobile }) => !isMobile, 'layout exclusivo abaixo de 768 px')
+
+  test('sem header e tab bar; voltar; o carrinho adiciona e fica; "Comprar NFT" adiciona e abre o carrinho', async ({ page }) => {
+    await openApp(page, '/')
+    await page.locator('#catalogo article').filter({ hasText: 'Emerald Ape #042' }).getByRole('link').click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Emerald Ape #042' })).toBeVisible()
+    await expect(page.getByRole('banner')).toBeHidden()
+    await expect(page.getByRole('navigation', { name: 'Atalhos' })).toHaveCount(0)
+    await expect(page.getByLabel('Avaliação média 4 de 5, 3 avaliações')).toBeVisible()
+
+    // Botão do carrinho: adiciona e continua no detalhe.
+    await page.getByRole('button', { name: 'Adicionar ao carrinho' }).click()
+    await expect(page.getByRole('status').filter({ hasText: '1 × "Emerald Ape #042" (edição 1/10) no carrinho.' })).toBeVisible()
+    await expect(page).toHaveURL(/\/nft\/nft-001/)
+
+    // "Comprar NFT": adiciona e abre o carrinho.
+    await page.getByRole('button', { name: 'Aumentar quantidade' }).click()
+    await page.getByRole('button', { name: 'Comprar NFT' }).click()
+    await expect(page).toHaveURL(/\/carrinho$/)
+    await expect(page.getByRole('main')).toContainText('Emerald Ape #042')
+
+    // Voltar retorna ao detalhe (histórico).
+    await page.goBack()
+    await page.getByRole('button', { name: 'Voltar' }).click()
+    await expect(page).toHaveURL(/\/$/)
   })
 })

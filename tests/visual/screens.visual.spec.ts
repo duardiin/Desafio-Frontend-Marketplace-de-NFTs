@@ -13,9 +13,9 @@ const FIXED_TIME = new Date('2026-10-14T12:00:00-03:00')
 
 // Avisos (toasts) são efêmeros: não fazem parte do layout comparado.
 const HIDE_TRANSIENT = '[role="status"][aria-live] { visibility: hidden !important; }'
-// Em captura de página inteira, a tab bar fixa (mobile) seria desenhada no meio da página.
-// Ela é comparada na captura da primeira tela do Início mobile.
-const HIDE_FIXED = 'nav[aria-label="Atalhos"] { visibility: hidden !important; }'
+// Em captura de página inteira, a tab bar e as barras de ação fixas (mobile) seriam desenhadas
+// no meio da página. Elas são comparadas nas capturas da primeira tela.
+const HIDE_FIXED = 'nav[aria-label="Atalhos"], [data-fixed-bar] { visibility: hidden !important; }'
 
 test.beforeEach(async ({ page }) => {
   // Só `Date` fica fixo; os timers seguem reais (MSW, socket e liquidação de pedidos dependem deles).
@@ -68,6 +68,14 @@ test('Detalhe do NFT', async ({ page }) => {
   await page.goto('/nft/nft-001')
   await expect(page.getByRole('heading', { level: 1, name: 'Emerald Ape #042' })).toBeVisible()
   await capture(page, 'detalhe')
+})
+
+test('Detalhe do NFT, primeira tela (com a barra de compra no mobile)', async ({ page }) => {
+  await page.goto('/nft/nft-001')
+  await expect(page.getByRole('heading', { level: 1, name: 'Emerald Ape #042' })).toBeVisible()
+  await settle(page)
+  await page.addStyleTag({ content: HIDE_TRANSIENT })
+  await expect(page).toHaveScreenshot('detalhe-primeira-tela.png')
 })
 
 test('Carrinho', async ({ page }) => {
