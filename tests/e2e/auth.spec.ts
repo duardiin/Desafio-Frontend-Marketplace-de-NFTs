@@ -143,7 +143,7 @@ test.describe('balão de login (Figma)', () => {
     const loginTab = page.getByRole('tab', { name: 'Entrar' })
     await expect(loginTab).toHaveAttribute('aria-selected', 'true')
     await page.getByRole('tab', { name: 'Criar conta' }).click()
-    await expect(page.getByRole('dialog', { name: 'Criar conta' }).getByLabel('Nome', { exact: true })).toBeVisible()
+    await expect(page.getByRole('dialog', { name: 'Criar conta' }).getByLabel('Nome de usuário', { exact: true })).toBeVisible()
     await page.getByRole('tab', { name: 'Criar conta' }).press('ArrowLeft')
     await expect(loginTab).toBeFocused()
     await expect(loginTab).toHaveAttribute('aria-selected', 'true')
@@ -176,7 +176,7 @@ test.describe('cadastro', () => {
     // Textos do balão (desktop, Figma 9:1022) ou da tela cheia (mobile, 16:1228).
     const texts = isMobile
       ? { title: 'Criar perfil de colecionador', name: 'Nome de usuário', submit: 'Criar perfil' }
-      : { title: 'Criar conta', name: 'Nome', submit: 'Criar conta' }
+      : { title: 'Criar conta', name: 'Nome de usuário', submit: 'Criar perfil' }
     const dialog = page.getByRole('dialog', { name: texts.title })
     await dialog.getByLabel(texts.name, { exact: true }).fill('Carla Souza')
     await dialog.getByLabel('E-mail').fill('ana@kurio.dev')

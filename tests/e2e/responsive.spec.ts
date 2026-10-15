@@ -86,3 +86,44 @@ test('todas as telas sem overflow horizontal em 390, 768 e 1440 px', async ({ pa
     }
   }
 })
+
+/**
+ * Zoom de 200% num monitor de 1280 × 900 (enunciado, seção 8: sem perda de
+ * conteúdo com zoom). Para o navegador, equivale a uma janela de 640 × 450 px
+ * CSS com densidade 2. O conteúdo reflui sem overflow, e as ações principais
+ * continuam visíveis e utilizáveis.
+ */
+test.describe('zoom de 200%', () => {
+  test.skip(({ isMobile }) => isMobile, 'o projeto mobile já cobre 390 px (e a tab bar de 320 a 414 px)')
+  test.use({ viewport: { width: 640, height: 450 }, deviceScaleFactor: 2 })
+
+  test('telas principais sem overflow e com as ações ao alcance', async ({ page }) => {
+    test.setTimeout(90_000)
+    await openApp(page)
+    await expectNoOverflow(page, '/ (zoom 200%)', 640)
+    await expect(page.getByRole('searchbox', { name: 'Buscar NFTs' })).toBeVisible()
+
+    await page.goto('/nft/nft-001')
+    await expectNoOverflow(page, '/nft/nft-001 (zoom 200%)', 640)
+    await page.getByRole('button', { name: /^(COMPRAR|Comprar NFT)$/ }).click()
+    await expect(page).toHaveURL(/\/carrinho$/)
+    await expectNoOverflow(page, '/carrinho (zoom 200%)', 640)
+
+    await loginViaUi(page, 'ana@kurio.dev', '/pagamento')
+    await expectNoOverflow(page, '/pagamento (zoom 200%)', 640)
+    await page.getByRole('button', { name: 'Conectar carteira' }).click()
+    await expect(page.getByText('Conectada', { exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Confirmar compra' }).click()
+    const review = page.getByRole('dialog', { name: 'Revise seu pedido' })
+    // Com 450 px de altura, a revisão rola por dentro: o botão é alcançável e aparece inteiro.
+    const confirm = review.getByRole('button', { name: 'Confirmar pagamento' })
+    await confirm.scrollIntoViewIfNeeded()
+    await expect(confirm).toBeInViewport({ ratio: 1 })
+
+    await page.keyboard.press('Escape')
+    await page.goto('/perfil')
+    await expectNoOverflow(page, '/perfil (zoom 200%)', 640)
+    await page.goto('/carteiras')
+    await expectNoOverflow(page, '/carteiras (zoom 200%)', 640)
+  })
+})
