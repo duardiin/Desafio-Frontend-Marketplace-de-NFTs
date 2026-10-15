@@ -4,7 +4,7 @@ import { useRef, type KeyboardEvent } from 'react'
 import facebookIcon from '@/assets/figma/login-facebook.svg'
 import googleIcon from '@/assets/figma/login-google.svg'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
-import { closeAuthDialog, openAuthDialog, useAuthDialogMode, type AuthMode } from '@/features/auth/auth-dialog-store'
+import { closeAuthDialog, openAuthDialog, type AuthMode } from '@/features/auth/auth-dialog-store'
 import { LoginForm } from '@/features/auth/login-form'
 import { RegisterForm } from '@/features/auth/register-form'
 import { ComingSoon } from '@/features/layout/coming-soon'
@@ -262,9 +262,7 @@ export function AuthDialog({ mode, redirect, motivo }: AuthSearch & { mode: Auth
 }
 
 /** Balão aberto pelo "Entrar" do header sobre a tela atual: fechar ou entrar mantém a página. */
-export function AuthDialogHost() {
-  const mode = useAuthDialogMode()
-  if (!mode) return null
+export function AuthDialogOverlay({ mode }: { mode: AuthMode }) {
   return (
     <AuthDialogView
       mode={mode}

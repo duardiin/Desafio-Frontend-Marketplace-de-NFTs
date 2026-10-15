@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
-import { AuthDialogHost } from '@/features/auth/auth-dialog'
+import { AuthDialogHost } from '@/features/auth/auth-dialog-host'
 import { NotificationRegion } from '@/features/feedback/notification-region'
 import { NotFoundPage } from '@/features/layout/not-found-page'
 import { RealtimeProvider } from '@/features/realtime/realtime-provider'
