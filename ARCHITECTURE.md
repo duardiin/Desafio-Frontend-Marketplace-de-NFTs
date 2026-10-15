@@ -60,7 +60,7 @@ lighthouse/        # configuração e relatórios da auditoria (versionados)
 - **Gravação do carrinho:** cancela as leituras do carrinho em andamento antes de gravar, para uma leitura antiga não sobrescrever a resposta nova.
 
 ### Reconciliação REST × Socket.IO
-- **Versão:** o evento só é aplicado se a versão for **maior que a do dado em cache**, item a item (detalhe, listas, favoritos e carrinho). Duplicatas são descartadas pelo `id`.
+- **Versão:** o evento só é aplicado se a versão for **maior que a do dado em cache**, item a item (detalhe, listas, favoritos e carrinho). Duplicatas são descartadas pelo `id`. A mesma regra vale para as respostas REST (`structuralSharing` com `src/lib/versioned-cache.ts`): uma resposta antiga em voo não sobrescreve um evento mais novo.
 - **Carrinho:** um evento que afeta o carrinho recarrega carrinho e cotação da API. O aviso de preço é imediato. O de disponibilidade só aparece depois do refetch, se o item ainda estiver lá.
 - **Conexão e reconexão:** a **cada** conexão do socket, inclusive a primeira, as consultas ativas de NFTs, carrinho e dados privados são invalidadas e recarregadas do REST, sem cancelar as requisições em andamento. Isso cobre os eventos perdidos durante uma queda e também os emitidos entre a resposta REST da página e a primeira conexão.
 - **Página do pedido:** também consulta a API a cada 15 s enquanto o pedido está pendente, como rede de segurança.

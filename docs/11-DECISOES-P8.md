@@ -224,6 +224,19 @@ Nenhuma das 42 combinações (14 telas × 3 larguras) tem overflow horizontal.
   - favoritos e galeria passaram a testar a versão de cada viewport;
   - baselines visuais da página inteira e da primeira tela (com a barra fixa).
 
+### 9.2 Carrinho
+- **Fiel ao frame:** voltar e título, itens em cartões (arte de 100 px, edição, total da linha da cotação, − n + em círculos) e resumo fixo com o cupom em pílula, os totais da cotação, "Taxa estimada" e **Conectar e finalizar** (leva ao pagamento; sem sessão, ao login).
+- **Remover:** o frame tem uma lixeira sobreposta ao "+" num dos itens, que parece rascunho. A lixeira fica no canto do cartão, com o nome do NFT no rótulo.
+- **Avisos e estados:** preço atualizado e item indisponível aparecem dentro do cartão do item. Carregando, vazio e erro seguem o mesmo padrão; sem itens, não há resumo fixo.
+- **Testes:**
+  - os testes do carrinho e da compra passaram a cobrir a versão de cada viewport ("Comprar NFT" ou "COMPRAR", "Conectar e finalizar" ou "Finalizar compra", contagem pelo badge ou na tela);
+  - os testes que usavam o Carrinho como "tela com header no mobile" passaram a usar a 404.
+
+### 9.3 Corrida encontrada no caminho: resposta REST antiga sobrescrevendo evento novo
+**Problema:** com a reconciliação na primeira conexão do socket (ajuste do P7), a consulta REST disparada ao conectar podia chegar **depois** de um evento `nft.updated` mais novo e sobrescrever o preço com o valor antigo. Um teste de tempo real pegou o caso de forma intermitente.
+
+**Correção:** a regra de versão passou a valer também para as respostas REST. Detalhe, listas do catálogo e favoritos usam `structuralSharing` (`src/lib/versioned-cache.ts`): um recurso com versão menor que a do cache não o substitui. A suíte de tempo real passou 3 vezes seguidas.
+
 ## 10. Testes
 
 - **`profile.spec.ts` (desktop e mobile):**

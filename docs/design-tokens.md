@@ -279,3 +279,13 @@ Sem chamada ao MCP: medidas tiradas de um print de 414 × 896.
 - **Barra fixa embaixo** (raio superior de 32, padding de 24):
   - "Qtd." (15 Bold), botões − e + em quadrados de 24 px `primary` (raio 6) com o número em 20 no meio, e o preço à direita (20 Bold `text-accent`);
   - **Comprar NFT** (pílula de 60 px em degradê `#D6924F` → `#A96B3D`, 16 Bold `ink`) e o botão redondo de carrinho (60 px, borda `border`, ícone `primary`).
+
+## Carrinho · mobile (node `16:360`, a partir de print do frame, 14/10)
+
+- **Topo:** voltar (32 px) e "Carrinho de NFTs" (20 Bold) centralizado. Sem header nem tab bar.
+- **Itens** em cartões `surface-card` (raio 16, 100 px de altura, gap de 20): arte de 100 px à esquerda, nome (15 Bold), "Edição: 1/50" (14 `text-secondary`), total da linha (18 Bold `text-accent`) e − n + em círculos de 24 px à direita.
+- **Resumo fixo embaixo** (raio superior de 32, padding de 24):
+  - cupom em pílula de 48 px (borda `border`) com "Digite o código promocional..." e **Aplicar** em degradê colado à direita;
+  - Subtotal, "Desconto do lançamento" ("(-) …") e Taxa de rede (15), com a nota "Taxa estimada" (12 `text-accent`) sob o valor;
+  - **Total** (16 Bold / 20 Bold `text-accent`);
+  - **Conectar e finalizar** (pílula de 60 px em degradê).
