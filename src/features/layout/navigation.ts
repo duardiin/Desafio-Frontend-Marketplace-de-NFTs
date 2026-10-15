@@ -9,6 +9,8 @@ declare module '@tanstack/react-router' {
     headerDivider?: boolean
     /** Header abaixo de 768 px. O Início mobile do Figma não tem header (busca no topo + tab bar). */
     mobileHeader?: boolean
+    /** Tab bar abaixo de 768 px. Detalhe, Carrinho e Pagamento mobile (Figma) têm barra de ação própria. */
+    mobileTabBar?: boolean
   }
 }
 

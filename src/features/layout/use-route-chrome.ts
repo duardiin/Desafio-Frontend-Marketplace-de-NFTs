@@ -5,6 +5,7 @@ interface RouteChrome {
   activeSection: NavSection | undefined
   headerDivider: boolean
   mobileHeader: boolean
+  mobileTabBar: boolean
 }
 
 /**
@@ -23,5 +24,6 @@ export function useRouteChrome(): RouteChrome {
     activeSection,
     headerDivider: staticData?.headerDivider ?? true,
     mobileHeader: staticData?.mobileHeader ?? true,
+    mobileTabBar: staticData?.mobileTabBar ?? true,
   }
 }
