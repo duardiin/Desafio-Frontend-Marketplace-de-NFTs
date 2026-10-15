@@ -1,6 +1,7 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
 import type { NftDetail, NftListParams, NftListResponse } from '@/api/contracts/nfts'
 import { httpClient } from '@/api/http-client'
+import { keepNewerItems, keepNewerResource } from '@/lib/versioned-cache'
 
 export async function fetchNfts(params: NftListParams, signal?: AbortSignal): Promise<NftListResponse> {
   const { data } = await httpClient.get<NftListResponse>('/nfts', {
@@ -28,6 +29,8 @@ export function catalogQueryOptions(params: NftListParams) {
     queryFn: ({ signal }) => fetchNfts(params, signal),
     // Mostra o resultado anterior (atenuado) enquanto o novo carrega.
     placeholderData: keepPreviousData,
+    // Resposta com versão menor que a do cache (ex.: evento chegou antes) não regride o item.
+    structuralSharing: keepNewerItems<NftListResponse>,
   })
 }
 
@@ -35,5 +38,6 @@ export function nftDetailQueryOptions(id: string) {
   return queryOptions({
     queryKey: ['nfts', 'detail', id],
     queryFn: ({ signal }) => fetchNft(id, signal),
+    structuralSharing: keepNewerResource<NftDetail>,
   })
 }
