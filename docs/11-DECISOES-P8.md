@@ -202,7 +202,29 @@ Nenhuma das 42 combinações (14 telas × 3 larguras) tem overflow horizontal.
 - **Visitante no favorito:** continua no NFT depois de entrar.
 - **Seletores:** os testes de senha passaram a usar `exact`, porque o campo ganhou o botão "Mostrar senha".
 
-## 9. Testes
+## 9. Telas mobile a partir de prints do Figma (Detalhe, Carrinho e Pagamento)
+
+**Origem:** prints dos frames `15:5536` (Detalhe), `16:360` (Carrinho) e `16:748` (Pagamento), enviados pelo usuário. Não houve chamada ao MCP.
+
+**Base comum:**
+- **Sem header e sem tab bar no mobile:** as rotas declaram `mobileHeader: false` e `mobileTabBar: false`.
+- **Topo:** voltar (histórico, ou uma rota de reserva no acesso direto) e título.
+- **Barra de ação fixa:** `MobileActionBar`, com raio superior de 32, e a página reserva a altura dela.
+- **Botão principal:** degradê `bg-cta-gradient`.
+- **Versão única:** só uma versão (desktop ou mobile) é montada por vez (`useMediaQuery`), porque as composições são diferentes e dividem o mesmo `h1`.
+
+### 9.1 Detalhe
+- **Fiel ao frame:** voltar e favorito no topo, imagem grande, cartão subindo sobre a imagem, pílula de avaliação, edições compactas, ID, coleção e atributos. Barra com "Qtd.", preço, **Comprar NFT** (adiciona e abre o carrinho) e o botão de carrinho (adiciona e continua na página, com aviso).
+- **Requisitos do enunciado que o frame não mostra:**
+  - **Galeria:** as vistas extras deslizam na horizontal (scroll-snap), com pontos. A lista é focável para as setas do teclado, e os pontos têm área de toque de 24 px. No mobile não há zoom: vale o zoom do próprio celular.
+  - **Mais informações:** criador, rede e compartilhamento ficam no fim do cartão; as abas "Detalhes / Avaliações" e o "Mais desta coleção" vêm abaixo.
+- **Acessibilidade:** o axe apontou três problemas na primeira versão (`aria-label` num parágrafo, carrossel sem foco pelo teclado, pontos de 8 px). Os três foram corrigidos antes do commit.
+- **Testes:**
+  - novo teste mobile: sem header e sem tab bar, avaliação, botão de carrinho que fica na página, "Comprar NFT" que abre o carrinho, voltar;
+  - favoritos e galeria passaram a testar a versão de cada viewport;
+  - baselines visuais da página inteira e da primeira tela (com a barra fixa).
+
+## 10. Testes
 
 - **`profile.spec.ts` (desktop e mobile):**
   - edição de todos os campos, com persistência após refresh;

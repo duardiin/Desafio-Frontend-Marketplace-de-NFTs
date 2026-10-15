@@ -265,3 +265,17 @@ Sem chamada ao MCP (limite atingido): medidas tiradas de um print 1:1 do frame.
 - **Campos** de 340 × 40 (x = 80), borda `border`, raio 3, só placeholder ("contato@email.com"). A senha tem o olho `icon-hide.svg`, e o campo em foco fica com borda `primary`. Gap de 12.
 - **"Esqueceu a senha?"** (14, `text-accent`) alinhado à direita; botão **Entrar** de 340 × 45, `primary`, 16 Bold `ink`.
 - **Divisória** de borda a borda com "Ou continue com" (13) ao centro. Botões **Continuar com Google** e **Continuar com Facebook** (340 × 40, borda `border`, ícone de 20 px, 13 Medium `text-secondary`, gap 12). Ícones: `login-google.svg` e `login-facebook.svg`.
+
+## Detalhe · mobile (node `15:5536`, a partir de print do frame, 14/10)
+
+Sem chamada ao MCP: medidas tiradas de um print de 414 × 896.
+- **Sem header nem tab bar.** No topo (24 px), botão de voltar (círculo de 32 px `surface-raised`, seta `primary`) à esquerda e favorito (coração em círculo de 32 px) à direita.
+- **Imagem** de 360 × ~340 (raio 24), com margem de 27 px.
+- **Cartão de informações** `surface-card`, raio superior de 32, padding de 24, subindo ~30 px sobre a imagem:
+  - nome (20 Bold) e pílula de avaliação "★ 4.8 (19)" (borda `primary`, altura 28, 14 px);
+  - descrição 14/24 `text-secondary`;
+  - "Edição:" (15 Bold) e pílulas de 24 px (13 px, selecionada com borda `primary`);
+  - ID do token, Coleção e Atributos (15 `secondary`, ~32 px entre linhas).
+- **Barra fixa embaixo** (raio superior de 32, padding de 24):
+  - "Qtd." (15 Bold), botões − e + em quadrados de 24 px `primary` (raio 6) com o número em 20 no meio, e o preço à direita (20 Bold `text-accent`);
+  - **Comprar NFT** (pílula de 60 px em degradê `#D6924F` → `#A96B3D`, 16 Bold `ink`) e o botão redondo de carrinho (60 px, borda `border`, ícone `primary`).
