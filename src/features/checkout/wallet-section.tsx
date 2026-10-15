@@ -22,7 +22,6 @@ interface WalletSectionProps {
 export function WalletSection({ form, wallets, connection, onConfirm, submitting }: WalletSectionProps) {
   const walletId = useWatch({ control: form.control, name: 'walletId' })
   const network = useWatch({ control: form.control, name: 'network' })
-  const connected = connection.status === 'connected' && connection.connection
 
   return (
     <section aria-labelledby="carteira-titulo" className="flex flex-col gap-5">
@@ -76,9 +75,35 @@ export function WalletSection({ form, wallets, connection, onConfirm, submitting
         })}
       </fieldset>
 
+      <WalletConnectionControl walletId={walletId} network={network} connection={connection} />
+
+      <Button
+        className="h-[45px] w-full rounded-xl text-body-15 font-bold"
+        onClick={onConfirm}
+        disabled={submitting}
+      >
+        Confirmar compra
+      </Button>
+    </section>
+  )
+}
+
+interface WalletConnectionControlProps {
+  walletId: string
+  network: CheckoutFormValues['network']
+  connection: ReturnType<typeof useWalletConnection>
+  /** `pill`: botão em pílula (Pagamento mobile). */
+  variant?: 'default' | 'pill'
+}
+
+/** Conexão simulada da carteira escolhida: "Conectar carteira", "Conectada" e erros (recusa, desconexão). */
+export function WalletConnectionControl({ walletId, network, connection, variant = 'default' }: WalletConnectionControlProps) {
+  const connected = connection.status === 'connected' && connection.connection
+  const pill = variant === 'pill'
+  return (
       <div className="flex flex-col gap-2" aria-live="polite">
         {connected ? (
-          <div className="flex items-center justify-between gap-3 rounded-[3px] border border-primary bg-surface-dark px-3 py-2 text-body-14">
+          <div className={cn('flex items-center justify-between gap-3 border border-primary bg-surface-dark px-3 py-2 text-body-14', pill ? 'rounded-2xl' : 'rounded-[3px]')}>
             <span>
               <span className="font-bold text-highlight">Conectada</span> · {NETWORK_LABELS[connected.network]} ·{' '}
               {shortAddress(connected.address)}
@@ -90,7 +115,7 @@ export function WalletSection({ form, wallets, connection, onConfirm, submitting
         ) : (
           <Button
             variant="outline"
-            className="w-full border-primary"
+            className={cn('w-full border-primary', pill && 'h-12 rounded-full')}
             disabled={!walletId || !network || connection.status === 'connecting'}
             onClick={() => void connection.connect(walletId, network)}
           >
@@ -104,14 +129,5 @@ export function WalletSection({ form, wallets, connection, onConfirm, submitting
           </p>
         )}
       </div>
-
-      <Button
-        className="h-[45px] w-full rounded-xl text-body-15 font-bold"
-        onClick={onConfirm}
-        disabled={submitting}
-      >
-        Confirmar compra
-      </Button>
-    </section>
   )
 }

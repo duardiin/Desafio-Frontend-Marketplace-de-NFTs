@@ -10,10 +10,16 @@ import { selectWallet, type CheckoutFormValues } from '@/features/checkout/schem
 interface CollectorFormProps {
   form: UseFormReturn<CheckoutFormValues>
   wallets: Wallet[]
+  /**
+   * Pagamento mobile (Figma 16:748): carteira e rede são escolhidas nas seções
+   * próprias do frame, então os campos de carteira, rede e endereço saem daqui
+   * (dois controles no mesmo campo entrariam em conflito).
+   */
+  compact?: boolean
 }
 
 /** "Perfil do colecionador" (Figma 11:2862): duas colunas de campos. */
-export function CollectorForm({ form, wallets }: CollectorFormProps) {
+export function CollectorForm({ form, wallets, compact = false }: CollectorFormProps) {
   const { register, formState } = form
   const errors = formState.errors
   const walletId = useWatch({ control: form.control, name: 'walletId' })
@@ -21,13 +27,14 @@ export function CollectorForm({ form, wallets }: CollectorFormProps) {
 
   return (
     <section aria-labelledby="colecionador-titulo" className="flex flex-col gap-3">
-      <h2 id="colecionador-titulo" className="text-body-17 font-bold">
+      <h2 id="colecionador-titulo" className={compact ? 'sr-only' : 'text-body-17 font-bold'}>
         Perfil do colecionador
       </h2>
       <div className="grid gap-x-6 gap-y-3 md:grid-cols-2">
         <InputField label="Nome de exibição" required autoComplete="name" error={errors.fullName?.message} {...register('fullName')} />
         <InputField label="Nome de usuário" required autoComplete="username" error={errors.username?.message} {...register('username')} />
 
+        {!compact && (
         <SelectField
           label="Rede"
           required
@@ -37,8 +44,10 @@ export function CollectorForm({ form, wallets }: CollectorFormProps) {
           hint={wallet ? undefined : 'Escolha a carteira primeiro.'}
           {...register('network')}
         />
+        )}
         <InputField label="Nome do perfil" required error={errors.profileName?.message} {...register('profileName')} />
 
+        {!compact && (
         <InputField
           label="Endereço da carteira"
           required
@@ -48,15 +57,17 @@ export function CollectorForm({ form, wallets }: CollectorFormProps) {
           placeholder="Endereço 0x da carteira"
           hint="Preenchido pela carteira escolhida."
         />
+        )}
         <InputField
           label="ENS ou carteira secundária (opcional)"
           srOnlyLabel
-          className="md:pt-[29px]"
+          className={compact ? undefined : 'md:pt-[29px]'}
           placeholder="ENS ou carteira secundária (opcional)"
           error={errors.secondaryWallet?.message}
           {...register('secondaryWallet')}
         />
 
+        {!compact && (
         <SelectField
           label="Tipo de carteira"
           required
@@ -75,6 +86,7 @@ export function CollectorForm({ form, wallets }: CollectorFormProps) {
               ),
           })}
         />
+        )}
         <InputField
           label="Código de indicação"
           placeholder="Opcional"
@@ -95,6 +107,7 @@ export function CollectorForm({ form, wallets }: CollectorFormProps) {
       </div>
 
       {/* O rascunho do pagamento fica salvo: ao voltar das carteiras, o formulário é restaurado. */}
+      {!compact && (
       <Link
         to="/carteiras"
         className="mt-3 flex w-fit items-center gap-2 rounded-sm text-body-15 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -102,6 +115,7 @@ export function CollectorForm({ form, wallets }: CollectorFormProps) {
         <img src={radioOther} alt="" width={15} height={15} />
         Usar outra carteira?
       </Link>
+      )}
 
       <TextAreaField
         label="Observação do colecionador (opcional)"

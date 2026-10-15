@@ -17,11 +17,15 @@ import { CollectorForm } from '@/features/checkout/collector-form'
 import { ReviewDialog } from '@/features/checkout/review-dialog'
 import { checkoutSchema, type CheckoutFormValues } from '@/features/checkout/schema'
 import { useCheckoutFlow, useWalletConnection } from '@/features/checkout/use-checkout'
-import { WalletSection } from '@/features/checkout/wallet-section'
+import { MobileCheckoutBar, MobileCollapsible, MobileProviderPicker, MobileWalletPicker } from '@/features/checkout/mobile-checkout'
+import { WalletConnectionControl, WalletSection } from '@/features/checkout/wallet-section'
+import { MobileTopBar } from '@/features/layout/mobile-screen'
+import { formatEth } from '@/lib/eth'
+import { useMediaQuery } from '@/lib/use-media-query'
 import { profileQueryOptions } from '@/features/profile/api'
 import { walletsQueryOptions } from '@/features/wallets/api'
 
-/** Pagamento (Figma 11:2862). Rota privada: `user` só é nulo durante o logout. */
+/** Pagamento (Figma 11:2862 no desktop; 16:748 no mobile). Rota privada: `user` só é nulo durante o logout. */
 export function CheckoutPage() {
   const user = useCurrentUser()
   if (!user) return null
@@ -37,9 +41,14 @@ function CheckoutLoader({ user }: { user: SessionUser }) {
   // itens): a revisão e o "Tentar de novo" não podem sumir.
   const hasAttempt = purchaseAttempt.load(user.id) !== null
   const hasItems = (cart.data?.items.length ?? 0) > 0
+  const isDesktop = useMediaQuery('(min-width: 768px)')
 
   return (
-    <div className="container-page mt-6 flex flex-col gap-8">
+    <>
+    {/* Mobile (Figma 16:748): topo com voltar e título, no lugar da trilha. */}
+    {!isDesktop && <MobileTopBar title="Pagamento com carteira" fallback="/carrinho" />}
+    <div className="container-page flex flex-col gap-8 md:mt-6">
+      {isDesktop && (
       <nav aria-label="Trilha de navegação" className="text-body-15 font-bold">
         <ol className="flex gap-1">
           <li>
@@ -57,7 +66,8 @@ function CheckoutLoader({ user }: { user: SessionUser }) {
           <li aria-current="page">Pagamento</li>
         </ol>
       </nav>
-      <h1 className="sr-only">Pagamento</h1>
+      )}
+      {isDesktop && <h1 className="sr-only">Pagamento</h1>}
 
       {(cart.isPending || profile.isPending || wallets.isPending) && <CheckoutSkeleton />}
 
@@ -76,9 +86,10 @@ function CheckoutLoader({ user }: { user: SessionUser }) {
       {cart.isSuccess && !hasItems && !hasAttempt && <EmptyCheckout userId={user.id} />}
 
       {cart.isSuccess && (hasItems || hasAttempt) && profile.isSuccess && wallets.isSuccess && (
-        <CheckoutContent user={user} profile={profile.data} wallets={wallets.data.items} />
+        <CheckoutContent user={user} profile={profile.data} wallets={wallets.data.items} isDesktop={isDesktop} />
       )}
     </div>
+    </>
   )
 }
 
@@ -102,7 +113,17 @@ function initialValues(userId: string, profile: Profile, wallets: Wallet[]): Che
   }
 }
 
-function CheckoutContent({ user, profile, wallets }: { user: SessionUser; profile: Profile; wallets: Wallet[] }) {
+function CheckoutContent({
+  user,
+  profile,
+  wallets,
+  isDesktop,
+}: {
+  user: SessionUser
+  profile: Profile
+  wallets: Wallet[]
+  isDesktop: boolean
+}) {
   const cart = useCart()
   const quote = useQuote()
   const pending = useQuery(pendingOrdersQueryOptions(user.id))
@@ -134,6 +155,20 @@ function CheckoutContent({ user, profile, wallets }: { user: SessionUser; profil
 
   const pendingOrder = pending.data?.items[0]
   const values = form.getValues()
+  // Mobile: seções recolhíveis para o que o frame não mostra; abrem sozinhas com erro.
+  const [dataOpen, setDataOpen] = useState(false)
+  const [itemsOpen, setItemsOpen] = useState(false)
+  const hasFieldErrors = Object.keys(form.formState.errors).length > 0
+  const items = cart.data?.items ?? []
+  const blockersAlert = quote.data && quote.data.blockers.length > 0 && (
+    <p role="alert" className="text-body-14">
+      <span className="font-bold text-destructive">Revise o carrinho: </span>
+      há itens esgotados ou acima do disponível.{' '}
+      <Link to="/carrinho" className="font-bold text-highlight underline">
+        Ir para o carrinho
+      </Link>
+    </p>
+  )
 
   if (wallets.length === 0) {
     return (
@@ -167,6 +202,44 @@ function CheckoutContent({ user, profile, wallets }: { user: SessionUser; profil
         </div>
       )}
 
+      {!isDesktop && (
+        <>
+          <form
+            noValidate
+            onSubmit={(event) => {
+              event.preventDefault()
+              void flow.openReview()
+            }}
+            className="flex flex-col gap-8 pb-[190px]"
+          >
+            <MobileWalletPicker form={form} wallets={wallets} />
+            <MobileProviderPicker form={form} wallets={wallets} />
+            <WalletConnectionControl walletId={walletId} network={network} connection={connection} variant="pill" />
+            {blockersAlert}
+            <div className="flex flex-col gap-4">
+              <MobileCollapsible
+                title="Dados do colecionador"
+                summary={`${values.fullName} · ${values.email}`}
+                open={dataOpen || hasFieldErrors}
+                onToggle={setDataOpen}
+              >
+                <CollectorForm form={form} wallets={wallets} compact />
+              </MobileCollapsible>
+              <MobileCollapsible
+                title="Itens e valores"
+                summary={`${items.length} ${items.length === 1 ? 'NFT' : 'NFTs'}${quote.data ? ` · ${formatEth(quote.data.totalEth)}` : ''}`}
+                open={itemsOpen}
+                onToggle={setItemsOpen}
+              >
+                <CheckoutSummary items={items} quote={quote.data} />
+              </MobileCollapsible>
+            </div>
+          </form>
+          <MobileCheckoutBar quote={quote.data} submitting={flow.submitting} onConfirm={() => void flow.openReview()} />
+        </>
+      )}
+
+      {isDesktop && (
       <form
         noValidate
         onSubmit={(event) => {
@@ -177,16 +250,8 @@ function CheckoutContent({ user, profile, wallets }: { user: SessionUser; profil
       >
         <CollectorForm form={form} wallets={wallets} />
         <div className="flex flex-col gap-6">
-          <CheckoutSummary items={cart.data?.items ?? []} quote={quote.data} />
-          {quote.data && quote.data.blockers.length > 0 && (
-            <p role="alert" className="text-body-14">
-              <span className="font-bold text-destructive">Revise o carrinho: </span>
-              há itens esgotados ou acima do disponível.{' '}
-              <Link to="/carrinho" className="font-bold text-highlight underline">
-                Ir para o carrinho
-              </Link>
-            </p>
-          )}
+          <CheckoutSummary items={items} quote={quote.data} />
+          {blockersAlert}
           <WalletSection
             form={form}
             wallets={wallets}
@@ -196,6 +261,7 @@ function CheckoutContent({ user, profile, wallets }: { user: SessionUser; profil
           />
         </div>
       </form>
+      )}
 
       <ReviewDialog
         review={flow.review}
