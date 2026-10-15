@@ -17,11 +17,18 @@ test.describe('Início mobile', () => {
     await expect(tabBar.getByRole('link')).toHaveCount(4)
     await expect(tabBar.getByRole('button')).toHaveCount(0)
 
-    // As outras telas mantêm o header.
+    // Carrinho mobile (Figma 16:360): sem header e sem tab bar, com "Voltar" e resumo fixo.
     await tabBar.getByRole('link', { name: /^Carrinho/ }).click()
     await expect(page).toHaveURL(/\/carrinho$/)
+    await expect(page.getByRole('heading', { level: 1, name: 'Carrinho de NFTs' })).toBeVisible()
+    await expect(page.getByRole('banner')).toBeHidden()
+    await expect(tabBar).toHaveCount(0)
+    await page.getByRole('button', { name: 'Voltar' }).click()
+    await expect(page).toHaveURL(/\/$/)
+
+    // Telas sem frame mobile próprio mantêm o header (ex.: 404).
+    await page.goto('/rota-inexistente')
     await expect(page.getByRole('banner')).toBeVisible()
-    await expect(tabBar.getByRole('link', { name: /^Carrinho/ })).toHaveAttribute('aria-current', 'page')
   })
 
   test('tab bar cabe e fica alinhada nas larguras comuns de celular (320 a 414 px)', async ({ page }) => {

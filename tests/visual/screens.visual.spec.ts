@@ -85,6 +85,15 @@ test('Carrinho', async ({ page }) => {
   await capture(page, 'carrinho')
 })
 
+test('Carrinho, primeira tela (com o resumo fixo no mobile)', async ({ page }) => {
+  await signInAsAna(page)
+  await page.goto('/carrinho')
+  await expect(page.getByRole('main')).toContainText('Sage Nomad #089')
+  await settle(page)
+  await page.addStyleTag({ content: HIDE_TRANSIENT })
+  await expect(page).toHaveScreenshot('carrinho-primeira-tela.png')
+})
+
 test('Pagamento', async ({ page }) => {
   await signInAsAna(page)
   await page.goto('/pagamento')

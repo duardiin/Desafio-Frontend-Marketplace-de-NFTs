@@ -35,9 +35,9 @@ test.describe('pagamento e pedido', () => {
   test('compra completa: catálogo, carrinho, login, pagamento, revisão e recibo confirmado', async ({ page }) => {
     // Visitante escolhe uma edição e vai ao carrinho.
     await openApp(page, '/nft/nft-007?edicao=1-10')
-    await page.getByRole('button', { name: 'COMPRAR' }).click()
+    await page.getByRole('button', { name: /^(COMPRAR|Comprar NFT)$/ }).click()
     await expect(page.getByRole('heading', { level: 3, name: 'Golden Beat #207' })).toBeVisible()
-    await page.getByRole('link', { name: 'Finalizar compra' }).click()
+    await page.getByRole('link', { name: /^(Finalizar compra|Conectar e finalizar)$/ }).click()
 
     // Pagamento é privado: login e volta, com os itens do visitante preservados.
     await expect(page).toHaveURL(/\/login\?redirect=%2Fpagamento/)

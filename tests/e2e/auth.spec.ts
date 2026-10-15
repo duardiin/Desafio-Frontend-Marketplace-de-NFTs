@@ -55,10 +55,18 @@ async function expectSignedInAs(page: Page, firstName: string, isMobile: boolean
   }
 }
 
+/**
+ * Tela com o "Entrar" do header. No mobile, Início, Detalhe, Carrinho e
+ * Pagamento seguem os frames do Figma (sem header); telas sem frame próprio,
+ * como a 404, mantêm o header com o menu.
+ */
+function pageWithHeader(isMobile: boolean) {
+  return isMobile ? '/rota-inexistente' : '/carrinho'
+}
+
 test.describe('login', () => {
   test('valida campos, mostra erro da API e mantém a sessão após o refresh', async ({ page, isMobile }) => {
-    // O carrinho tem header também no mobile (o Início mobile do Figma não tem).
-    await openApp(page, '/carrinho')
+    await openApp(page, pageWithHeader(isMobile))
     await openLoginFromHeader(page, isMobile)
     const dialog = page.getByRole('dialog', { name: 'Entrar' })
 
@@ -84,19 +92,21 @@ test.describe('login', () => {
   })
 
   test('Esc fecha o modal e devolve a tela anterior', async ({ page, isMobile }) => {
-    await openApp(page, '/carrinho')
+    const path = pageWithHeader(isMobile)
+    await openApp(page, path)
     await openLoginFromHeader(page, isMobile)
     await page.keyboard.press('Escape')
     await expect(page.getByRole('dialog', { name: 'Entrar' })).toBeHidden()
-    await expect(page).toHaveURL(/\/carrinho$/)
+    expect(new URL(page.url()).pathname).toBe(path)
   })
 })
 
 test.describe('balão de login (Figma)', () => {
   test('abre sobre a tela atual; entrar mantém a página; abas trocam entre login e cadastro', async ({ page, isMobile }) => {
-    await openApp(page, '/carrinho')
+    const path = pageWithHeader(isMobile)
+    await openApp(page, path)
     await openLoginFromHeader(page, isMobile)
-    await expect(page).toHaveURL(/\/carrinho$/)
+    expect(new URL(page.url()).pathname).toBe(path)
 
     // Abas "Entrar | Criar conta", também pelas setas do teclado.
     const loginTab = page.getByRole('tab', { name: 'Entrar' })
@@ -113,11 +123,11 @@ test.describe('balão de login (Figma)', () => {
     await expect(dialog.getByText('Continuar com Google')).toHaveAttribute('aria-disabled', 'true')
     await expect(dialog.getByRole('button', { name: /Google|Facebook/ })).toHaveCount(0)
 
-    // O foco começa no e-mail; entrar fecha o balão e continua no carrinho.
+    // O foco começa no e-mail; entrar fecha o balão e continua na mesma tela.
     await fillLogin(page, 'ana@kurio.dev')
     await expect(dialog).toBeHidden()
-    await expect(page).toHaveURL(/\/carrinho$/)
-    await expect(page.getByRole('main')).toContainText('Sage Nomad #089')
+    expect(new URL(page.url()).pathname).toBe(path)
+    if (!isMobile) await expect(page.getByRole('main')).toContainText('Sage Nomad #089')
   })
 
   test('na rota /login, as abas trocam de rota mantendo o redirect', async ({ page }) => {

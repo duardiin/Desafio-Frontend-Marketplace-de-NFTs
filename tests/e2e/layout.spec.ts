@@ -14,8 +14,8 @@ async function hasHorizontalOverflow(page: Page) {
 
 test.describe('layout base', () => {
   test('header e footer aparecem com a marca e o rodapé do Figma', async ({ page }) => {
-    // O Início mobile do Figma não tem header; as demais telas têm.
-    await page.goto('/carrinho')
+    // No mobile, as telas com frame próprio (Início, Detalhe, Carrinho, Pagamento) não têm header; a 404 tem.
+    await page.goto('/rota-inexistente')
     await expect(page.getByRole('link', { name: 'Kurio, página inicial' })).toBeVisible()
     await expect(page.getByRole('contentinfo')).toContainText(
       '© 2026 Kurio. Propriedade digital para todos.',
@@ -89,7 +89,7 @@ test.describe('navegação mobile', () => {
   test.skip(({ isMobile }) => !isMobile, 'menu em drawer só existe abaixo de 1024 px')
 
   test('menu abre, prende o foco, fecha com Esc e devolve o foco ao botão', async ({ page }) => {
-    await page.goto('/carrinho')
+    await page.goto('/rota-inexistente')
     const trigger = page.getByRole('button', { name: 'Abrir menu' })
     await trigger.focus()
     await page.keyboard.press('Enter')
