@@ -109,8 +109,8 @@ test.describe('login e cadastro em tela cheia no mobile (Figma 16:1022 e 16:1228
     await page.goto('/login?redirect=%2Fperfil')
     const login = page.getByRole('dialog', { name: 'Entrar' })
     await expect(login).toBeVisible()
-    const box = await login.boundingBox()
-    expect(box?.width).toBe(page.viewportSize()?.width)
+    // Espera o fim da animação de abertura (o diálogo cresce de 95% a 100%).
+    await expect.poll(async () => (await login.boundingBox())?.width).toBe(page.viewportSize()?.width)
     await expect(page.getByRole('tab')).toHaveCount(0)
     await expect(login.getByLabel('E-mail')).toBeFocused()
     await expect(login.getByText('Continuar com Google')).toHaveAttribute('aria-disabled', 'true')
