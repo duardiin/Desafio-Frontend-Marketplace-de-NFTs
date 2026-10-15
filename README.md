@@ -204,7 +204,7 @@ Os eventos passam pelo `socket.io-client`; com mocks, o servidor Socket.IO é si
 
 **Resultado:**
 - **Desktop:** ~98 em Performance e 100 nas demais categorias.
-- **Mobile:** Accessibility, Best Practices e SEO em 100. **Performance ficou em ~79 (Início) e ~76 (Detalhe)**, abaixo da meta de 90. A causa principal é a camada de mocks (~180 KB gzip), que precisa subir antes da primeira requisição no 4G lento simulado. A análise completa e os experimentos estão em [lighthouse/ANALISE.md](lighthouse/ANALISE.md).
+- **Mobile:** Accessibility, Best Practices e SEO em 100. **Performance ficou em ~78 (Início) e ~77 (Detalhe)**, abaixo da meta de 90. A causa principal é a camada de mocks (~180 KB gzip), que precisa subir antes da primeira requisição no 4G lento simulado. A análise completa e os experimentos estão em [lighthouse/ANALISE.md](lighthouse/ANALISE.md).
 
 ## Imagens
 

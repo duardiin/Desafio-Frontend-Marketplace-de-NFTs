@@ -109,7 +109,7 @@ Feita em 14/10, com o código do commit `6cfe397` e as mudanças de documentaç�
 | Início e detalhe, mobile e desktop, build otimizado, cenário padrão | ✅ | |
 | 3 medições e mediana; configuração versionada; HTML/JSON; versões e ambiente | ✅ | |
 | LCP, CLS e TBT registrados | ✅ | |
-| Metas | 🟡 | Desktop 98/100/100/100. Mobile: Accessibility, Best Practices e SEO em 100; **Performance 79 (Início) e 76 (Detalhe)**, abaixo de 90. Causas e experimentos em `lighthouse/ANALISE.md`. |
+| Metas | 🟡 | Desktop 98/100/100/100. Mobile: Accessibility, Best Practices e SEO em 100; **Performance 78 (Início) e 77 (Detalhe)** (medida de 15/10, código final), abaixo de 90. Causas e experimentos em `lighthouse/ANALISE.md`. |
 
 ## 12. Entrega
 

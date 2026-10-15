@@ -239,10 +239,10 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 
 ## Limitações conhecidas
 
-- **Lighthouse mobile abaixo de 90 em Performance** (~79 no Início e ~76 no Detalhe; desktop ~98; as demais categorias em 100). A causa principal é a camada de mocks (~180 KB gzip, incluindo a Public Suffix List do MSW), que precisa subir antes da primeira requisição no 4G lento simulado. Análise e experimentos em `lighthouse/ANALISE.md`.
+- **Lighthouse mobile abaixo de 90 em Performance** (~78 no Início e ~77 no Detalhe; desktop ~98; as demais categorias em 100). A causa principal é a camada de mocks (~180 KB gzip, incluindo a Public Suffix List do MSW), que precisa subir antes da primeira requisição no 4G lento simulado. Análise e experimentos em `lighthouse/ANALISE.md`.
 - **Baselines visuais geradas no Windows.** A regressão visual (`npm run test:visual`) fica fora do `test:e2e`, porque fonte e antialiasing variam por sistema. Em outro sistema, gere as baselines com `npm run test:visual:update` antes de comparar.
 - Carteiras não podem ser excluídas (a API simulada só tem cadastro e edição; o enunciado pede principal e secundária).
-- Bundle inicial de ~379 KB (120 KB gzip), depois do code-splitting por rota. O zod saiu do carregamento inicial no P9. A camada de mocks soma ~180 KB gzip antes do primeiro render (ver `lighthouse/ANALISE.md`).
+- Bundle inicial de ~374 KB (118 KB gzip), depois do code-splitting por rota. O zod saiu do carregamento inicial no P9, e o login (formulários) só carrega ao abrir. A camada de mocks soma ~180 KB gzip antes do primeiro render (ver `lighthouse/ANALISE.md`).
 - **Limitações do tempo real simulado:**
   - não há rooms nem namespaces (filtro por usuário feito à mão);
   - não há long-polling;
