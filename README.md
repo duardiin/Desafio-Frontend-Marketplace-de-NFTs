@@ -42,7 +42,7 @@ npm run build               # typecheck + build de produção
 npm run preview             # serve o build (mocks ativos)
 npm run typecheck           # tsc -b (app, configuração e testes)
 npm run lint                # oxlint, falha com warnings
-npm run test:e2e            # Playwright: E2E funcionais, desktop (1440) e mobile (390)
+npm run test:e2e            # Playwright: 162 E2E funcionais, desktop (1440) e mobile (390)
 npm run test:e2e:ui         # o mesmo, no modo interativo
 npm run test:visual         # regressão visual (baselines em tests/visual/__screenshots__)
 npm run test:visual:update  # regera as baselines
@@ -114,7 +114,7 @@ Os casos de negócio vêm dos dados e funcionam em qualquer cenário:
 
 ## Testes
 
-- **E2E funcionais** (`npm run test:e2e`, 161 testes em desktop e mobile), em `tests/e2e/`:
+- **E2E funcionais** (`npm run test:e2e`, 162 testes em desktop e mobile), em `tests/e2e/`:
   - layout, mocks, sessão, catálogo, detalhe e favoritos;
   - carrinho, pagamento, tempo real, perfil, carteiras e Início mobile;
   - **varredura de overflow** em 14 telas × 390/768/1440 px e **zoom de 200%**;

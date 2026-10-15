@@ -11,7 +11,7 @@ Feita em 14/10 e **revisada em 15/10** com o código final (telas mobile pelos p
 | Compra confirmada só com resposta da simulação | ✅ | A confirmação só aparece com `status: confirmed` vindo da API ou do evento (`checkout.spec`, `realtime.spec`). |
 | Sem exposição de dados entre usuários | ✅ | Cache privado por `userId`, purga no logout e na troca de conta, socket por sessão e filtro duplo de `order.updated` (`auth.spec`, `realtime.spec`). |
 | Eventos não simulados direto na UI | ✅ | Os testes mudam só o "servidor" (`__kurioMock`); o evento chega pelo `socket.io-client`. |
-| Testes E2E executáveis | ✅ | `npm run test:e2e`: 161 testes (desktop e mobile), executados duas vezes seguidas sem falha. Também validados num clone limpo do GitHub. |
+| Testes E2E executáveis | ✅ | `npm run test:e2e`: 162 testes (desktop e mobile), executados duas vezes seguidas sem falha. Também validados num clone limpo do GitHub. |
 
 ## 1–3. Escopo, stack, telas e fluxos
 

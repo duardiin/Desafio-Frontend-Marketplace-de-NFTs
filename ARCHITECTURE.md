@@ -243,6 +243,10 @@ Detalhe completo em [`docs/11-DECISOES-P8.md`](docs/11-DECISOES-P8.md).
 - **Baselines visuais geradas no Windows.** A regressão visual (`npm run test:visual`) fica fora do `test:e2e`, porque fonte e antialiasing variam por sistema. Em outro sistema, gere as baselines com `npm run test:visual:update` antes de comparar.
 - Carteiras não podem ser excluídas (a API simulada só tem cadastro e edição; o enunciado pede principal e secundária).
 - Bundle inicial de ~374 KB (118 KB gzip), depois do code-splitting por rota. O zod saiu do carregamento inicial no P9, e o login (formulários) só carrega ao abrir. A camada de mocks soma ~180 KB gzip antes do primeiro render (ver `lighthouse/ANALISE.md`).
+- **Service worker do MSW encerrado pelo navegador:** com a aba em segundo plano, o navegador encerra o service worker ocioso, e o MSW perde a lista (em memória) das abas que usam os mocks. Sem tratamento, ao voltar à aba as requisições iam para a rede real; na Vercel isso devolvia o HTML do site e a tela quebrava ("Algo deu errado"). O problema foi achado pelo usuário em produção. Duas camadas resolvem:
+  - a aba se registra de novo no MSW (`MOCK_ACTIVATE`) ao voltar a ficar visível ou focada e a cada 10 s (`src/mocks/start.ts`);
+  - o cliente HTTP trata uma resposta HTML no lugar da API como falha transitória, que as consultas repetem sozinhas.
+  Teste: `service-worker.spec.ts` encerra o service worker pelo protocolo do Chrome e navega sem recarregar.
 - **Limitações do tempo real simulado:**
   - não há rooms nem namespaces (filtro por usuário feito à mão);
   - não há long-polling;

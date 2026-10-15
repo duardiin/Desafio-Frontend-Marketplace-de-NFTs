@@ -18,7 +18,7 @@ Este documento explica o projeto do zero: o que foi entregue, como roda, como ca
 npm ci
 npx playwright install chromium
 npm run dev          # http://localhost:5173, já com os mocks
-npm run test:e2e     # 161 testes E2E (desktop 1440 e mobile 390)
+npm run test:e2e     # 162 testes E2E (desktop 1440 e mobile 390)
 ```
 
 Não precisa de `.env`: os valores padrão estão no código e espelham o `.env.example`.
@@ -28,7 +28,7 @@ Não precisa de `.env`: os valores padrão estão no código e espelham o `.env.
 | Verificação | Resultado |
 |---|---|
 | Critérios eliminatórios | **Todos atendidos** (seção 5) |
-| Testes E2E (Playwright, desktop e mobile) | **161 passando** |
+| Testes E2E (Playwright, desktop e mobile) | **162 passando** |
 | Regressão visual (`npm run test:visual`) | **16 baselines** passando |
 | Acessibilidade (axe, WCAG 2.2 AA) | **0 violações** nas telas auditadas |
 | Overflow horizontal (14 telas × 390, 768 e 1440 px, mais zoom de 200%) | **0** |
@@ -138,7 +138,7 @@ Três princípios guiaram tudo:
 | Compra confirmada só com resposta da simulação | O modal depende do status `confirmed` vindo da API ou do evento; não há atalho no cliente | `src/features/orders`, teste "compra completa" |
 | Sem exposição de dados entre usuários | Cache privado por usuário com purga, socket por sessão e filtro duplo de eventos de pedido | `auth.spec.ts`, `realtime.spec.ts` |
 | Eventos não simulados direto na UI | Os eventos passam pelo `socket.io-client`; os testes só alteram o "servidor" | `src/mocks/realtime.ts`, `realtime.spec.ts` |
-| Testes E2E executáveis | `npm run test:e2e` (161 testes), validado num clone limpo | `tests/e2e/` |
+| Testes E2E executáveis | `npm run test:e2e` (162 testes), validado num clone limpo | `tests/e2e/` |
 
 ---
 
