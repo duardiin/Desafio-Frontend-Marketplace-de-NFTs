@@ -94,6 +94,15 @@ test('Carrinho, primeira tela (com o resumo fixo no mobile)', async ({ page }) =
   await expect(page).toHaveScreenshot('carrinho-primeira-tela.png')
 })
 
+test('Pagamento, primeira tela (com o total e o botão fixos no mobile)', async ({ page }) => {
+  await signInAsAna(page)
+  await page.goto('/pagamento')
+  await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeVisible()
+  await settle(page)
+  await page.addStyleTag({ content: HIDE_TRANSIENT })
+  await expect(page).toHaveScreenshot('pagamento-primeira-tela.png')
+})
+
 test('Pagamento', async ({ page }) => {
   await signInAsAna(page)
   await page.goto('/pagamento')

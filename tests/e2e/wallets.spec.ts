@@ -78,7 +78,8 @@ test.describe('carteiras', () => {
     await expect(walletCard(page, 'MetaMask da Ana')).toBeVisible()
 
     await page.goto('/pagamento')
-    await page.getByRole('link', { name: 'Usar outra carteira?' }).click()
+    // "Usar outra carteira?" no desktop (Figma 11:2862); "Trocar carteira" no mobile (16:748).
+    await page.getByRole('link', { name: /^(Usar outra carteira\?|Trocar carteira)$/ }).click()
     await expect(page).toHaveURL(/\/carteiras$/)
     await expect(walletCard(page, 'MetaMask da Ana')).toBeVisible()
   })

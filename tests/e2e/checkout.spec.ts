@@ -26,13 +26,23 @@ async function openReview(page: Page) {
   return dialog
 }
 
+/**
+ * Pagamento mobile (Figma 16:748): os dados do colecionador e os itens ficam em
+ * seções recolhíveis (o frame não os mostra). No desktop estão sempre visíveis.
+ */
+async function openMobileSection(page: Page, isMobile: boolean, title: 'Dados do colecionador' | 'Itens e valores') {
+  if (!isMobile) return
+  const section = page.locator('details').filter({ has: page.locator('summary', { hasText: title }) })
+  if ((await section.getAttribute('open')) === null) await section.locator('summary').click()
+}
+
 async function expectConfirmed(page: Page) {
   await expect(page).toHaveURL(/\/pedidos\/ord-/)
   await expect(page.getByRole('dialog', { name: 'Pedido confirmado' })).toBeVisible({ timeout: 15_000 })
 }
 
 test.describe('pagamento e pedido', () => {
-  test('compra completa: catálogo, carrinho, login, pagamento, revisão e recibo confirmado', async ({ page }) => {
+  test('compra completa: catálogo, carrinho, login, pagamento, revisão e recibo confirmado', async ({ page, isMobile }) => {
     // Visitante escolhe uma edição e vai ao carrinho.
     await openApp(page, '/nft/nft-007?edicao=1-10')
     await page.getByRole('button', { name: /^(COMPRAR|Comprar NFT)$/ }).click()
@@ -47,6 +57,7 @@ test.describe('pagamento e pedido', () => {
     await login.getByRole('button', { name: 'Entrar' }).click()
     await expect(page).toHaveURL(/\/pagamento$/)
 
+    await openMobileSection(page, isMobile, 'Itens e valores')
     const summary = page.getByRole('region', { name: 'Seus NFTs' })
     await expect(summary.getByText('Golden Beat #207')).toBeVisible()
     await expect(summary.getByText('Sage Nomad #089')).toBeVisible()
@@ -69,8 +80,9 @@ test.describe('pagamento e pedido', () => {
     await expect(page.getByText('Seu carrinho está vazio.')).toBeVisible()
   })
 
-  test('valida os campos do layout com erros associados', async ({ page }) => {
+  test('valida os campos do layout com erros associados', async ({ page, isMobile }) => {
     await loginViaUi(page, 'ana@kurio.dev', '/pagamento')
+    await openMobileSection(page, isMobile, 'Dados do colecionador')
     const name = page.getByLabel('Nome de exibição')
     await name.fill('')
     await page.getByLabel('Código de indicação').fill('x!')
@@ -167,8 +179,9 @@ test.describe('pagamento e pedido', () => {
     expect(await ordersOf(page)).toHaveLength(1)
   })
 
-  test('sessão expirada no pagamento: login e retomada com o rascunho', async ({ page }) => {
+  test('sessão expirada no pagamento: login e retomada com o rascunho', async ({ page, isMobile }) => {
     await loginViaUi(page, 'ana@kurio.dev', '/pagamento')
+    await openMobileSection(page, isMobile, 'Dados do colecionador')
     await page.getByLabel('Nome do perfil').fill('Ana Colecionadora')
     await page.evaluate(() => window.__kurioMock?.expireSessions())
 
@@ -186,5 +199,33 @@ test.describe('pagamento e pedido', () => {
 
     await expect(page).toHaveURL(/\/pagamento$/)
     await expect(page.getByLabel('Nome do perfil')).toHaveValue('Ana Colecionadora')
+  })
+})
+
+test.describe('pagamento mobile (Figma 16:748)', () => {
+  test.skip(({ isMobile }) => !isMobile, 'layout exclusivo abaixo de 768 px')
+
+  test('carteiras em cartões, provedor seleciona a carteira, rede em chips e topo sem header', async ({ page }) => {
+    await loginViaUi(page, 'ana@kurio.dev', '/pagamento')
+    await expect(page.getByRole('heading', { level: 1, name: 'Pagamento com carteira' })).toBeVisible()
+    await expect(page.getByRole('banner')).toBeHidden()
+    await expect(page.getByRole('link', { name: 'Trocar carteira' })).toHaveAttribute('href', '/carteiras')
+
+    // A principal (MetaMask) vem marcada, com a rede em chips.
+    await expect(page.getByRole('radio', { name: /Carteira principal/ })).toBeChecked()
+    await expect(page.getByRole('radio', { name: 'MetaMask', exact: true })).toBeChecked()
+    await page.getByRole('group', { name: 'Rede de Carteira principal' }).getByText('Polygon').click()
+    await expect(page.getByRole('radio', { name: 'Polygon', exact: true })).toBeChecked()
+
+    // Escolher o provedor Coinbase seleciona a carteira dele (Solana).
+    await page.locator('label').filter({ hasText: 'Coinbase Wallet' }).click()
+    await expect(page.getByRole('radio', { name: /Carteira Solana/ })).toBeChecked()
+    await expect(page.getByRole('radio', { name: /^WalletConnect/ })).toBeDisabled()
+
+    // Conectar e confirmar abre a mesma revisão do desktop, com o total da cotação.
+    await page.getByRole('button', { name: 'Conectar carteira' }).click()
+    await expect(page.getByText('Conectada', { exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Confirmar compra' }).click()
+    await expect(page.getByRole('dialog', { name: 'Revise seu pedido' })).toContainText('Solana')
   })
 })
