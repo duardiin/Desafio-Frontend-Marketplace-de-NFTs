@@ -18,7 +18,7 @@ Este documento explica o projeto do zero: o que foi entregue, como roda, como ca
 npm ci
 npx playwright install chromium
 npm run dev          # http://localhost:5173, já com os mocks
-npm run test:e2e     # 160 testes E2E (desktop 1440 e mobile 390)
+npm run test:e2e     # 161 testes E2E (desktop 1440 e mobile 390)
 ```
 
 Não precisa de `.env`: os valores padrão estão no código e espelham o `.env.example`.
@@ -28,10 +28,10 @@ Não precisa de `.env`: os valores padrão estão no código e espelham o `.env.
 | Verificação | Resultado |
 |---|---|
 | Critérios eliminatórios | **Todos atendidos** (seção 5) |
-| Testes E2E (Playwright, desktop e mobile) | **160 passando** |
+| Testes E2E (Playwright, desktop e mobile) | **161 passando** |
 | Regressão visual (`npm run test:visual`) | **16 baselines** passando |
 | Acessibilidade (axe, WCAG 2.2 AA) | **0 violações** nas telas auditadas |
-| Overflow horizontal (14 telas × 390, 768 e 1440 px) | **0** |
+| Overflow horizontal (14 telas × 390, 768 e 1440 px, mais zoom de 200%) | **0** |
 | Typecheck e lint (`--deny-warnings`) | limpos |
 | Lighthouse desktop (Início e Detalhe) | Performance 98; Accessibility, Best Practices e SEO 100 |
 | Lighthouse mobile | Performance **78 / 77** (abaixo da meta de 90, com causas na seção 8); as demais categorias em 100 |
@@ -138,7 +138,7 @@ Três princípios guiaram tudo:
 | Compra confirmada só com resposta da simulação | O modal depende do status `confirmed` vindo da API ou do evento; não há atalho no cliente | `src/features/orders`, teste "compra completa" |
 | Sem exposição de dados entre usuários | Cache privado por usuário com purga, socket por sessão e filtro duplo de eventos de pedido | `auth.spec.ts`, `realtime.spec.ts` |
 | Eventos não simulados direto na UI | Os eventos passam pelo `socket.io-client`; os testes só alteram o "servidor" | `src/mocks/realtime.ts`, `realtime.spec.ts` |
-| Testes E2E executáveis | `npm run test:e2e` (160 testes), validado num clone limpo | `tests/e2e/` |
+| Testes E2E executáveis | `npm run test:e2e` (161 testes), validado num clone limpo | `tests/e2e/` |
 
 ---
 
@@ -160,7 +160,7 @@ Três princípios guiaram tudo:
 
 **Verificação além dos testes funcionais:**
 - **Acessibilidade e layout:**
-  - varredura automática de overflow em 14 telas e 3 larguras, que pega também o overflow escondido pelo zoom do celular;
+  - varredura automática de overflow em 14 telas e 3 larguras, que pega também o overflow escondido pelo zoom do celular, e um teste de zoom de 200% num monitor de 1280 px;
   - **axe** nos E2E, sem tolerar violações.
 - **Regressão visual:** baselines versionadas, com relógio fixo e dados estáveis.
 - **Lighthouse:** com mediana de 3 medições, versões e ambiente registrados.
@@ -198,7 +198,7 @@ Ficam registradas aqui para não serem descoberta do avaliador:
   - **Causa principal:** a camada de mocks (~180 KB, dos quais ~100 KB são a lista de domínios que o MSW usa para cookies) precisa subir antes da primeira requisição no 4G lento simulado.
   - **Por que não foi cortada:** isso não existiria numa implantação real. Cortar mexendo no MSW seria uma simplificação só para a pontuação, o que o enunciado veda.
   - **Detalhes:** desktop e as demais categorias cumprem as metas; os experimentos estão em `lighthouse/ANALISE.md`.
-- **Frames não vistos** (Carrinho, Confirmação e Carteiras desktop; aba Criar conta do balão desktop): seguem o padrão das telas extraídas.
+- **Frames não vistos** (Carrinho, Confirmação e Carteiras desktop; balão de cadastro desktop, que usa os textos do frame mobile): seguem o padrão das telas extraídas.
 - **Baselines visuais geradas no Windows:** por isso `test:visual` fica fora do `test:e2e`. Em outro sistema, rode `npm run test:visual:update` antes.
 - **Ambiente simulado:**
   - o banco vive no `localStorage` do navegador;

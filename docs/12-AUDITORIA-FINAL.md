@@ -1,6 +1,6 @@
 # Auditoria final contra o enunciado
 
-Feita em 14/10, com o código do commit `6cfe397` e as mudanças de documentação do P9. Cada item do `docs/00-ENUNCIADO.md` foi conferido no código e nos testes. Legenda: ✅ implementado · 🟡 parcial (com motivo) · ❌ faltando.
+Feita em 14/10 e **revisada em 15/10** com o código final (telas mobile pelos prints dos frames, login em tela cheia e teste de zoom). Cada item do `docs/00-ENUNCIADO.md` foi conferido no código e nos testes. Legenda: ✅ implementado · 🟡 parcial (com motivo) · ❌ faltando.
 
 ## Critérios eliminatórios
 
@@ -11,7 +11,7 @@ Feita em 14/10, com o código do commit `6cfe397` e as mudanças de documentaç�
 | Compra confirmada só com resposta da simulação | ✅ | A confirmação só aparece com `status: confirmed` vindo da API ou do evento (`checkout.spec`, `realtime.spec`). |
 | Sem exposição de dados entre usuários | ✅ | Cache privado por `userId`, purga no logout e na troca de conta, socket por sessão e filtro duplo de `order.updated` (`auth.spec`, `realtime.spec`). |
 | Eventos não simulados direto na UI | ✅ | Os testes mudam só o "servidor" (`__kurioMock`); o evento chega pelo `socket.io-client`. |
-| Testes E2E executáveis | ✅ | `npm run test:e2e`: 152 testes (desktop e mobile), executados duas vezes seguidas sem falha. |
+| Testes E2E executáveis | ✅ | `npm run test:e2e`: 161 testes (desktop e mobile), executados duas vezes seguidas sem falha. Também validados num clone limpo do GitHub. |
 
 ## 1–3. Escopo, stack, telas e fluxos
 
@@ -22,11 +22,11 @@ Feita em 14/10, com o código do commit `6cfe397` e as mudanças de documentaç�
 | Carrinho: quantidades, remoção, cupom e resumo | ✅ | |
 | Pagamento: dados, carteira e rede, revisão e envio | ✅ | |
 | Confirmação: resultado, transação, itens, taxas e total | ✅ | Modal na página do pedido, com recibo em snapshot. |
-| Login e Cadastro: validação, retorno ao fluxo e conflito | ✅ | |
+| Login e Cadastro: validação, retorno ao fluxo e conflito | ✅ | Balão sobre a tela atual no desktop (Figma `9:115`); tela cheia no mobile (`16:1022` e `16:1228`). |
 | Perfil: dados, avatar e senha | ✅ | Figma `9:1238`. |
 | Carteiras: principal e secundária | ✅ | Sem frame extraído; segue o padrão do Perfil e do Pagamento. |
-| Frames desktop | 🟡 | Extraídos: Início, Detalhe, Pagamento e Perfil. Carrinho, Confirmação e Carteiras foram adaptados do padrão dessas telas, por causa do limite de chamadas do Figma (6 por mês). |
-| Frames mobile | 🟡 | Início mobile extraído e implementado. Detalhe, Carrinho, Pagamento, Login e Cadastro mobile foram adaptados (layout responsivo das telas desktop, com tab bar), pelo mesmo limite. |
+| Frames desktop | 🟡 | Seguem o Figma: Início, Detalhe, Pagamento e Perfil (extraídos com o MCP) e o Login (print). Carrinho, Confirmação, Carteiras e o balão de Cadastro não foram vistos (limite de 6 chamadas do Figma por mês) e seguem o padrão das telas extraídas; o Cadastro usa os textos do frame mobile. |
+| Frames mobile | ✅ | Todos os frames mobile do arquivo foram implementados: Início (extraído com o MCP), Detalhe, Carrinho, Pagamento, Login e Cadastro (a partir de prints). Perfil, Carteiras e Confirmação não têm frame mobile e funcionam em mobile, como pede o enunciado. |
 | Perfil, carteiras e confirmação em mobile | ✅ | Verificados na varredura de 390 px e nos E2E mobile. |
 | Fora do escopo sem aparentar sucesso | ✅ | "Em breve" com `aria-disabled` e sem foco; newsletter avisa que não está disponível. |
 | Catálogo: estado na URL, filtros combináveis, paginação reiniciada, vazio, falha e fora de ordem | ✅ | |
@@ -88,7 +88,7 @@ Feita em 14/10, com o código do commit `6cfe397` e as mudanças de documentaç�
 | Alternativas textuais para imagens | ✅ | |
 | Contraste e estados não dependentes só de cor | ✅ | |
 | Feedback acessível de mutations e tempo real | ✅ | Região `aria-live`. |
-| Perda de conteúdo com zoom | 🟡 | Coberto indiretamente: 390 px equivale a ~370% de zoom num monitor de 1440. Não há teste específico de zoom do navegador. |
+| Perda de conteúdo com zoom | ✅ | Teste de zoom de 200% num monitor de 1280 px (janela de 640 × 450 CSS, densidade 2): Início, Detalhe, Carrinho, Pagamento (com a revisão), Perfil e Carteiras sem overflow e com as ações alcançáveis (`responsive.spec.ts`). |
 | Assets locais e substituições documentadas | ✅ | WebP gerado das artes do Figma; fonte local. |
 
 ## 9. Testes
@@ -97,7 +97,7 @@ Feita em 14/10, com o código do commit `6cfe397` e as mudanças de documentaç�
 |---|---|
 | Todos os fluxos listados no enunciado (busca até skeletons/recuperação) | ✅ |
 | Chromium desktop e mobile | ✅ |
-| Regressão visual de início, detalhe, carrinho e pagamento, com baselines versionadas e dados estáveis | ✅ (`npm run test:visual`; baselines do Windows) |
+| Regressão visual de início, detalhe, carrinho e pagamento, com baselines versionadas e dados estáveis | ✅ (`npm run test:visual`: 16 baselines, de página inteira e de primeira tela, desktop e mobile; geradas no Windows) |
 | Estado isolado por teste; relógio, latência e eventos controlados | ✅ |
 | Relatório HTML e traces das falhas | ✅ |
 | REST pelos handlers MSW; tempo real pelo `socket.io-client` | ✅ |

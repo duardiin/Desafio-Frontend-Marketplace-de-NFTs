@@ -57,7 +57,7 @@ lighthouse/        # configuração e relatórios da auditoria (versionados)
 - **Mutations nunca repetem sozinhas:** o pedido depende da chave de idempotência, e a pessoa decide quando tentar de novo.
 - **Catálogo:** a chave tem todos os parâmetros da URL, o `signal` cancela as requisições obsoletas e a lista anterior fica visível (atenuada) enquanto a nova carrega. Respostas fora de ordem não sobrescrevem a tela.
 - **Favoritos:** otimistas, com rollback e aviso. Carrinho e perfil gravam a resposta da API no cache, sem nova requisição.
-- **Gravação do carrinho:** cancela as leituras do carrinho em andamento antes de gravar, para uma leitura antiga não sobrescrever a resposta nova.
+- **Gravação do carrinho:** cancela as leituras do carrinho em andamento antes de gravar, para uma leitura antiga não sobrescrever a resposta nova. Vale também para a mescla do carrinho de visitante no login: a leitura do carrinho da conta, iniciada antes da mescla, não apaga os itens mesclados.
 
 ### Reconciliação REST × Socket.IO
 - **Versão:** o evento só é aplicado se a versão for **maior que a do dado em cache**, item a item (detalhe, listas, favoritos e carrinho). Duplicatas são descartadas pelo `id`. A mesma regra vale para as respostas REST (`structuralSharing` com `src/lib/versioned-cache.ts`): uma resposta antiga em voo não sobrescreve um evento mais novo.

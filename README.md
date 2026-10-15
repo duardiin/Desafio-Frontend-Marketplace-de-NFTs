@@ -114,10 +114,10 @@ Os casos de negócio vêm dos dados e funcionam em qualquer cenário:
 
 ## Testes
 
-- **E2E funcionais** (`npm run test:e2e`, ~150 testes em desktop e mobile), em `tests/e2e/`:
+- **E2E funcionais** (`npm run test:e2e`, 161 testes em desktop e mobile), em `tests/e2e/`:
   - layout, mocks, sessão, catálogo, detalhe e favoritos;
   - carrinho, pagamento, tempo real, perfil, carteiras e Início mobile;
-  - **varredura de overflow** em 14 telas × 390/768/1440 px;
+  - **varredura de overflow** em 14 telas × 390/768/1440 px e **zoom de 200%**;
   - **acessibilidade com axe** (WCAG 2.2 AA, sem tolerar violações).
 
   Os testes de REST passam pelos handlers do MSW, e os de tempo real pelo cliente Socket.IO. Os controles `__kurioMock` só mudam o "servidor" e nunca escrevem no cache do app.
