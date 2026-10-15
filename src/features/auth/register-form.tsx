@@ -7,10 +7,10 @@ import { registerSchema, type RegisterFormValues } from '@/features/auth/schemas
 import { useRegister } from '@/features/auth/use-auth-actions'
 import { applyApiErrors } from '@/lib/form-errors'
 
-/** Cadastro no padrão do login do Figma (frame 9:1022, 656 px: nome, e-mail, senha e confirmação). */
 /**
- * `screen`: cadastro mobile em tela cheia (Figma 16:1228): "Nome de usuário",
- * "Digite seu e-mail", senha e confirmação, e o botão "Criar perfil".
+ * Cadastro com os textos do frame mobile 16:1228 ("Nome de usuário", "Digite seu
+ * e-mail", "Criar perfil"), também no balão desktop (o frame 9:1022 não foi visto).
+ * `screen`: tela cheia no mobile (campos de 50 px e botão de 60 px).
  */
 export function RegisterForm({ onSuccess, variant = 'balloon' }: { onSuccess: () => void; variant?: 'balloon' | 'screen' }) {
   const screen = variant === 'screen'
@@ -35,10 +35,10 @@ export function RegisterForm({ onSuccess, variant = 'balloon' }: { onSuccess: ()
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-3">
       <FormAlert message={errors.root?.server?.message} />
       <InputField
-        label={screen ? 'Nome de usuário' : 'Nome'}
+        label="Nome de usuário"
         srOnlyLabel
         autoComplete="name"
-        placeholder={screen ? 'Nome de usuário' : 'Seu nome'}
+        placeholder="Nome de usuário"
         inputClassName={input}
         error={errors.displayName?.message}
         {...form.register('displayName')}
@@ -48,7 +48,7 @@ export function RegisterForm({ onSuccess, variant = 'balloon' }: { onSuccess: ()
         srOnlyLabel
         type="email"
         autoComplete="email"
-        placeholder={screen ? 'Digite seu e-mail' : 'contato@email.com'}
+        placeholder="Digite seu e-mail"
         inputClassName={input}
         error={errors.email?.message}
         {...form.register('email')}
@@ -76,7 +76,7 @@ export function RegisterForm({ onSuccess, variant = 'balloon' }: { onSuccess: ()
         className={screen ? 'mt-7 h-[60px] w-full rounded-xl text-body-16' : 'mt-3 h-[45px] w-full rounded-[3px]'}
         disabled={isSubmitting}
       >
-        {isSubmitting ? 'Criando conta…' : screen ? 'Criar perfil' : 'Criar conta'}
+        {isSubmitting ? 'Criando perfil…' : 'Criar perfil'}
       </Button>
     </form>
   )
