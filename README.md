@@ -8,6 +8,45 @@ Desafio frontend: marketplace de NFTs em React + TypeScript seguindo o Figma "Gr
 - **Repositório:** https://github.com/duardiin/Desafio-Frontend-Marketplace-de-NFTs
 - **Arquitetura e decisões:** [ARCHITECTURE.md](ARCHITECTURE.md). Contratos REST e eventos: [docs/contratos-api.md](docs/contratos-api.md). Decisões por etapa: `docs/04` a `docs/11`.
 - **Lighthouse:** [lighthouse/RESULTADOS.md](lighthouse/RESULTADOS.md) e [lighthouse/ANALISE.md](lighthouse/ANALISE.md).
+- **Índice de toda a documentação:** [docs/README.md](docs/README.md).
+
+<p align="center">
+  <img src="docs/screenshots/desktop-inicio.png" alt="Início no desktop: hero 'Seja dono do futuro da arte digital', menu e botão Entrar" width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/mobile-inicio.png" alt="Início no mobile: busca, hero, abas e grade de NFTs com tab bar" width="24%">
+  <img src="docs/screenshots/mobile-detalhe.png" alt="Detalhe do NFT no mobile, com edições e botão de compra" width="24%">
+  <img src="docs/screenshots/mobile-carrinho.png" alt="Carrinho no mobile com resumo do pedido fixo" width="24%">
+</p>
+
+<details>
+<summary><strong>Mais telas e o comparativo com o Figma</strong></summary>
+
+| Detalhe do NFT | Pagamento |
+|---|---|
+| ![Detalhe do NFT no desktop: galeria, edições, quantidade e COMPRAR](docs/screenshots/desktop-detalhe.png) | ![Pagamento no desktop: carteira, revisão e resumo do pedido](docs/screenshots/desktop-pagamento.png) |
+
+| Figma (referência) | Implementado (baseline da regressão visual) |
+|---|---|
+| ![Frame do Figma da Início no desktop](docs/figma/desktop-inicio.png) | ![Início implementada no desktop, página inteira](docs/screenshots/desktop-inicio-completa.png) |
+
+Os prints vêm das baselines da regressão visual (`tests/visual/__screenshots__`): banco novo, relógio fixo, 1440 × 900 e 390 × 844.
+
+</details>
+
+## Em números
+
+| | |
+|---|---|
+| **Critérios eliminatórios** | todos atendidos, com a prova de cada um em [COMO-FOI-FEITO.md](COMO-FOI-FEITO.md) |
+| **Testes E2E** | 162 (Playwright, desktop 1440 e mobile 390), todos passando |
+| **Regressão visual** | 16 baselines (8 telas × 2 viewports) |
+| **Acessibilidade** | axe WCAG 2.2 AA sem violações; teclado, foco visível, `aria-live` em mutations e eventos |
+| **Responsividade** | sem overflow horizontal em 14 telas × 390/768/1440 px e com zoom de 200% |
+| **Lighthouse desktop** | Performance ~98, Accessibility, Best Practices e SEO 100 |
+| **Lighthouse mobile** | ~78 (Início) e ~77 (Detalhe) em Performance, demais 100; a causa e os experimentos estão em [ANALISE.md](lighthouse/ANALISE.md) |
+| **Cenários de falha reproduzíveis** | 17, por `?cenario=<nome>` (rede lenta, offline, timeout, 500, pagamento recusado, preço alterado…) |
 
 ## O que tem
 
